@@ -1,0 +1,1 @@
+../../hy/demo/components/uploadFile/index.vue

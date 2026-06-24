@@ -1,0 +1,121 @@
+.hy-layout-form {
+    & .icon-tool_close {
+      cursor: pointer;
+      color: rgba(67,66,93,.3);
+    }
+    
+    & .row {
+      margin-bottom: 25px;
+      
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+    
+    & .arf-row {
+      margin-top: 15px;
+      margin-bottom: 0;
+    }
+    
+    & .title {
+      border-bottom: 1px dashed rgba(67,66,93,.2);
+      font-size: 18px;
+      font-weight: 400;
+      color: rgba(67,66,93,1);
+      padding: 8px 0;
+    }
+    
+    & >>> .el-collapse {
+      border-top: none;
+      
+      & .el-collapse-item__header {
+        background-color: transparent;
+        border-bottom: 1px dashed rgba(67,66,93,.2);
+        font-size: 18px;
+        font-weight: 400;
+        color: rgba(67,66,93,1);
+      }
+      
+      & .el-collapse-item__wrap {
+        background-color: transparent;
+        padding-right: 10px;
+        border-bottom: none;
+      }
+      
+      & .arf-icon {
+        font-size: 18px;
+        color: rgba(67,66,93,.5);
+        cursor: pointer;
+      }
+      
+      & .add-btn {
+        margin-top: 25px;
+      }
+    }
+    
+    & >>> .el-form-item {
+      display: flex;
+      margin: 0;
+      width: 100%;
+      
+      & .el-form-item__label {
+        white-space: nowrap;
+        font-size: 14px;
+        color: rgba(67,66,93,.5);
+      }
+      
+      & .el-form-item__content {
+        flex: 1 1 auto;
+        max-width: 100%;
+        height: auto;
+        
+        & * {
+          font-size: 14px;
+        }
+        
+        & .iconfont {
+          font-size: 18px;
+          color: rgba(67,66,93,.5);
+        }
+        
+        & .el-input__inner,
+        & .el-textarea__inner {
+          background-color: transparent;
+          padding: 0;
+        }
+      }
+      
+      &.line {
+        border-bottom: 1px solid rgba(225,225,229,1);
+        
+        & .el-input__inner,
+        & .el-textarea__inner {
+          border: none;
+        }
+      }
+    }
+    
+    & .handlers {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 30px;
+      
+      /* & .confirm {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+      } */
+      
+      & .btn {
+        width: 200px;
+        
+        & + .btn {
+          margin-left: 30px;
+        }
+      }
+    }
+  }

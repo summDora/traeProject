@@ -1,0 +1,14 @@
+@import '../../styles/var/layout.css';
+.treeBox{
+  width: 330px;
+  & .treeDo{
+  	@apply --flexRow;
+  	margin-bottom: 5px;
+  }
+}
+.treeSlot{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 12px;
+}

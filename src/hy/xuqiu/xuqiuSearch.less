@@ -1,0 +1,52 @@
+/* xuqiu 模块 hyProjectForm 查询区对齐样式 */
+.hy-new-search-box {
+  /deep/ .hy_project_form.el-form--inline {
+    align-items: flex-start;
+
+    .el-form-item:not(.search_box):not(.other_btn_box) {
+      flex: 0 0 320px;
+      max-width: 320px;
+      margin-right: 10px;
+      margin-bottom: 8px;
+      vertical-align: top;
+    }
+
+    .el-form-item__content {
+      line-height: 32px;
+    }
+
+    .hy_project_form_input.normal,
+    .hy_project_form_select.el-select,
+    .hy_project_form_date {
+      width: 320px;
+    }
+  }
+}
+
+/* 列表页工具栏，与 demo / 需求收口主页面一致 */
+.toolbar-wrap {
+  border: 1px solid rgba(34, 39, 52, 0.15);
+  border-top: none;
+  background: transparent linear-gradient(0deg, #fff 0%, #f2f3f6 100%) 0% 0% no-repeat padding-box;
+
+  /deep/ .new-buttons,
+  /deep/ .fusionButtons {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+}
+
+/* 子页面区块标题，与需求收口等子页一致 */
+.xuqiu-section-title {
+  background: #e6f3f1;
+  padding: 8px 12px;
+  margin: 16px 0 8px;
+  font-weight: bold;
+}
+
+.xuqiu-footer-actions {
+  margin-top: 24px;
+  text-align: right;
+}

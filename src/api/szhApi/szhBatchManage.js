@@ -1,0 +1,7 @@
+import { createMockFn } from '../mockFactory.js';
+
+export const getRelationalProjectList = createMockFn([{"projectName":"示例项目A","projectCode":"P2024001","batchName":"2024年第一批次","demandCode":"XQ001","createByName":"张三","sbsj":"2024-06-01"}]);
+export const deleteRelationalProject = createMockFn([]);
+export const getProjectData = createMockFn([]);
+export const getBatchListOption = createMockFn([]);
+export const saveRelationalProject = createMockFn([]);

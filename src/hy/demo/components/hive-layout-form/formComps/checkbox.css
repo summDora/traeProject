@@ -1,0 +1,33 @@
+.hy-checkbox-group,
+.hy-checkbox {
+  &>>>.el-checkbox__inner {
+    width: 24px;
+    height: 24px;
+    /* border: 3px solid var(--primary-color-4); */
+
+    &::after {
+      border: 3px solid #FFF;
+      border-top: 0;
+      border-left: 0;
+      width: 8px;
+      height: 15px;
+      top: -2px;
+      left: 4px;
+    }
+  }
+
+  &>>>.el-checkbox__input.is-checked,
+  &>>>.el-checkbox__input.is-indeterminate {
+    & .el-checkbox__inner {
+      /* background-color: var(--primary-color); */
+
+      &::before {
+        top: 8px;
+      }
+    }
+
+    &+.el-checkbox__label {
+      color: rgba(67,66,93,1);
+    }
+  }
+}

@@ -1,0 +1,1 @@
+../../hy/demo/components/viewMaterial/index.vue

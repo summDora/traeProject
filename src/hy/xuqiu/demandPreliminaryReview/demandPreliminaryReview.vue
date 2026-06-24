@@ -1,0 +1,101 @@
+<template>
+  <section>
+    <preliminary-review-list
+      v-if="activeView === 'main'"
+      :show-back="false"
+      page-title="需求初审"
+      @review="goReview"
+      @detail="goDetail"
+      @batch-review="goBatchReview"
+      @go-classify-list="goClassifyList"
+    />
+
+    <preliminary-review-list
+      v-else-if="activeView === 'classifyList'"
+      :key="'classify-list'"
+      :show-back="true"
+      page-title="初审列表"
+      @back="handleBackToMain"
+      @review="goReview"
+      @detail="goDetail"
+      @batch-review="goBatchReview"
+    />
+
+    <preliminary-review-process
+      v-else-if="activeView === 'review'"
+      :key="`review-${pageContext.demandId}`"
+      :demand-id="pageContext.demandId"
+      :readonly="pageContext.readonly"
+      @back="handleBackFromReview"
+      @saved="handleReviewSaved"
+    />
+  </section>
+</template>
+
+<script>
+import preliminaryReviewList from './preliminaryReviewList.vue';
+import preliminaryReviewProcess from './preliminaryReviewProcess.vue';
+
+export default {
+  name: 'demandPreliminaryReview',
+
+  components: {
+    preliminaryReviewList,
+    preliminaryReviewProcess
+  },
+
+  data() {
+    return {
+      activeView: 'main',
+      pageContext: {}
+    };
+  },
+
+  methods: {
+    goClassifyList() {
+      this.activeView = 'classifyList';
+    },
+
+    goReview(row) {
+      this.pageContext = {
+        demandId: row.id,
+        readonly: false,
+        fromView: this.activeView
+      };
+      this.activeView = 'review';
+    },
+
+    goDetail(row) {
+      this.pageContext = {
+        demandId: row.id,
+        readonly: true,
+        fromView: this.activeView
+      };
+      this.activeView = 'review';
+    },
+
+    goBatchReview(rows) {
+      if (rows.length === 1) {
+        this.goReview(rows[0]);
+        return;
+      }
+      this.$message.info(`已选中 ${rows.length} 条待初审需求，请逐条确认结论后提交（模拟批量入口）`);
+      this.goReview(rows[0]);
+    },
+
+    handleBackToMain() {
+      this.activeView = 'main';
+      this.pageContext = {};
+    },
+
+    handleBackFromReview() {
+      this.activeView = this.pageContext.fromView || 'main';
+      this.pageContext = {};
+    },
+
+    handleReviewSaved() {
+      this.handleBackFromReview();
+    }
+  }
+};
+</script>

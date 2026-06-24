@@ -1,0 +1,28 @@
+<template>
+  <el-checkbox v-model="model[prop]" v-bind="bindProps" v-on="events" class="hy-checkbox">{{ text }}</el-checkbox>
+</template>
+
+<script>
+import mixin from '../mixin';
+
+export default {
+  name: 'HyCheckbox',
+  mixins: [mixin],
+  props: {
+    text: String,
+    trueLabel: {
+      type: [String, Number]
+    },
+    falseLabel: {
+      type: [String, Number]
+    }
+  },
+  created() {
+    if (this.model[this.prop] == null) this.$set(this.model, this.prop, this.falseLabel);
+  }
+};
+</script>
+
+<style scoped lang="scss">
+@import '../checkbox.css';
+</style>
