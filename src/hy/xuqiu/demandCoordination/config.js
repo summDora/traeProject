@@ -1,5 +1,5 @@
 import { batchOptions } from './mockData.js';
-import { createInputField, createSelectField } from '../utils/formField.js';
+import { createInputField, createSelectField } from '@/utils/formField.js';
 
 const getPlanYears = () => {
   const yearMax = new Date().getFullYear();

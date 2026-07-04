@@ -12,7 +12,7 @@ import {
   statMetricColumns,
   dimensionLabels
 } from './mockData.js';
-import { createInputField, createSelectField } from '../utils/formField.js';
+import { createInputField, createSelectField } from '@/utils/formField.js';
 
 const getStatYears = () => {
   const yearMax = new Date().getFullYear();

@@ -17,9 +17,6 @@
           @onReset="onReset"
         />
       </div>
-      <div class="search-advanced-link">
-        <el-button type="text" @click="onAdvancedSearch">高级查询 →</el-button>
-      </div>
     </div>
 
     <div class="total-content_table-content-info hy-table_content" :style="{ height: tableHeight }">
@@ -148,10 +145,6 @@ export default {
       this.loadTableData();
     },
 
-    onAdvancedSearch() {
-      this.$message.info('高级查询功能开发中（模拟）');
-    },
-
     handleSelectionChange(val) {
       this.selectData = val;
     },
@@ -198,16 +191,7 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
-.search-advanced-link {
-  padding: 0 10px 8px;
-  text-align: right;
-  margin-top: -4px;
-}
 .status-closed {
   color: #67c23a;
 }

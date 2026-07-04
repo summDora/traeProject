@@ -1,5 +1,5 @@
 import { closingStatusOptions, unitOptions } from './mockData.js';
-import { createInputField, createSelectField } from '../utils/formField.js';
+import { createInputField, createSelectField } from '@/utils/formField.js';
 
 const yesNoOptions = [
   { key: '', value: '全部' },

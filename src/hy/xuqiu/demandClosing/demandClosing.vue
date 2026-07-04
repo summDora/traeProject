@@ -305,10 +305,6 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
 .status-pending {
   color: #f56c6c;

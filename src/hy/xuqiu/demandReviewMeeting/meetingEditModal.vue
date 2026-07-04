@@ -9,6 +9,8 @@
     :ifSure="false"
     :ifCancle="false"
     width="1180px"
+    :append-to-body="true"
+    :modal-append-to-body="true"
     @closeHandle="handleClose"
   >
     <div class="meeting-edit-body">
@@ -18,13 +20,22 @@
           :formConfig="displayFormConfig"
           :formData="formData"
           :rules="meetingFormRules"
-          :ifInLine="true"
+          :ifInLine="false"
           :ifSearch2="false"
-          label-width="120px"
+          label-position="right"
+          label-width="130px"
         />
       </div>
 
-      <div class="xuqiu-section-title">评审列表</div>
+      <div
+        ref="reviewListSection"
+        class="review-list-section"
+        :class="{ 'is-error': reviewListError }"
+      >
+        <div class="review-list-header">
+          <div class="xuqiu-section-title">评审列表</div>
+          <div v-if="reviewListError" class="review-list-error">{{ reviewListError }}</div>
+        </div>
       <div class="review-search">
         <div class="hy-new-search-box">
           <hyProjectForm
@@ -58,20 +69,21 @@
           </template>
         </newTable>
       </div>
+      </div>
     </div>
 
     <template slot="footer">
       <el-button @click="handleClose">取消</el-button>
       <el-button type="primary" @click="handleConfirm">确认</el-button>
     </template>
-  </hyNewModal>
 
-  <add-review-demand-modal
-    :visible="addDemandVisible"
-    :exclude-ids="existingDemandIds"
-    @confirm="handleAddDemandConfirm"
-    @close="addDemandVisible = false"
-  />
+    <add-review-demand-modal
+      :visible="addDemandVisible"
+      :exclude-ids="existingDemandIds"
+      @confirm="handleAddDemandConfirm"
+      @close="addDemandVisible = false"
+    />
+  </hyNewModal>
   </div>
 </template>
 
@@ -125,7 +137,8 @@ export default {
       reviewDemandList: [],
       reviewSelectData: [],
       candidateDemands: [],
-      addDemandVisible: false
+      addDemandVisible: false,
+      reviewListError: ''
     };
   },
 
@@ -176,11 +189,13 @@ export default {
             remark: detail.remark
           };
           this.reviewDemandList = detail.reviewDemands.slice();
+          this.reviewListError = '';
           return;
         }
       }
       this.formData = this.m_copy(meetingFormData);
       this.reviewDemandList = [];
+      this.reviewListError = '';
     },
 
     loadCandidateDemands() {
@@ -217,6 +232,9 @@ export default {
         const ids = this.reviewSelectData.map((item) => item.id);
         this.reviewDemandList = this.reviewDemandList.filter((item) => !ids.includes(item.id));
         this.reviewSelectData = [];
+        if (!this.reviewDemandList.length) {
+          this.reviewListError = '请至少添加一条评审需求';
+        }
         return;
       }
       this.$message.success(`${text}操作成功（模拟）`);
@@ -224,6 +242,7 @@ export default {
 
     handleAddDemandConfirm(rows) {
       this.reviewDemandList.push(...rows);
+      this.reviewListError = '';
       this.$message.success(`已新增 ${rows.length} 条评审需求`);
     },
 
@@ -241,18 +260,43 @@ export default {
         return;
       }
       this.reviewDemandList.push(...toAdd.map((item) => ({ ...item })));
+      this.reviewListError = '';
       this.$message.success(`已按标签新增 ${toAdd.length} 条评审需求`);
     },
 
     removeReviewDemand(row) {
       this.reviewDemandList = this.reviewDemandList.filter((item) => item.id !== row.id);
+      if (this.reviewDemandList.length) {
+        this.reviewListError = '';
+      } else {
+        this.reviewListError = '请至少添加一条评审需求';
+      }
+    },
+
+    validateReviewList() {
+      if (this.reviewDemandList.length) {
+        this.reviewListError = '';
+        return true;
+      }
+      this.reviewListError = '请至少添加一条评审需求';
+      return false;
     },
 
     handleConfirm() {
-      this.$refs.meetingForm.validate((valid) => {
-        if (!valid) return;
-        if (!this.reviewDemandList.length) {
-          this.$message.warning('请至少添加一条评审需求');
+      const listValid = this.validateReviewList();
+      const formRef = this.$refs.meetingForm && this.$refs.meetingForm.$refs.form;
+      if (!formRef) return;
+
+      formRef.validate((formValid) => {
+        if (!formValid || !listValid) {
+          if (!listValid) {
+            this.$nextTick(() => {
+              const section = this.$refs.reviewListSection;
+              if (section && section.scrollIntoView) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              }
+            });
+          }
           return;
         }
         if (this.formData.groupingType === '分组' && !this.formData.groupNames.length) {
@@ -275,10 +319,6 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
 .meeting-edit-body {
   max-height: 70vh;
@@ -286,6 +326,29 @@ export default {
 }
 .form-section {
   padding: 0 4px 8px;
+}
+.form-section >>> .el-form-item__label {
+  white-space: nowrap;
+}
+.form-section >>> .el-form-item__content {
+  line-height: 32px;
+}
+.review-list-section.is-error .xuqiu-section-title {
+  color: #f56c6c;
+}
+.review-list-header .xuqiu-section-title {
+  margin-bottom: 0;
+}
+.review-list-error {
+  color: #f56c6c;
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 4px 12px 8px;
+}
+.review-list-section.is-error {
+  border: 1px solid #fbc4c4;
+  border-radius: 4px;
+  background: #fef0f0;
 }
 .review-table-wrap {
   padding: 0 4px 8px;

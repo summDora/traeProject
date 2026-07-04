@@ -4,7 +4,7 @@ import {
   preliminaryStatusOptions,
   unitOptions
 } from './mockData.js';
-import { createInputField, createSelectField } from '../utils/formField.js';
+import { createInputField, createSelectField } from '@/utils/formField.js';
 
 const getPlanYears = () => {
   const yearMax = new Date().getFullYear();
@@ -113,9 +113,37 @@ const listTableColumn = [
     label: '操作',
     isSlot: true,
     slotName: 'operation',
-    baseWidth: 200,
+    baseWidth: 260,
     fixed: 'right'
   }
+];
+
+const level1SelectSearchConfig = [
+  createInputField('keyword', '关键字', '系统/子系统/一级功能名称')
+];
+
+const level1SelectSearchData = {
+  keyword: ''
+};
+
+const level1SelectTableColumn = [
+  { key: 'systemName', label: '系统名称', width: 240 },
+  { key: 'subsystemName', label: '子系统/微应用', width: 160 },
+  { key: 'level1Name', label: '一级功能名称', width: 160 },
+  { key: 'level1Desc', label: '一级功能描述', width: 220 }
+];
+
+const level2SelectSearchConfig = [
+  createInputField('keyword', '关键字', '二级功能名称/描述')
+];
+
+const level2SelectSearchData = {
+  keyword: ''
+};
+
+const level2SelectTableColumn = [
+  { key: 'level2Name', label: '二级功能', width: 180 },
+  { key: 'descBefore', label: '二级功能描述（建设前）', width: 320 }
 ];
 
 const mainButtonsConfig = [
@@ -173,5 +201,11 @@ export {
   mainButtonsConfig,
   classifyButtonsConfig,
   reviewFormConfig,
-  reviewFormData
+  reviewFormData,
+  level1SelectSearchConfig,
+  level1SelectSearchData,
+  level1SelectTableColumn,
+  level2SelectSearchConfig,
+  level2SelectSearchData,
+  level2SelectTableColumn
 };

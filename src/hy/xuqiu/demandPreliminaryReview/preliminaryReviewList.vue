@@ -59,6 +59,7 @@
           </span>
         </template>
         <template slot="operation" slot-scope="{ data }">
+          <el-button type="text" @click.stop="goBlueprint(data)">蓝图</el-button>
           <el-button
             v-if="isPendingReview(data)"
             type="text"
@@ -282,6 +283,10 @@ export default {
       this.$emit('detail', row);
     },
 
+    goBlueprint(row) {
+      this.$emit('blueprint', row);
+    },
+
     viewReport(row) {
       this.currentDemandId = row.id;
       this.reportVisible = true;
@@ -297,10 +302,6 @@ export default {
   }
 };
 </script>
-
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
 
 <style scoped>
 .status-pending {

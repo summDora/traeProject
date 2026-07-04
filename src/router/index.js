@@ -161,6 +161,24 @@ const router = new VueRouter({
       meta: { title: '专家评审安排' }
     },
     {
+      path: '/demo/xuqiu/reviewSummary',
+      name: 'ReviewSummary',
+      component: () => import('../hy/xuqiu/reviewSummary/reviewSummary.vue'),
+      meta: { title: '评审汇总' }
+    },
+    {
+      path: '/demo/xuqiu/demandTagLibrary',
+      name: 'DemandTagLibrary',
+      component: () => import('../hy/xuqiu/demandTagLibrary/demandTagLibrary.vue'),
+      meta: { title: '需求标签库' }
+    },
+    {
+      path: '/demo/xuqiu/demandTemplateManagement',
+      name: 'DemandTemplateManagement',
+      component: () => import('../hy/xuqiu/demandTemplateManagement/demandTemplateManagement.vue'),
+      meta: { title: '需求模板管理' }
+    },
+    {
       path: '*',
       redirect: '/'
     }
@@ -214,6 +232,9 @@ export const navMenus = [
       { path: "/demo/xuqiu/demandDeclaration", title: "需求申报" },
       { path: "/demo/xuqiu/demandReviewMeeting", title: "需求评审会议安排" },
       { path: "/demo/xuqiu/expertReviewArrangement", title: "专家评审安排" },
+      { path: "/demo/xuqiu/reviewSummary", title: "评审汇总" },
+      { path: "/demo/xuqiu/demandTagLibrary", title: "需求标签库" },
+      { path: "/demo/xuqiu/demandTemplateManagement", title: "需求模板管理" },
     ],
   },
 ];

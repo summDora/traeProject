@@ -197,10 +197,6 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
 .assign-body {
   display: flex;

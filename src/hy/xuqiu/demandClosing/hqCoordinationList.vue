@@ -165,10 +165,6 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
 .danger-btn {
   color: #f56c6c;

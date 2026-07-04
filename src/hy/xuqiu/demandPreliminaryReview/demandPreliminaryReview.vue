@@ -8,6 +8,7 @@
       @detail="goDetail"
       @batch-review="goBatchReview"
       @go-classify-list="goClassifyList"
+      @blueprint="goBlueprint"
     />
 
     <preliminary-review-list
@@ -19,6 +20,7 @@
       @review="goReview"
       @detail="goDetail"
       @batch-review="goBatchReview"
+      @blueprint="goBlueprint"
     />
 
     <preliminary-review-process
@@ -29,19 +31,29 @@
       @back="handleBackFromReview"
       @saved="handleReviewSaved"
     />
+
+    <blueprint-manage
+      v-else-if="activeView === 'blueprint'"
+      :key="`blueprint-${pageContext.demandId}`"
+      :demand-id="pageContext.demandId"
+      @back="handleBackFromBlueprint"
+      @saved="handleBlueprintSaved"
+    />
   </section>
 </template>
 
 <script>
 import preliminaryReviewList from './preliminaryReviewList.vue';
 import preliminaryReviewProcess from './preliminaryReviewProcess.vue';
+import blueprintManage from './blueprintManage.vue';
 
 export default {
   name: 'demandPreliminaryReview',
 
   components: {
     preliminaryReviewList,
-    preliminaryReviewProcess
+    preliminaryReviewProcess,
+    blueprintManage
   },
 
   data() {
@@ -74,6 +86,14 @@ export default {
       this.activeView = 'review';
     },
 
+    goBlueprint(row) {
+      this.pageContext = {
+        demandId: row.id,
+        fromView: this.activeView
+      };
+      this.activeView = 'blueprint';
+    },
+
     goBatchReview(rows) {
       if (rows.length === 1) {
         this.goReview(rows[0]);
@@ -95,6 +115,15 @@ export default {
 
     handleReviewSaved() {
       this.handleBackFromReview();
+    },
+
+    handleBackFromBlueprint() {
+      this.activeView = this.pageContext.fromView || 'main';
+      this.pageContext = {};
+    },
+
+    handleBlueprintSaved() {
+      this.handleBackFromBlueprint();
     }
   }
 };

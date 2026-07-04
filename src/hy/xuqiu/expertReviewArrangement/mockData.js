@@ -182,23 +182,6 @@ function withdrawReviewOpinion(recordId, source = []) {
   return { success: true };
 }
 
-const systemNameOptions = [
-  { key: '', value: '全部' },
-  { key: '能源互联网营销服务系统', value: '能源互联网营销服务系统' }
-];
-
-const microAppOptions = [
-  { key: '', value: '全部' },
-  { key: '95598客户服务', value: '95598客户服务' },
-  { key: '电网接入', value: '电网接入' }
-];
-
-const level1FunctionOptions = [
-  { key: '', value: '全部' },
-  { key: '客户诉求处理', value: '客户诉求处理' },
-  { key: '业扩报装', value: '业扩报装' }
-];
-
 function getCentralizedReviewDetail(demandId, batchContext = {}) {
   const demand = allDemandList.find((item) => item.id === demandId) || {};
   const batch = allBatchList.find((item) => item.batchCode === demand.batchCode)
@@ -207,35 +190,124 @@ function getCentralizedReviewDetail(demandId, batchContext = {}) {
 
   return {
     demandId: demand.id || demandId,
-    demandCode: demand.demandCode || 'XX2024KFSS017',
+    demandCode: demand.demandCode || 'XX2025KFSS072',
     demandName: demand.demandName || '党建引领综合管理平台应用场景建设项目',
     batchName: batch.batchName || '2024综合计划数字化第一批次',
     batchTitle: batch.batchTitle || '',
-    demandSource: '需求申报',
+    demandSource: '需求来源xxxxxxxxxxx',
     demandPriority: '一般',
-    professionalCategory: '数字化',
-    businessDepartment: demand.manageDepartment || '数字化部',
-    majorCategory: '建设类',
-    minorCategory: '应用建设',
-    currentIssues: '现有系统功能分散，数据共享能力不足，难以支撑业务协同。',
-    mainWork: '建设统一管理平台，整合现有应用，实现数据互通与业务联动。',
-    expectedResults: '提升管理效率，降低运维成本，支撑数字化转型目标。',
-    demandBasis: '根据国家电网公司数字化转型相关要求编制。',
-    businessPoints: '1. 统一门户入口；2. 数据汇聚展示；3. 业务流程在线办理。',
-    businessStatus: '目前以线下流程为主，信息化支撑不足。',
-    feasibility: '技术方案成熟，实施风险可控。',
-    applicationScope: '省公司及下属单位相关业务部门。',
-    implementationDesc: '本期完成核心功能开发与试点上线。',
-    previousProjectCode: '—',
-    previousProjectName: '—',
-    costFee: demand.estimatedCost || '120.00',
-    capitalFee: '0.00',
-    teamUnit: demand.demandUnit || '数字化部',
-    submitter: '张磊',
+    professionalCategory: '开发实施类',
+    businessDepartment: '党建部',
+    majorCategory: '党建',
+    minorCategory: '党员教育',
+    currentIssues: '目前xxxxxxxxxxxxxxxxxx尚不完善，xxxxxxxxxxxxxx功能逻辑不够通顺。',
+    mainWork: '在哪个系统上开展哪些功能完善或数据治理。',
+    expectedResults: '成效：可量化可验收的业务成效，与"目前存在的问题"和"本期主要开展工作"能够呼应，不应为过于空洞的成效，也不追求高大上的成效（300字以内）。示例：通过该项目的实施，实现变电专业工作票、输电专业工作票、配电专业工作票、营销工作票、信息通信工作票等29个票种全业务流程贯通，满足国安监要求，提升现场人员数票实用效率，基于电网一张图提升变电一票智能化水平。',
+    demandBasis: '填写需求依据，可填写相关文件、单位等，支持多行输入。',
+    businessPoints: '分点描述业务需求，示例：1.新建电费结算系统；2.完善客户档案管理；3.优化业扩报装流程。',
+    businessStatus: '描述需求业务现状，说明当前业务开展方式及存在不足。',
+    feasibility: '描述建设可行性，包括技术路线、资源保障及风险分析等内容。',
+    applicationScope: '描述实施范围，如省公司本部、11家地市供电公司及相关直属单位。',
+    implementationDesc: '描述项目实施功能，这是一个实施功能的描述。',
+    previousProjectCode: 'B311HZ123456',
+    previousProjectName: '这是项目名称xxx',
+    costFee: '233',
+    capitalFee: '333',
+    teamUnit: '国网浙江信通公司',
+    submitter: 'xxx',
+    undertakeUnit: '国网浙江信通公司',
+    undertakeLeader: 'xxx',
+    teamMembers: 'xxxxxxxxxxxxxxxxx',
     blueprintName: '营销业务蓝图 V2.0',
     baselineName: '标准功能基线库-营销域',
-    duplicateResult: demand.duplicateResult || '9.47%',
-    relevanceLevel: demand.relevanceLevel || '中',
+    duplicateCompare: {
+      top1Rate: '38%',
+      top2Rate: '34%',
+      groups: [
+        {
+          name: '重复需求',
+          rows: [
+            {
+              field: '申报编号',
+              current: 'XX2025KFSS072',
+              top1: 'XX2025KFSS068',
+              top2: 'XX2025KFSS061',
+              currentLink: true,
+              top1Link: true,
+              top2Link: true
+            },
+            {
+              field: '需求名称',
+              current: '党建引领综合管理平台应用场景建设项目',
+              top1: 'xxxxxxxxxxxx需求',
+              top2: 'xxxxxxxxxxxx需求'
+            },
+            {
+              field: '本期主要开展工作',
+              current: '在哪个系统上开展哪些功能完善或数据治理。',
+              top1: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+              top2: 'xxxxxxxxxxxxxxxxxxxxxxxx'
+            },
+            {
+              field: '预期目标',
+              current: '提升管理效率，降低运维成本，支撑数字化转型目标。',
+              top1: 'xxxxxxxxxxxxxxxxxxxxxxxx',
+              top2: 'xxxxxxxxxxxxxxxxxxxxxxxx'
+            },
+            {
+              field: '批次编号',
+              current: 'PC2026002',
+              top1: 'PC2026002',
+              top2: 'PC2026001'
+            },
+            {
+              field: '批次名称',
+              current: '2026年综合计划数字化项目需求申报批次',
+              top1: '2026年综合计划数字化项目需求申报批次',
+              top2: '2026年综合计划数字化项目需求申报批次'
+            }
+          ]
+        },
+        {
+          name: '重复可研',
+          rows: [
+            {
+              field: '可研编号',
+              current: '',
+              top1: 'ZKY2024013',
+              top2: 'ZKY2024008',
+              top1Link: true,
+              top2Link: true
+            },
+            {
+              field: '项目名称',
+              current: '',
+              top1: '可研名称1',
+              top2: '可研名称2'
+            },
+            { field: '关联可研状态', current: '', top1: '', top2: '' },
+            { field: '本期主要开展工作', current: '', top1: '', top2: '' },
+            { field: '预期目标', current: '', top1: '', top2: '' },
+            { field: '项目状态', current: '', top1: '', top2: '' },
+            { field: '备注', current: '', top1: '', top2: '' },
+            { field: '批次编号', current: '', top1: '', top2: '' },
+            { field: '批次名称', current: '', top1: '', top2: '' }
+          ]
+        }
+      ]
+    },
+    relevanceReview: {
+      level: '极高',
+      projectCode: 'B311AA129878432',
+      projectName: '党建引领综合管理平台应用场景建设项目',
+      previousProjectCode: 'B311AB187298302',
+      previousProjectName: 'xxxxxxxxxxxxxxxxxxxx项目',
+      mainArguments: '新建项目名称、建设主题与候选项目完全一致，均聚焦基础设施安全感知与风险预警能力建设。',
+      contentSimilarity: '两者核心目标均为提升安全管理水平，均提出利用人工智能开展违章识别与风险管控。',
+      systemOverlap: '均基于同一基础设施安全感知平台，整合物联网、视频与人工智能技术。',
+      teamOverlap: '需求提出单位均为建设部，提出人虽不同（秦申峰与陈哲），但团队及业务类别重叠度较高。',
+      functionSimilarity: '风险预警、感知接入等功能高度重合，新建项目在此基础上深化人工智能与无人机联动应用。'
+    },
     businessSystemStatus: '所属业务系统运行稳定，具备接入条件。',
     previousProjectStatus: '前期无关联在建项目。',
     baselineTree: [
@@ -271,13 +343,60 @@ function submitCentralizedReview(demandId, payload = {}) {
   return { success: true, opinion: payload.opinion || '' };
 }
 
+const materialCategories = ['需求文档', '需求提出依据', '佐证材料'];
+
+function getDemandMaterials(demandId, demandCode = '') {
+  const demand = allDemandList.find((item) => item.id === demandId);
+  const code = demandCode || (demand && demand.demandCode) || 'XX2026ZHJH1233';
+  const baseDate = '2026-06-10 15:13:13';
+
+  return materialCategories.map((category, index) => ({
+    id: `${demandId || 'material'}-${index}`,
+    category,
+    fileName: `${category}- ${code}.docx`,
+    updateTime: index === 0 ? baseDate : '2026-06-24 15:13:13'
+  }));
+}
+
+function getPreReviewOpinions(demandId) {
+  const demand = allDemandList.find((item) => item.id === demandId) || {};
+  const idx = Number(String(demandId).replace(/\D/g, '')) || 1;
+  const isReject = idx % 5 === 0;
+
+  return {
+    demandCode: demand.demandCode || 'XX2025KFSS072',
+    demandName: demand.demandName || '党建引领综合管理平台应用场景建设项目',
+    preliminary: {
+      cover: isReject ? '不符合' : '符合',
+      template: isReject ? '错误' : '正确',
+      content: isReject ? '不符合' : '符合',
+      opinionDesc: isReject
+        ? '申报材料封面信息不完整，文档模板使用错误，请按规范修改后重新提报。'
+        : '该需求符合要求，xxxxxxxxxxxxxxxxxx。'
+    },
+    professionalList: [
+      {
+        reviewer: '审查人1',
+        opinion: '同意',
+        priority: '1',
+        opinionDesc: '该需求建设需求强烈，功能逻辑清晰，将极大提升工作效率，同意提交专家评审。'
+      },
+      {
+        reviewer: '审查人1',
+        opinion: idx % 4 === 0 ? '不同意' : '同意',
+        priority: idx % 4 === 0 ? '-' : '2',
+        opinionDesc: idx % 4 === 0
+          ? '该需求无建设必要，建议退回修改。'
+          : '经专业审查，需求建设内容合理，技术路线可行，同意提交专家评审。'
+      }
+    ]
+  };
+}
+
 export {
   demandStatusOptions,
   investmentChannelOptions,
   professionalTypeOptions,
-  systemNameOptions,
-  microAppOptions,
-  level1FunctionOptions,
   allBatchList,
   allDemandList,
   filterBatchList,
@@ -287,5 +406,7 @@ export {
   withdrawReviewOpinion,
   getCentralizedReviewDetail,
   submitCentralizedReview,
+  getDemandMaterials,
+  getPreReviewOpinions,
   paginateList
 };

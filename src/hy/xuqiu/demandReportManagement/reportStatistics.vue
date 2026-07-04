@@ -226,10 +226,6 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
 .dimension-tabs {
   display: flex;

@@ -65,13 +65,11 @@
               @onReset="onDemandReset"
             />
           </div>
-          <div class="search-advanced-link">
-            <el-button type="text" @click="onAdvancedSearch">高级查询 →</el-button>
-          </div>
-          <div class="toolbar-wrap">
+          <div class="total-content_table-content-message">
             <hyNewButtons
               :buttonsData="toolbarButtonsConfig"
               @selectButtons="selectButtons"
+              style="padding: 10px"
             />
           </div>
         </div>
@@ -99,8 +97,8 @@
               <span :class="relevanceClass(data.relevanceLevel)">{{ data.relevanceLevel }}</span>
             </template>
             <template slot="operation" slot-scope="{ data }">
-              <el-button type="text" @click.stop="openExpertAssign(data)">专家指派</el-button>
-              <el-button type="text" @click.stop="openExpertView(data)">专家查看</el-button>
+              <el-button type="text" @click.stop="openViewMaterial(data)">材料查看</el-button>
+              <el-button type="text" @click.stop="openPreReviewOpinion(data)">评审前意见</el-button>
             </template>
           </newTable>
           <div class="hy_two_pageBox">
@@ -118,16 +116,17 @@
       </div>
     </div>
 
-    <expert-assign-modal
-      :visible="expertAssignVisible"
-      :meeting-id="currentDemandId"
-      @close="expertAssignVisible = false"
+    <view-material-modal
+      :visible="viewMaterialVisible"
+      :demand-id="currentDemandId"
+      :demand-code="currentDemandCode"
+      @close="viewMaterialVisible = false"
     />
 
-    <expert-view-modal
-      :visible="expertViewVisible"
-      :meeting-id="currentDemandId"
-      @close="expertViewVisible = false"
+    <pre-review-opinion-modal
+      :visible="preReviewOpinionVisible"
+      :demand-id="currentDemandId"
+      @close="preReviewOpinionVisible = false"
     />
     </template>
 
@@ -137,13 +136,22 @@
       :batch-context="selectedBatch"
       @back="handleBackToList"
     />
+
+    <centralized-review
+      v-else-if="activeView === 'centralizedReview'"
+      :demand-id="reviewDemandId"
+      :batch-context="selectedBatch"
+      @back="handleBackToList"
+      @saved="handleReviewSaved"
+    />
   </section>
 </template>
 
 <script>
-import expertAssignModal from '../demandReviewMeeting/expertAssignModal.vue';
-import expertViewModal from '../demandReviewMeeting/expertViewModal.vue';
+import viewMaterialModal from './viewMaterialModal.vue';
+import preReviewOpinionModal from './preReviewOpinionModal.vue';
 import reviewRecordList from './reviewRecordList.vue';
+import centralizedReview from './centralizedReview.vue';
 import {
   batchSearchConfig,
   batchSearchData,
@@ -163,15 +171,17 @@ export default {
   name: 'expertReviewArrangement',
 
   components: {
-    expertAssignModal,
-    expertViewModal,
-    reviewRecordList
+    viewMaterialModal,
+    preReviewOpinionModal,
+    reviewRecordList,
+    centralizedReview
   },
 
   data() {
     return {
       activeView: 'list',
       reviewRecordContext: [],
+      reviewDemandId: '',
       batchSearchConfig,
       batchSearchObj: this.m_copy(batchSearchData),
       batchTableColumn,
@@ -186,9 +196,10 @@ export default {
       demandSelectData: [],
       selectedBatch: {},
       selectedBatchId: '',
-      expertAssignVisible: false,
-      expertViewVisible: false,
+      viewMaterialVisible: false,
+      preReviewOpinionVisible: false,
       currentDemandId: '',
+      currentDemandCode: '',
       containerHeight: 600,
       topPanelHeight: 260,
       dragging: false,
@@ -335,10 +346,6 @@ export default {
       this.loadDemandData();
     },
 
-    onAdvancedSearch() {
-      this.$message.info('高级查询功能开发中（模拟）');
-    },
-
     handleDemandSelectionChange(val) {
       this.demandSelectData = val;
     },
@@ -393,35 +400,38 @@ export default {
     },
 
     goReview(row) {
-      this.$message.info(`进入「${row.demandName}」评审页面（模拟）`);
+      this.reviewDemandId = row.id;
+      this.activeView = 'centralizedReview';
     },
 
-    openExpertAssign(row) {
+    openViewMaterial(row) {
       this.currentDemandId = row.id;
-      this.expertAssignVisible = true;
+      this.currentDemandCode = row.demandCode || '';
+      this.viewMaterialVisible = true;
     },
 
-    openExpertView(row) {
+    openPreReviewOpinion(row) {
       this.currentDemandId = row.id;
-      this.expertViewVisible = true;
+      this.preReviewOpinionVisible = true;
     },
 
     handleBackToList() {
       this.activeView = 'list';
       this.reviewRecordContext = [];
+      this.reviewDemandId = '';
       this.$nextTick(() => {
         this.calcContainerHeight();
         this.loadBatchData();
         this.loadDemandData();
       });
+    },
+
+    handleReviewSaved() {
+      this.handleBackToList();
     }
   }
 };
 </script>
-
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
 
 <style scoped>
 .split-container {
@@ -478,10 +488,6 @@ export default {
 .split-divider.is-dragging .split-divider-text {
   color: #005f5b;
   font-weight: 600;
-}
-.search-advanced-link {
-  padding: 0 10px 4px;
-  text-align: right;
 }
 .status-pending {
   color: #e6a23c;

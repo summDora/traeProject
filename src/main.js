@@ -8,6 +8,7 @@ import store from './store'
 import mCopy from './utils/mCopy'
 import { installMApiFn } from './utils/mApiFn'
 import './hy/demo/registerComponents'
+import './hy/xuqiu/xuqiuSearch.less'
 
 Vue.use(ElementUI)
 Vue.use(Vuex)

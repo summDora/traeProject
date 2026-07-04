@@ -9,7 +9,7 @@ import {
   groupNameOptions,
   fundingChannelOptions
 } from './mockData.js';
-import { createInputField, createSelectField } from '../utils/formField.js';
+import { createInputField, createSelectField } from '@/utils/formField.js';
 
 const getPlanYears = () => {
   const yearMax = new Date().getFullYear();
@@ -107,7 +107,7 @@ const meetingFormConfig = [
     key: 'meetingName',
     label: '会议名称',
     placeholder: '请输入会议名称',
-    width: 360,
+    width: 480,
     clearable: true
   },
   {
@@ -115,7 +115,7 @@ const meetingFormConfig = [
     key: 'meetingLocation',
     label: '会议地点',
     placeholder: '请输入会议地点',
-    width: 360,
+    width: 480,
     clearable: true
   },
   {
@@ -123,7 +123,7 @@ const meetingFormConfig = [
     key: 'meetingLeader',
     label: '会议负责人',
     placeholder: '请输入会议负责人',
-    width: 360,
+    width: 480,
     clearable: true
   },
   {
@@ -134,7 +134,7 @@ const meetingFormConfig = [
     format: 'yyyy-MM-dd HH:mm',
     valFormat: 'yyyy-MM-dd HH:mm',
     placeholder: ['开始时间', '结束时间'],
-    width: 360,
+    width: 480,
     clearable: true
   },
   {
@@ -142,7 +142,7 @@ const meetingFormConfig = [
     key: 'groupingType',
     label: '分组策略',
     placeholder: '请选择分组策略',
-    width: 360,
+    width: 480,
     clearable: true,
     options: groupingTypeOptions
   },
@@ -150,7 +150,7 @@ const meetingFormConfig = [
     type: 'checkbox',
     key: 'groupNames',
     label: '分组名称',
-    width: 360,
+    width: 480,
     notShow: false,
     options: groupNameOptions
   },
@@ -159,7 +159,7 @@ const meetingFormConfig = [
     key: 'fundingChannel',
     label: '出资建议渠道',
     placeholder: '请选择出资建议渠道',
-    width: 360,
+    width: 480,
     clearable: true,
     options: fundingChannelOptions
   },
@@ -168,7 +168,7 @@ const meetingFormConfig = [
     key: 'remark',
     label: '备注',
     placeholder: '请输入备注',
-    width: 360,
+    width: 480,
     rows: 2,
     clearable: true
   }

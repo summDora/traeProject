@@ -1,5 +1,5 @@
-import { demandStatusOptions, systemNameOptions, microAppOptions, level1FunctionOptions } from './mockData.js';
-import { createInputField, createSelectField } from '../utils/formField.js';
+import { demandStatusOptions } from './mockData.js';
+import { createInputField, createSelectField } from '@/utils/formField.js';
 
 const batchSearchConfig = [
   createInputField('meetingName', '会议名称', '请输入会议名称')
@@ -77,7 +77,7 @@ const demandTableColumn = [
     label: '操作',
     isSlot: true,
     slotName: 'operation',
-    baseWidth: 180,
+    baseWidth: 200,
     fixed: 'right'
   }
 ];
@@ -136,27 +136,19 @@ const reviewRecordTableColumn = [
   }
 ];
 
-const baselineSearchConfig = [
-  createSelectField('systemName', '系统名称', '请选择系统名称', systemNameOptions),
-  createSelectField('microAppName', '微应用名称', '请选择微应用名称', microAppOptions),
-  createSelectField('level1Function', '一级功能', '请选择一级功能', level1FunctionOptions)
+const materialTableColumn = [
+  {
+    key: 'fileName',
+    label: '文件名称（点击下载）',
+    width: 360,
+    isSlot: true,
+    slotName: 'fileName'
+  },
+  { key: 'updateTime', label: '最后更新时间', width: 180 }
 ];
 
-const baselineSearchData = {
-  systemName: '',
-  microAppName: '',
-  level1Function: ''
-};
-
-const centralizedReviewTabs = [
-  { key: 'baseline', label: '标准功能基线库' },
-  { key: 'blueprint', label: '关联业务蓝图' },
-  { key: 'basicInfo', label: '需求基本信息' },
-  { key: 'detailInfo', label: '需求详情信息' },
-  { key: 'duplicate', label: '需求查重结果' },
-  { key: 'relevance', label: '关联性审查结果' },
-  { key: 'businessSystem', label: '所属业务系统情况' },
-  { key: 'previousProject', label: '前期项目情况' }
+const materialDownloadButtonsConfig = [
+  { id: 0, text: '下载全部', color: '#298BF5' }
 ];
 
 export {
@@ -170,7 +162,6 @@ export {
   reviewRecordSearchConfig,
   reviewRecordSearchData,
   reviewRecordTableColumn,
-  baselineSearchConfig,
-  baselineSearchData,
-  centralizedReviewTabs
+  materialTableColumn,
+  materialDownloadButtonsConfig
 };

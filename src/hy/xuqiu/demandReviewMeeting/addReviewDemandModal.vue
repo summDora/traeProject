@@ -8,6 +8,8 @@
     :ifSure="false"
     :ifCancle="false"
     width="1080px"
+    :append-to-body="true"
+    :modal-append-to-body="true"
     @closeHandle="handleClose"
   >
     <div class="add-demand-body">
@@ -20,9 +22,6 @@
           @onSearch="onSearch"
           @onReset="onReset"
         />
-      </div>
-      <div class="search-advanced-link">
-        <el-button type="text" @click="onAdvancedSearch">高级查询 →</el-button>
       </div>
 
       <newTable
@@ -107,10 +106,6 @@ export default {
       this.loadTableData();
     },
 
-    onAdvancedSearch() {
-      this.$message.info('高级查询功能开发中（模拟）');
-    },
-
     handleSelectionChange(val) {
       this.selectData = val;
     },
@@ -131,18 +126,9 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import '../xuqiuSearch.less';
-</style>
-
 <style scoped>
 .add-demand-body {
   max-height: 70vh;
   overflow-y: auto;
-}
-.search-advanced-link {
-  padding: 0 10px 8px;
-  text-align: right;
-  margin-top: -4px;
 }
 </style>
