@@ -179,6 +179,12 @@ const router = new VueRouter({
       meta: { title: '需求模板管理' }
     },
     {
+      path: '/green-bi-cockpit',
+      name: 'GreenBiCockpit',
+      component: () => import('../pages/GreenBiCockpit/GreenEnergyDashboar.vue'),
+      meta: { title: '绿色能源驾驶舱', fullscreen: true }
+    },
+    {
       path: '*',
       redirect: '/'
     }
