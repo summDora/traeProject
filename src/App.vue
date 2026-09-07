@@ -1,7 +1,7 @@
 <template>
-  <div id="app">
-    <TopNav />
-    <main class="main-content">
+  <div id="app" :class="{ 'app--fullscreen': isFullscreen }">
+    <TopNav v-if="!isFullscreen" />
+    <main class="main-content" :class="{ 'main-content--fullscreen': isFullscreen }">
       <router-view />
     </main>
   </div>
@@ -14,6 +14,11 @@ export default {
   name: 'App',
   components: {
     TopNav
+  },
+  computed: {
+    isFullscreen() {
+      return this.$route.meta && this.$route.meta.fullscreen
+    }
   }
 }
 </script>
@@ -34,8 +39,20 @@ body {
   background-color: #f5f7fa;
 }
 
+#app.app--fullscreen {
+  min-height: 100vh;
+  background-color: #020818;
+}
+
 .main-content {
   padding: 20px;
   min-height: calc(100vh - 56px);
+}
+
+.main-content--fullscreen {
+  padding: 0;
+  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 </style>
