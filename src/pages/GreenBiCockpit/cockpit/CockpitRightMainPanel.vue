@@ -71,7 +71,7 @@
 <script>
 import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
-import { formatNumber, FONT_DIN, AXIS_LABEL_COLOR, AXIS_LABEL_FONT_SIZE, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops } from '../utils/chartTheme'
+import { formatNumber, FONT_DIN, AXIS_LABEL_COLOR, AXIS_LABEL_FONT_SIZE, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops } from './utils/chartTheme'
 
 export default {
   name: 'CockpitRightMainPanel',

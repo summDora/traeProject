@@ -23,13 +23,12 @@
 </template>
 
 <script>
-import { applyCockpitTheme, DESIGN_WIDTH, DESIGN_HEIGHT } from './utils/chartTheme'
-import { setDashboardData, createEmptyDashboardState } from './utils/setDashboardData'
-import screenScaleMixin from './mixins/screenScale'
+import { applyCockpitTheme, DESIGN_WIDTH, DESIGN_HEIGHT } from './cockpit/utils/chartTheme'
+import { setDashboardData, createEmptyDashboardState } from './cockpit/utils/setDashboardData'
+import screenScaleMixin from './cockpit/mixins/screenScale'
 import CockpitLeftMainPanel from './cockpit/CockpitLeftMainPanel.vue'
 import CockpitRightMainPanel from './cockpit/CockpitRightMainPanel.vue'
-import { getGreenBiCockpitDashboard } from '@/api/greenBiCockpit'
-import dashboardData from './dashboardData.json'
+import { getGreenBiCockpitDashboard } from './cockpit/api/greenBiCockpit'
 
 applyCockpitTheme()
 
@@ -71,7 +70,6 @@ export default {
     }
   },
   created() {
-    this.setData(dashboardData)
     this.loadDashboard()
   },
   methods: {

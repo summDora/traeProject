@@ -118,7 +118,7 @@ import {
   GRID_LINE_COLOR,
   POLAR_GRID_LINE_COLOR,
   AXIS_LINE_COLOR
-} from '../utils/chartTheme'
+} from './utils/chartTheme'
 
 Highcharts3D(Highcharts)
 HighchartsMore(Highcharts)

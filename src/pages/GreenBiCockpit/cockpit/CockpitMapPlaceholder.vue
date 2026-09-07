@@ -7,8 +7,8 @@
 
 <script>
 import * as echarts from 'echarts'
-import chinaJson from '../assets/china.json'
-import { buildCockpitMapOptions, MAP_MAIN_SERIES_INDEX } from '../utils/cockpitMapOptions'
+import chinaJson from './assets/china.json'
+import { buildCockpitMapOptions, MAP_MAIN_SERIES_INDEX } from './utils/cockpitMapOptions'
 
 let chinaMapRegistered = false
 

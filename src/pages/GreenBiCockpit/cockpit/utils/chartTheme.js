@@ -73,10 +73,6 @@ export const CHINA_TREND_SERIES_COLORS = {
   授权总量: CHART_COLORS.barSecondary
 }
 
-export function getCountryChartColor(name) {
-  return COUNTRY_CHART_COLORS[name] || CHART_COLORS.muted
-}
-
 export function getTrendLineColor(name) {
   return VALID_PATENT_TREND_COLORS[name] || COUNTRY_CHART_COLORS[name] || CHART_COLORS.muted
 }
@@ -120,13 +116,14 @@ export function getChinaTrendAreaStops(color) {
 }
 
 /** 将接口 seriesData 规范为纯数值数组 */
-export function normalizeSeriesValues(seriesData = []) {
+export function normalizeSeriesValues(seriesData) {
+  if (!Array.isArray(seriesData)) return []
+
   return seriesData.map(item => {
     if (typeof item === 'number') return item
     if (item && typeof item === 'object') {
       if (item.value != null) return item.value
       if (item.y != null) return item.y
-      return 0
     }
     return 0
   })

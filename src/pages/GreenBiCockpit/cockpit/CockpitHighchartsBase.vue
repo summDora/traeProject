@@ -4,7 +4,7 @@
 
 <script>
 import Highcharts from 'highcharts'
-import { mergeCockpitChartOptions } from '../utils/chartTheme'
+import { mergeCockpitChartOptions } from './utils/chartTheme'
 
 export default {
   name: 'CockpitHighchartsBase',

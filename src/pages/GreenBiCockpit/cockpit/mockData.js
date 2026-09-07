@@ -1,7 +1,7 @@
 /**
  * @deprecated 驾驶舱数据已迁移至 dashboardData.json（API 契约格式）
  * 本文件仅作为 scripts/buildDashboardJson.js 的数据源，业务代码请勿直接引用
- * 运行 node src/pages/GreenBiCockpit/scripts/buildDashboardJson.js 可重新生成 JSON
+ * 运行 node src/pages/GreenBiCockpit/cockpit/scripts/buildDashboardJson.js 可重新生成 JSON
  */
 
 export const globalCountryStats = [

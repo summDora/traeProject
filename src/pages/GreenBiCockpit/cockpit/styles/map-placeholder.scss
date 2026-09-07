@@ -10,14 +10,6 @@
     min-height: 180px;
   }
 
-  &__placeholder {
-    position: relative;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   &__glow {
     position: absolute;
     z-index: 0;
@@ -29,13 +21,5 @@
     height: 56%;
     background: url('~@/bi/asset/images/cockpit/mapbottom.png') center bottom / 100% auto no-repeat;
     pointer-events: none;
-  }
-
-  &__text {
-    position: relative;
-    z-index: 1;
-    font-size: 12px;
-    color: #6BDCFF;
-    letter-spacing: 1px;
   }
 }
