@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini 极简流式传输测试</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        #output { font-family: monospace; white-space: pre-wrap; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; min-height: 100px; line-height: 1.6; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>Gemini Stream 测试</h2>
+    <button id="btn" onclick="startStream()">开始生成回答</button>
+    <p>输出结果：</p>
+    <div id="output">等待指令...</div>
+
+    <script>
+        // 请在此处替换为您的 Google AI Studio API Key
+        const API_KEY = 'YOUR_GEMINI_API_KEY';
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:streamGenerateContent?alt=sse&key=${API_KEY}`;
+
+        async function startStream() {
+            const outputElement = document.getElementById('output');
+            const btn = document.getElementById('btn');
+            outputElement.textContent = '';
+            btn.disabled = true;
+
+            const requestBody = {
+                contents: [{ parts: [{ text: "请用大约100字描述一下未来的通用人工智能。" }] }]
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error:${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        break;
+                    }
+
+                    // 1. 解码传入的字节块
+                    buffer += decoder.decode(value, { stream: true });
+
+                    // 2. 按行切分并逐行处理
+                    let lineBreakIndex;
+                    while ((lineBreakIndex = buffer.indexOf('\n')) !== -1) {
+                        const line = buffer.slice(0, lineBreakIndex).trim();
+                        buffer = buffer.slice(lineBreakIndex + 1);
+
+                        if (line.startsWith('data: ')) {
+                            const jsonString = line.substring(6).trim();
+                            if (jsonString === '') continue;
+
+                            try {
+                                const dataObj = JSON.parse(jsonString);
+                                // 根据 Gemini 的返回结构解析文本路径
+                                const textPart = dataObj.candidates[0].content.parts[0].text;
+                                outputElement.textContent += textPart;
+                            } catch (e) {
+                                // 略过不完整的 JSON 行
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('请求失败:', error);
+                outputElement.textContent = `请求失败:${error.message}`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
