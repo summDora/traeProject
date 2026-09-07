@@ -3,11 +3,11 @@ import { FONT_DIN } from './chartTheme'
 
 const MAP_NAME = 'china'
 
-/** 辽宁示例同比例；全国地图保留 aspectScale 0.85 适配宽高，center 上移留出底部空间 */
+/** 辽宁示例同比例；全国地图保留 aspectScale 0.85 适配宽高 */
 const LAYOUT = {
   aspectScale: 0.85,
   zoom: 0.65,
-  layoutCenter: ['50%', '41%'],
+  layoutCenter: ['50%', '50%'],
   layoutSize: '180%'
 }
 
@@ -17,7 +17,7 @@ export const MAP_MAIN_SERIES_INDEX = 4
 const SHADOW_LAYERS = [
   {
     zlevel: -1,
-    centerY: '42%',
+    centerY: '51%',
     itemStyle: {
       borderWidth: 1,
       borderColor: 'rgba(58, 149, 253, 0.8)',
@@ -29,7 +29,7 @@ const SHADOW_LAYERS = [
   },
   {
     zlevel: -2,
-    centerY: '43%',
+    centerY: '52%',
     itemStyle: {
       borderWidth: 1,
       borderColor: 'rgba(58, 149, 253, 0.6)',
@@ -41,7 +41,7 @@ const SHADOW_LAYERS = [
   },
   {
     zlevel: -3,
-    centerY: '44%',
+    centerY: '53%',
     itemStyle: {
       borderWidth: 1,
       borderColor: 'rgba(58, 149, 253, 0.4)',
@@ -53,7 +53,7 @@ const SHADOW_LAYERS = [
   },
   {
     zlevel: -4,
-    centerY: '45%',
+    centerY: '54%',
     itemStyle: {
       borderWidth: 5,
       borderColor: 'rgba(5, 9, 57, 0.8)',
@@ -261,17 +261,15 @@ export function buildCockpitMapOptions(data = []) {
           shadowBlur: 120,
           areaColor: 'transparent'
         }
-      },
-
-      ...buildShadowSeries()
+      }
     ],
     series: [
+      ...buildShadowSeries(),
       {
         name: '省份数据',
         type: 'map',
         map: MAP_NAME,
-
-        ...mapLayout(),
+        geoIndex: 0,
         zlevel: 1,
         data,
         label: {
@@ -293,10 +291,10 @@ export function buildCockpitMapOptions(data = []) {
         itemStyle: {
           areaColor: {
             type: 'linear',
-            x: 0,
+            x: 1200,
             y: 0,
             x2: 0,
-            y2: 700,
+            y2: 0,
             colorStops: [
               { offset: 0, color: 'rgba(3, 27, 78, 0.75)' },
               { offset: 1, color: 'rgba(58, 149, 253, 0.75)' }

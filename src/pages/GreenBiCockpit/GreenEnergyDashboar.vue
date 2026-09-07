@@ -29,6 +29,7 @@ import screenScaleMixin from './cockpit/mixins/screenScale'
 import CockpitLeftMainPanel from './cockpit/CockpitLeftMainPanel.vue'
 import CockpitRightMainPanel from './cockpit/CockpitRightMainPanel.vue'
 import { getGreenBiCockpitDashboard } from './cockpit/api/greenBiCockpit'
+import dashboardData from './cockpit/dashboardData.json'
 
 applyCockpitTheme()
 
@@ -46,11 +47,11 @@ export default {
   },
   computed: {
     scaleSlotStyle() {
-      // zoom 会同步布局尺寸，F11 原始结构无需 slot；transform 需 slot 保证滚动高度
-      if (this.useZoom || this.isFullscreen) return null
+      // 始终固定缩放槽尺寸，避免 F11 切换时在「有/无 slot」两种布局间跳动
       return {
-        width: `${DESIGN_WIDTH * this.scale}px`,
-        height: `${DESIGN_HEIGHT * this.scale}px`
+        width: `${Math.round(DESIGN_WIDTH * this.scale)}px`,
+        height: `${Math.round(DESIGN_HEIGHT * this.scale)}px`,
+        flexShrink: 0
       }
     },
     scaleStyle() {
@@ -63,13 +64,14 @@ export default {
         style.zoom = this.scale
       } else {
         style.transform = `scale(${this.scale})`
-        style.transformOrigin = this.isFullscreen ? 'center center' : 'top center'
+        style.transformOrigin = 'top center'
       }
 
       return style
     }
   },
   created() {
+    this.setData(dashboardData)
     this.loadDashboard()
   },
   methods: {

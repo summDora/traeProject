@@ -9,6 +9,7 @@ import { DESIGN_WIDTH, DESIGN_HEIGHT } from '../utils/chartTheme'
 export const COCKPIT_SCALE_MODE = 'adaptive'
 
 let resizeRaf = null
+let resizeEmitTimer = null
 let fullscreenMq = null
 
 const BROWSER_CHROME_HEIGHT = 72
@@ -81,9 +82,20 @@ export default {
       cancelAnimationFrame(resizeRaf)
       resizeRaf = null
     }
+    if (resizeEmitTimer) {
+      clearTimeout(resizeEmitTimer)
+      resizeEmitTimer = null
+    }
   },
   methods: {
     updateScale() {
+      if (resizeRaf) cancelAnimationFrame(resizeRaf)
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null
+        this.applyScale()
+      })
+    },
+    applyScale() {
       const fullscreen = isLikelyFullscreen()
       const { width, height } = getScaleViewport(fullscreen)
       const scaleX = width / DESIGN_WIDTH
@@ -92,11 +104,12 @@ export default {
       this.isFullscreen = fullscreen
       this.scale = resolveScale(scaleX, scaleY)
 
-      if (resizeRaf) cancelAnimationFrame(resizeRaf)
-      resizeRaf = requestAnimationFrame(() => {
-        resizeRaf = null
+      if (resizeEmitTimer) clearTimeout(resizeEmitTimer)
+      // 等 F11 过渡结束后再通知图表 reflow，避免读到中间态尺寸
+      resizeEmitTimer = setTimeout(() => {
+        resizeEmitTimer = null
         window.dispatchEvent(new Event('resize'))
-      })
+      }, 160)
     }
   }
 }
