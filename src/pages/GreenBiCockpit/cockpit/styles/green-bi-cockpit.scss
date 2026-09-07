@@ -1,58 +1,27 @@
+@import './design';
+
 .green-bi-cockpit {
   width: 100vw;
+  min-height: 100vh;
   height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
   background: #020818 url('~@/bi/asset/images/cockpit/bg.png') center center / cover no-repeat;
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
 
-  &--fullscreen {
-    overflow: hidden;
-  }
-
-  &__viewport {
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    box-sizing: border-box;
-  }
-
-  &--fullscreen &__viewport {
-    height: 100%;
-    min-height: 0;
-    align-items: center;
-  }
-
-  &__scale-slot {
-    flex-shrink: 0;
-  }
-
-  &__scale {
-    transform-origin: top center;
-    flex-shrink: 0;
-    will-change: transform;
-  }
-
-  &--fullscreen &__scale {
-    transform-origin: center center;
-  }
-
   &__screen {
     position: relative;
-    width: 1920px;
-    height: 1080px;
-    flex-shrink: 0;
+    width: 100vw;
+    min-height: vw(1080);
     overflow: hidden;
   }
 
   &__content {
     display: grid;
     grid-template-columns: minmax(0, 1372fr) minmax(0, 500fr);
-    gap: 16px;
-    height: calc(1080px - 84px);
-    padding: 6px 16px 12px;
+    gap: vw(16);
+    height: vw(996);
+    padding: vw(6) vw(16) vw(12);
     box-sizing: border-box;
     min-height: 0;
     overflow: hidden;
@@ -90,7 +59,7 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  padding: 16px;
+  padding: vw(16);
   box-sizing: border-box;
   background: linear-gradient(180deg, #11437c33 0%, #10224D 100%);
 

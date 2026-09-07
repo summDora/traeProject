@@ -1,9 +1,11 @@
+@import './design';
+
 .right-main {
   &__body {
     flex: 1;
     display: grid;
     grid-template-rows: minmax(0, 292fr) minmax(0, 332fr) minmax(0, 245fr);
-    gap: 10px;
+    gap: vw(10);
     min-height: 0;
     overflow: hidden;
   }
@@ -15,7 +17,7 @@
     overflow: hidden;
 
     &--summary {
-      padding-bottom: 4px;
+      padding-bottom: vw(4);
     }
 
     &--tech {
@@ -26,15 +28,15 @@
 
 .summary-cards {
   display: flex;
-  gap: 8px;
-  padding: 4px 0 8px;
+  gap: vw(8);
+  padding: vw(4) 0 vw(8);
   flex-shrink: 0;
 
   &__card {
     flex: 1;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: vw(8);
     min-width: 0;
   }
 
@@ -43,10 +45,10 @@
     min-width: 0;
   }
 
-  &__icon { width: 44px; height: 44px; flex-shrink: 0; }
+  &__icon { width: vw(44); height: vw(44); flex-shrink: 0; }
 
   &__label {
-    font-size: 11px;
+    font-size: vw(11);
     color: #ffffff;
     line-height: 1.3;
     white-space: nowrap;
@@ -57,25 +59,25 @@
   &__value-row {
     display: flex;
     align-items: baseline;
-    margin-top: 4px;
-    padding: 6px 10px;
+    margin-top: vw(4);
+    padding: vw(6) vw(10);
     background: url('~@/bi/asset/images/cockpit/numbergb.png') center / 100% 100% no-repeat;
   }
 
   &__value {
-    font-size: 20px;
+    font-size: vw(20);
     font-weight: 700;
     line-height: 1;
     font-family: 'DIN Alternate', 'DIN', sans-serif;
-    text-shadow: 0 0 10px rgba(83, 127, 241, 0.45);
+    text-shadow: 0 0 vw(10) rgba(83, 127, 241, 0.45);
 
     &--apply { color: #6BDCFF; }
     &--grant { color: #6BDCFF; }
   }
 
   &__unit {
-    margin-left: 4px;
-    font-size: 12px;
+    margin-left: vw(4);
+    font-size: vw(12);
     color: #ffffff;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
   }
@@ -83,8 +85,8 @@
 
 .summary-chart {
   flex: 0 0 auto;
-  height: 152px;
-  margin-bottom: 6px;
+  height: vw(152);
+  margin-bottom: vw(6);
   min-height: 0;
 }
 
@@ -92,8 +94,8 @@
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0 8px;
-  margin-top: 4px;
+  gap: 0 vw(8);
+  margin-top: vw(4);
   min-height: 0;
   align-items: stretch;
 }
@@ -105,16 +107,16 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: vw(4);
 
   &__item {
     flex: 1;
     min-height: 0;
     display: flex;
     align-items: center;
-    padding: 0 10px;
-    border-left: 2px solid #1CBADD;
-    font-size: 11px;
+    padding: 0 vw(10);
+    border-left: vw(2) solid #1CBADD;
+    font-size: vw(11);
     background: linear-gradient(
       90deg,
       rgba(156, 196, 255, 0) 0%,
@@ -124,11 +126,11 @@
   }
 
   &__badge {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
+    width: vw(20);
+    height: vw(20);
+    line-height: vw(20);
     text-align: center;
-    font-size: 11px;
+    font-size: vw(11);
     font-weight: 700;
     color: #fff;
     border-radius: 50%;
@@ -141,7 +143,7 @@
     &--default { background: rgba(50, 70, 95, 0.85); }
   }
 
-  &__name { flex: 1; margin-left: 8px; color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  &__name { flex: 1; margin-left: vw(8); color: #ffffff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   &__value { color: #6BDCFF; font-weight: 600; flex-shrink: 0; font-family: 'DIN Alternate', 'DIN', sans-serif; }
 }
 

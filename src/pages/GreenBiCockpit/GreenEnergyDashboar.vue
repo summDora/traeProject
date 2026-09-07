@@ -1,21 +1,15 @@
 <template>
-  <div class="green-bi-cockpit" :class="{ 'green-bi-cockpit--fullscreen': isFullscreen }">
-    <div class="green-bi-cockpit__viewport">
-      <div class="green-bi-cockpit__scale-slot" :style="scaleSlotStyle">
-        <div class="green-bi-cockpit__scale" :style="scaleStyle">
-          <div class="green-bi-cockpit__screen">
-            <div class="green-bi-cockpit-layer bg" />
-            <div class="green-bi-cockpit-layer show">
-              <header class="cockpit-header">
-                <div class="cockpit-header__bg" />
-                <h1 class="cockpit-header__title">国家绿色能源电力产业知识产权运营驾驶舱</h1>
-              </header>
-              <div class="green-bi-cockpit__content">
-                <CockpitLeftMainPanel :data="leftPanelData" />
-                <CockpitRightMainPanel :data="rightPanelData" />
-              </div>
-            </div>
-          </div>
+  <div class="green-bi-cockpit">
+    <div class="green-bi-cockpit__screen">
+      <div class="green-bi-cockpit-layer bg" />
+      <div class="green-bi-cockpit-layer show">
+        <header class="cockpit-header">
+          <div class="cockpit-header__bg" />
+          <h1 class="cockpit-header__title">国家绿色能源电力产业知识产权运营驾驶舱</h1>
+        </header>
+        <div class="green-bi-cockpit__content">
+          <CockpitLeftMainPanel :data="leftPanelData" />
+          <CockpitRightMainPanel :data="rightPanelData" />
         </div>
       </div>
     </div>
@@ -23,9 +17,9 @@
 </template>
 
 <script>
-import { applyCockpitTheme, DESIGN_WIDTH, DESIGN_HEIGHT } from './cockpit/utils/chartTheme'
+import { applyCockpitTheme } from './cockpit/utils/chartTheme'
 import { setDashboardData, createEmptyDashboardState } from './cockpit/utils/setDashboardData'
-import screenScaleMixin from './cockpit/mixins/screenScale'
+import cockpitViewportMixin from './cockpit/mixins/cockpitViewport'
 import CockpitLeftMainPanel from './cockpit/CockpitLeftMainPanel.vue'
 import CockpitRightMainPanel from './cockpit/CockpitRightMainPanel.vue'
 import { getGreenBiCockpitDashboard } from './cockpit/api/greenBiCockpit'
@@ -38,36 +32,11 @@ const emptyState = createEmptyDashboardState()
 export default {
   name: 'GreenEnergyDashboard',
   components: { CockpitLeftMainPanel, CockpitRightMainPanel },
-  mixins: [screenScaleMixin],
+  mixins: [cockpitViewportMixin],
   data() {
     return {
       leftPanelData: emptyState.leftPanelData,
       rightPanelData: emptyState.rightPanelData
-    }
-  },
-  computed: {
-    scaleSlotStyle() {
-      // 始终固定缩放槽尺寸，避免 F11 切换时在「有/无 slot」两种布局间跳动
-      return {
-        width: `${Math.round(DESIGN_WIDTH * this.scale)}px`,
-        height: `${Math.round(DESIGN_HEIGHT * this.scale)}px`,
-        flexShrink: 0
-      }
-    },
-    scaleStyle() {
-      const style = {
-        width: `${DESIGN_WIDTH}px`,
-        height: `${DESIGN_HEIGHT}px`
-      }
-
-      if (this.useZoom) {
-        style.zoom = this.scale
-      } else {
-        style.transform = `scale(${this.scale})`
-        style.transformOrigin = 'top center'
-      }
-
-      return style
     }
   },
   created() {
@@ -92,12 +61,13 @@ export default {
 </script>
 
 <style scoped lang="scss">
+@import './cockpit/styles/design';
 @import './cockpit/styles/green-bi-cockpit.scss';
 
 .cockpit-header {
   position: relative;
   width: 100%;
-  height: 84px;
+  height: vw(84);
   flex-shrink: 0;
 
   &__bg {
@@ -110,11 +80,11 @@ export default {
     position: relative;
     z-index: 1;
     margin: 0;
-    padding-top: 8px;
+    padding-top: vw(8);
     text-align: center;
-    font-size: 30px;
+    font-size: vw(30);
     font-weight: 600;
-    letter-spacing: 3px;
+    letter-spacing: vw(3);
     color: #fff;
     -webkit-text-fill-color: #fff;
     text-shadow: none;

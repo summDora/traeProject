@@ -1,14 +1,17 @@
 import Highcharts from 'highcharts'
+import { DESIGN_WIDTH, DESIGN_HEIGHT, dpxStr } from './designUnits'
 
-export const DESIGN_WIDTH = 1920
-export const DESIGN_HEIGHT = 1080
+export { DESIGN_WIDTH, DESIGN_HEIGHT }
 
 export const FONT_DIN = '"DIN Alternate", "DIN", sans-serif'
 export const AXIS_LABEL_COLOR = '#ffffffcc'
-export const AXIS_LABEL_FONT_SIZE = '12px'
 export const GRID_LINE_COLOR = 'rgba(200, 215, 228, 0.26)'
 export const POLAR_GRID_LINE_COLOR = 'rgba(200, 215, 228, 0.3)'
 export const AXIS_LINE_COLOR = 'rgba(200, 215, 228, 0.2)'
+
+export function getAxisLabelFontSize(viewportWidth) {
+  return dpxStr(12, viewportWidth)
+}
 
 export const CHART_COLORS = {
   cyan: '#00D4FF',
@@ -158,7 +161,11 @@ export function mergeCockpitChartOptions(options = {}) {
   })
 }
 
-export function applyCockpitTheme() {
+export function applyCockpitTheme(viewportWidth = typeof window !== 'undefined' ? window.innerWidth : DESIGN_WIDTH) {
+  const axisFontSize = getAxisLabelFontSize(viewportWidth)
+  const legendFontSize = dpxStr(11, viewportWidth)
+  const tooltipFontSize = dpxStr(12, viewportWidth)
+
   Highcharts.setOptions({
     chart: {
       backgroundColor: 'transparent',
@@ -167,11 +174,11 @@ export function applyCockpitTheme() {
     credits: { enabled: false },
     title: { text: null },
     legend: {
-      itemStyle: { color: '#A8D4FF', fontSize: '11px', fontWeight: 'normal' },
+      itemStyle: { color: '#A8D4FF', fontSize: legendFontSize, fontWeight: 'normal' },
       itemHoverStyle: { color: '#FFFFFF' }
     },
     xAxis: {
-      labels: { style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE } },
+      labels: { style: { color: AXIS_LABEL_COLOR, fontSize: axisFontSize } },
       lineWidth: 1,
       lineColor: AXIS_LINE_COLOR,
       tickColor: AXIS_LINE_COLOR,
@@ -180,7 +187,7 @@ export function applyCockpitTheme() {
       gridLineColor: GRID_LINE_COLOR
     },
     yAxis: {
-      labels: { style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN } },
+      labels: { style: { color: AXIS_LABEL_COLOR, fontSize: axisFontSize, fontFamily: FONT_DIN } },
       lineWidth: 1,
       lineColor: AXIS_LINE_COLOR,
       tickColor: AXIS_LINE_COLOR,
@@ -192,7 +199,7 @@ export function applyCockpitTheme() {
     tooltip: {
       backgroundColor: 'rgba(2, 18, 48, 0.92)',
       borderColor: 'rgba(0, 212, 255, 0.4)',
-      style: { color: '#FFFFFF', fontSize: '12px', fontFamily: FONT_DIN }
+      style: { color: '#FFFFFF', fontSize: tooltipFontSize, fontFamily: FONT_DIN }
     },
     plotOptions: {
       series: {

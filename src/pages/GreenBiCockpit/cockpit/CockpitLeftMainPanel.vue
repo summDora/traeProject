@@ -105,6 +105,7 @@ import CockpitWorldRankHub from './CockpitWorldRankHub.vue'
 import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
 import CockpitMapPlaceholder from './CockpitMapPlaceholder.vue'
+import cockpitViewportMixin from './mixins/cockpitViewport'
 import {
   formatNumber,
   FONT_DIN,
@@ -114,7 +115,6 @@ import {
   getApplyBarTopColor,
   normalizeSeriesValues,
   AXIS_LABEL_COLOR,
-  AXIS_LABEL_FONT_SIZE,
   GRID_LINE_COLOR,
   POLAR_GRID_LINE_COLOR,
   AXIS_LINE_COLOR
@@ -126,6 +126,7 @@ HighchartsMore(Highcharts)
 export default {
   name: 'CockpitLeftMainPanel',
   components: { CockpitSectionTitle, CockpitHighchartsBase, CockpitMapPlaceholder, CockpitWorldRankHub },
+  mixins: [cockpitViewportMixin],
   props: {
     data: {
       type: Object,
@@ -147,6 +148,9 @@ export default {
     }
   },
   computed: {
+    axisLabelFontSize() {
+      return this.ds(12)
+    },
     total() {
       const stock = this.data.globalPatentStock
       return (stock && stock.total) || 0
@@ -227,15 +231,16 @@ export default {
       return this.applyTab === 'countries' ? this.applyTrendCountries : this.applyTrendOffices
     },
     pieOptions() {
+      const ds = n => this.ds(n)
       return {
         chart: { type: 'pie', options3d: { enabled: true, alpha: 50, beta: 0 }, margin: [0, 0, 0, 0] },
         plotOptions: {
           pie: {
             innerSize: '55%', depth: 35, size: '92%', center: ['50%', '52%'],
             dataLabels: {
-              enabled: true, distance: 14, connectorColor: 'rgba(0,212,255,0.25)',
-              format: '<span style="color:#A8D4FF;font-size:10px;">{point.name}</span><br/>' +
-                `<span style="color:#00D4FF;font-size:11px;font-weight:600;font-family:${FONT_DIN}">{point.y}%</span>`,
+              enabled: true, distance: this.d(14), connectorColor: 'rgba(0,212,255,0.25)',
+              format: `<span style="color:#A8D4FF;font-size:${ds(10)};">{point.name}</span><br/>` +
+                `<span style="color:#00D4FF;font-size:${ds(11)};font-weight:600;font-family:${FONT_DIN}">{point.y}%</span>`,
               style: { textOutline: 'none', fontFamily: FONT_DIN }
             }
           }
@@ -254,7 +259,7 @@ export default {
     },
     trendOptions() {
       return {
-        chart: { type: 'spline', marginTop: 8, marginBottom: 58 },
+        chart: { type: 'spline', marginTop: this.d(8), marginBottom: this.d(58) },
         xAxis: {
           categories: this.trendYears,
           tickmarkPlacement: 'between',
@@ -271,17 +276,17 @@ export default {
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
-          labels: { format: '{value}万', style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN } }
+          labels: { format: '{value}万', style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN } }
         },
         legend: {
           align: 'center',
           verticalAlign: 'bottom',
-          margin: 18,
-          itemDistance: 8,
-          symbolWidth: 8,
-          symbolHeight: 8
+          margin: this.d(18),
+          itemDistance: this.d(8),
+          symbolWidth: this.d(8),
+          symbolHeight: this.d(8)
         },
-        plotOptions: { spline: { lineWidth: 2, marker: { enabled: false } } },
+        plotOptions: { spline: { lineWidth: this.d(2), marker: { enabled: false } } },
         series: this.trendSeries.map(s => {
           const color = getTrendLineColor(s.name)
           return {
@@ -290,7 +295,7 @@ export default {
             data: s.data,
             shadow: {
               color,
-              width: 4,
+              width: this.d(4),
               opacity: 0.18,
               offsetX: 0,
               offsetY: 0
@@ -303,14 +308,18 @@ export default {
       const data = this.currentApplyData
       const maxY = 2000000
       const items = data.data
+      const d = n => this.d(n)
+      const ds = n => this.ds(n)
+      const stripH = d(2)
+      const axisFontSize = this.axisLabelFontSize
 
       return {
         chart: {
           type: 'column',
-          marginTop: 24,
-          marginBottom: 36,
-          marginLeft: 44,
-          marginRight: 8,
+          marginTop: d(24),
+          marginBottom: d(36),
+          marginLeft: d(44),
+          marginRight: d(8),
           backgroundColor: 'transparent',
           events: {
             render() {
@@ -326,7 +335,7 @@ export default {
                 if (!point.shapeArgs || !point.y) return
                 const { x, y, width } = point.shapeArgs
                 const strip = chart.renderer
-                  .rect(x, y - 2, width, 2)
+                  .rect(x, y - stripH, width, stripH)
                   .attr({
                     fill: getApplyBarTopColor(index),
                     zIndex: 6
@@ -344,7 +353,7 @@ export default {
           tickLength: 0,
           gridLineWidth: 0,
           labels: {
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE },
+            style: { color: AXIS_LABEL_COLOR, fontSize: axisFontSize },
             rotation: 0,
             autoRotation: false,
             useHTML: true,
@@ -365,7 +374,7 @@ export default {
           gridLineColor: GRID_LINE_COLOR,
           title: { text: null },
           labels: {
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN },
+            style: { color: AXIS_LABEL_COLOR, fontSize: axisFontSize, fontFamily: FONT_DIN },
             formatter() {
               return (this.value / 10000) + '万'
             }
@@ -387,9 +396,9 @@ export default {
               enabled: true,
               crop: false,
               overflow: 'none',
-              y: -4,
+              y: d(-4),
               format: '{y:,.0f}',
-              style: { color: '#FFFFFF', fontSize: '10px', textOutline: 'none', fontWeight: 'normal', fontFamily: FONT_DIN }
+              style: { color: '#FFFFFF', fontSize: ds(10), textOutline: 'none', fontWeight: 'normal', fontFamily: FONT_DIN }
             }
           },
           series: { states: { hover: { brightness: 0.08 } } }
@@ -399,7 +408,7 @@ export default {
             name: '背景',
             data: items.map(() => maxY),
             color: 'rgba(20, 60, 110, 0.45)',
-            pointWidth: 40,
+            pointWidth: d(40),
             enableMouseTracking: false,
             dataLabels: { enabled: false },
             zIndex: 0
@@ -410,7 +419,7 @@ export default {
               y,
               color: getApplyBarGradient(index, 0.68)
             })),
-            pointWidth: 22,
+            pointWidth: d(22),
             zIndex: 1
           }
         ]
@@ -428,12 +437,15 @@ export default {
         to: ringStep * (i + 1),
         color: i % 2 === 0 ? 'rgba(200, 215, 228, 0.1)' : 'transparent'
       }))
+      const d = n => this.d(n)
+      const ds = n => this.ds(n)
+      const axisFontSize = this.axisLabelFontSize
 
       return {
         chart: {
           polar: true,
           type: 'line',
-          margin: [4, 4, 4, 4],
+          margin: [d(4), d(4), d(4), d(4)],
           backgroundColor: 'transparent'
         },
         pane: {
@@ -454,9 +466,9 @@ export default {
           gridLineColor,
           labels: {
             useHTML: true,
-            distance: 18,
+            distance: d(18),
             formatter() {
-              return `<span style="color:#ffffffcc;font-size:${AXIS_LABEL_FONT_SIZE};white-space:nowrap">${this.value}</span>`
+              return `<span style="color:#ffffffcc;font-size:${axisFontSize};white-space:nowrap">${this.value}</span>`
             }
           }
         },
@@ -479,11 +491,11 @@ export default {
           },
           line: {
             fillOpacity: 0.45,
-            lineWidth: 2,
+            lineWidth: d(2),
             lineColor: '#72A8DA',
             marker: {
               enabled: true,
-              radius: 3,
+              radius: d(3),
               fillColor: '#72A8DA',
               lineColor: '#fff',
               lineWidth: 1
@@ -498,7 +510,7 @@ export default {
               overflow: 'none',
               formatter() {
                 const wan = (this.y / 10000).toFixed(2)
-                return `<span style="color:#ffffffcc;font-size:10px;font-family:${FONT_DIN};white-space:nowrap">${wan}万</span>`
+                return `<span style="color:#ffffffcc;font-size:${ds(10)};font-family:${FONT_DIN};white-space:nowrap">${wan}万</span>`
               }
             }
           }
@@ -512,7 +524,7 @@ export default {
           data: values.map(y => ({
             y,
             dataLabels: {
-              distance: Math.max(12, (0.9 - y / maxVal) * 72)
+              distance: Math.max(d(12), (0.9 - y / maxVal) * d(72))
             }
           })),
           fillColor: {

@@ -1,8 +1,10 @@
+@import './design';
+
 .left-main {
   &__content {
     display: grid;
     grid-template-rows: minmax(0, 278fr) minmax(0, 595fr);
-    row-gap: 32px;
+    row-gap: vw(32);
     flex: 1;
     height: 100%;
     min-height: 0;
@@ -13,7 +15,7 @@
   &__top {
     display: grid;
     grid-template-columns: minmax(0, 936fr) minmax(0, 372fr);
-    gap: 32px;
+    gap: vw(32);
     min-height: 0;
     max-height: 100%;
     overflow: hidden;
@@ -39,7 +41,7 @@
   &__rankings {
     display: grid;
     grid-template-rows: minmax(0, 189fr) minmax(0, 398fr);
-    gap: 6px;
+    gap: vw(6);
     min-height: 0;
     overflow: hidden;
   }
@@ -47,10 +49,10 @@
   &__charts {
     display: grid;
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 6px;
+    gap: vw(6);
     min-height: 0;
     overflow: hidden;
-    padding-right: 32px;
+    padding-right: vw(32);
   }
 
   &__chart-wrap {
@@ -74,7 +76,7 @@
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 413fr) minmax(0, 518fr);
-  gap: 8px;
+  gap: vw(8);
   min-height: 0;
   max-height: 100%;
   min-width: 0;
@@ -101,14 +103,14 @@
     gap: 0;
     flex-shrink: 0;
     width: 100%;
-    margin: 4px 0 2px;
+    margin: vw(4) 0 vw(2);
   }
 
   &__tab {
     flex: 1;
     width: 50%;
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: vw(4) vw(8);
+    font-size: vw(11);
     color: #ffffffcc;
     background: #ffffff0d;
     cursor: pointer;
@@ -133,11 +135,11 @@
     min-height: 0;
 
     &--apply {
-      min-height: 120px;
+      min-height: vw(120);
     }
 
     &--radar {
-      min-height: 140px;
+      min-height: vw(140);
     }
   }
 }
@@ -154,20 +156,20 @@
 .rank-list,
 .grantee-list {
   list-style: none;
-  margin: 4px 0 0;
+  margin: vw(4) 0 0;
   padding: 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: vw(4);
 
   &__item {
     flex: 1;
     min-height: 0;
     display: flex;
     align-items: center;
-    padding: 0 10px 0 8px;
-    border-left: 2px solid #1CBADD;
+    padding: 0 vw(10) 0 vw(8);
+    border-left: vw(2) solid #1CBADD;
     background: linear-gradient(
       90deg,
       rgba(156, 196, 255, 0) 0%,
@@ -185,11 +187,11 @@
 
 .grantee-list {
   &__badge {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
+    width: vw(20);
+    height: vw(20);
+    line-height: vw(20);
     text-align: center;
-    font-size: 11px;
+    font-size: vw(11);
     font-weight: 700;
     color: #fff;
     border-radius: 50%;
@@ -204,8 +206,8 @@
 
   &__name {
     flex: 1;
-    margin-left: 8px;
-    font-size: 11px;
+    margin-left: vw(8);
+    font-size: vw(11);
     color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
@@ -214,15 +216,15 @@
 
   &__value {
     flex-shrink: 0;
-    font-size: 12px;
+    font-size: vw(12);
     font-weight: 600;
     color: #6BDCFF;
     font-family: 'DIN Alternate', 'DIN', sans-serif;
   }
 
   &__unit {
-    margin-left: 2px;
-    font-size: 10px;
+    margin-left: vw(2);
+    font-size: vw(10);
     font-weight: 400;
     color: #ffffff;
     font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
@@ -231,11 +233,11 @@
 
 .rank-list {
   &__badge {
-    width: 20px;
-    height: 20px;
-    line-height: 20px;
+    width: vw(20);
+    height: vw(20);
+    line-height: vw(20);
     text-align: center;
-    font-size: 11px;
+    font-size: vw(11);
     font-weight: 700;
     color: #fff;
     border-radius: 50%;
@@ -250,8 +252,8 @@
 
   &__name {
     flex: 1;
-    margin-left: 8px;
-    font-size: 11px;
+    margin-left: vw(8);
+    font-size: vw(11);
     color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
@@ -260,7 +262,7 @@
 
   &__value {
     flex-shrink: 0;
-    font-size: 12px;
+    font-size: vw(12);
     font-weight: 600;
     color: #6BDCFF;
     font-family: 'DIN Alternate', 'DIN', sans-serif;

@@ -71,11 +71,13 @@
 <script>
 import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
-import { formatNumber, FONT_DIN, AXIS_LABEL_COLOR, AXIS_LABEL_FONT_SIZE, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops } from './utils/chartTheme'
+import cockpitViewportMixin from './mixins/cockpitViewport'
+import { formatNumber, FONT_DIN, AXIS_LABEL_COLOR, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops } from './utils/chartTheme'
 
 export default {
   name: 'CockpitRightMainPanel',
   components: { CockpitSectionTitle, CockpitHighchartsBase },
+  mixins: [cockpitViewportMixin],
   props: {
     data: {
       type: Object,
@@ -83,6 +85,9 @@ export default {
     }
   },
   computed: {
+    axisLabelFontSize() {
+      return this.ds(12)
+    },
     summary() {
       return this.data.chinaPatentSummary || {}
     },
@@ -117,8 +122,9 @@ export default {
       return this.top50List.filter(item => item.rank % 2 === 0).slice(0, 6)
     },
     trendOptions() {
+      const d = n => this.d(n)
       return {
-        chart: { type: 'areaspline', marginTop: 22, marginBottom: 20 },
+        chart: { type: 'areaspline', marginTop: d(22), marginBottom: d(20) },
         xAxis: {
           categories: this.trendYears,
           tickmarkPlacement: 'between',
@@ -135,29 +141,29 @@ export default {
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
-          labels: { formatter() { return (this.value / 10000) + '万' }, style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN } }
+          labels: { formatter() { return (this.value / 10000) + '万' }, style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN } }
         },
         legend: {
           align: 'center',
           verticalAlign: 'top',
-          y: -4,
-          itemDistance: 32,
-          symbolWidth: 18,
-          symbolHeight: 10,
-          itemStyle: { color: '#C8E6FF', fontSize: '11px', fontWeight: 'normal' },
+          y: d(-4),
+          itemDistance: d(32),
+          symbolWidth: d(18),
+          symbolHeight: d(10),
+          itemStyle: { color: '#C8E6FF', fontSize: this.ds(11), fontWeight: 'normal' },
           itemHoverStyle: { color: '#FFFFFF' }
         },
         plotOptions: {
           areaspline: {
             fillOpacity: 1,
-            lineWidth: 2,
+            lineWidth: d(2),
             legendSymbol: 'lineMarker',
             marker: {
               enabled: true,
-              radius: 4,
+              radius: d(4),
               symbol: 'circle',
               fillColor: '#10224D',
-              lineWidth: 2,
+              lineWidth: d(2),
               lineColor: null
             }
           }
@@ -171,7 +177,7 @@ export default {
             marker: {
               fillColor: '#10224D',
               lineColor: color,
-              lineWidth: 2
+              lineWidth: d(2)
             },
             fillColor: {
               linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -187,23 +193,24 @@ export default {
       const barColor = '#537FF1'
       const maxLabelLen = Math.max(...categories.map(name => name.length))
       const axisMax = 400000
+      const d = n => this.d(n)
 
       return {
         chart: {
           type: 'bar',
-          marginLeft: Math.max(148, maxLabelLen * 11 + 16),
-          marginRight: 56,
-          marginTop: 22,
-          marginBottom: 8,
-          spacingTop: 4
+          marginLeft: Math.max(d(148), maxLabelLen * d(11) + d(16)),
+          marginRight: d(56),
+          marginTop: d(22),
+          marginBottom: d(8),
+          spacingTop: d(4)
         },
         xAxis: {
           categories,
           reversed: true,
           labels: {
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE },
+            style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize },
             align: 'right',
-            x: -6,
+            x: d(-6),
             reserveSpace: true
           },
           lineWidth: 0,
@@ -224,8 +231,8 @@ export default {
             formatter() {
               return this.value === 0 ? '0' : (this.value / 10000) + '万'
             },
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN },
-            y: 2
+            style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN },
+            y: d(2)
           },
           lineColor: AXIS_LINE_COLOR,
           tickColor: AXIS_LINE_COLOR,
@@ -243,8 +250,8 @@ export default {
               enabled: true,
               align: 'right',
               format: '{y:.0f}',
-              style: { color: '#FFFFFF', fontSize: '10px', textOutline: 'none', fontFamily: FONT_DIN },
-              x: 6
+              style: { color: '#FFFFFF', fontSize: this.ds(10), textOutline: 'none', fontFamily: FONT_DIN },
+              x: d(6)
             }
           },
           series: { states: { hover: { brightness: 0.08 } } }
