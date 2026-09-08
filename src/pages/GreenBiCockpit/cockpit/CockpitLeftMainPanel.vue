@@ -117,8 +117,18 @@ import {
   AXIS_LABEL_COLOR,
   GRID_LINE_COLOR,
   POLAR_GRID_LINE_COLOR,
-  AXIS_LINE_COLOR
+  AXIS_LINE_COLOR,
+  formatRadarAxisLabel
 } from './utils/chartTheme'
+
+/** 雷达图各维度数值标签位置（设计稿 px） */
+const RADAR_LABEL_LAYOUT = {
+  智能电网产业: { distance: 14, x: -4, y: 22 },
+  太阳能产业: { distance: 16, x: 20, y: 3 },
+  生物质能及其他新能源产业: { distance: 20, x: 12, y: 22 },
+  风能产业: { distance: 16, x: -12, y: 22 },
+  核电产业: { distance: 14, x: -20, y: 3 }
+}
 
 Highcharts3D(Highcharts)
 HighchartsMore(Highcharts)
@@ -259,7 +269,7 @@ export default {
     },
     trendOptions() {
       return {
-        chart: { type: 'spline', marginTop: this.d(8), marginBottom: this.d(58) },
+        chart: { type: 'spline', marginTop: this.d(8), marginBottom: this.d(72) },
         xAxis: {
           categories: this.trendYears,
           tickmarkPlacement: 'between',
@@ -281,7 +291,7 @@ export default {
         legend: {
           align: 'center',
           verticalAlign: 'bottom',
-          margin: this.d(18),
+          margin: this.d(32),
           itemDistance: this.d(8),
           symbolWidth: this.d(8),
           symbolHeight: this.d(8)
@@ -295,10 +305,10 @@ export default {
             data: s.data,
             shadow: {
               color,
-              width: this.d(4),
-              opacity: 0.18,
+              width: this.d(8),
+              opacity: 0.12,
               offsetX: 0,
-              offsetY: 0
+              offsetY: this.d(3)
             }
           }
         })
@@ -445,11 +455,12 @@ export default {
         chart: {
           polar: true,
           type: 'line',
-          margin: [d(4), d(4), d(4), d(4)],
-          backgroundColor: 'transparent'
+          margin: [d(10), d(16), d(10), d(16)],
+          backgroundColor: 'transparent',
+          spacing: [d(4), d(4), d(4), d(4)]
         },
         pane: {
-          size: '82%',
+          size: '80%',
           startAngle: 0,
           endAngle: 360,
           background: [{
@@ -466,9 +477,9 @@ export default {
           gridLineColor,
           labels: {
             useHTML: true,
-            distance: d(18),
-            formatter() {
-              return `<span style="color:#ffffffcc;font-size:${axisFontSize};white-space:nowrap">${this.value}</span>`
+            distance: d(12),
+            formatter: function formatRadarLabel() {
+              return formatRadarAxisLabel(this.value, axisFontSize)
             }
           }
         },
@@ -490,13 +501,12 @@ export default {
             connectEnds: true
           },
           line: {
-            fillOpacity: 0.45,
             lineWidth: d(2),
-            lineColor: '#72A8DA',
+            lineColor: '#537FF1',
             marker: {
               enabled: true,
               radius: d(3),
-              fillColor: '#72A8DA',
+              fillColor: '#537FF1',
               lineColor: '#fff',
               lineWidth: 1
             }
@@ -518,22 +528,26 @@ export default {
         series: [{
           type: 'area',
           name: '授权量',
-          color: '#72A8DA',
+          color: '#537FF1',
+          lineColor: '#537FF1',
           connectEnds: true,
           pointPlacement: 'on',
-          data: values.map(y => ({
-            y,
-            dataLabels: {
-              distance: Math.max(d(12), (0.9 - y / maxVal) * d(72))
+          data: this.radarCategories.map((category, index) => {
+            const y = values[index] || 0
+            const custom = RADAR_LABEL_LAYOUT[category] || {}
+            const defaultDistance = Math.max(d(12), (0.9 - y / maxVal) * d(72))
+
+            return {
+              y,
+              dataLabels: {
+                distance: custom.distance != null ? d(custom.distance) : defaultDistance,
+                x: custom.x != null ? d(custom.x) : 0,
+                y: custom.y != null ? d(custom.y) : 0
+              }
             }
-          })),
-          fillColor: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-            stops: [
-              [0, 'rgba(114, 168, 218, 0.55)'],
-              [1, 'rgba(19, 89, 153, 0.08)']
-            ]
-          }
+          }),
+          fillColor: 'rgba(83, 127, 241, 0.6)',
+          fillOpacity: 1
         }]
       }
     }

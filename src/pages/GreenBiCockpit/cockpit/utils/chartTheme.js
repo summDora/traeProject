@@ -199,6 +199,7 @@ export function applyCockpitTheme(viewportWidth = typeof window !== 'undefined' 
     tooltip: {
       backgroundColor: 'rgba(2, 18, 48, 0.92)',
       borderColor: 'rgba(0, 212, 255, 0.4)',
+      headerFormat: `<span style="font-size:${tooltipFontSize};color:#FFFFFF;font-family:${FONT_DIN}">{point.key}</span><br/>`,
       style: { color: '#FFFFFF', fontSize: tooltipFontSize, fontFamily: FONT_DIN }
     },
     plotOptions: {
@@ -213,4 +214,25 @@ export function applyCockpitTheme(viewportWidth = typeof window !== 'undefined' 
 
 export function formatNumber(num) {
   return Number(num).toLocaleString('zh-CN')
+}
+
+/** 雷达图坐标轴长文本换行 */
+export function formatRadarAxisLabel(text, fontSize) {
+  const value = String(text)
+  const baseStyle = `color:#ffffffcc;font-size:${fontSize};text-align:center;line-height:1.25;display:inline-block`
+
+  if (value.length <= 7) {
+    return `<span style="${baseStyle};white-space:nowrap">${value}</span>`
+  }
+
+  let splitAt = Math.ceil(value.length / 2)
+  for (const ch of ['及', '与', '和', '的']) {
+    const idx = value.indexOf(ch)
+    if (idx > 1 && idx < value.length - 2) {
+      splitAt = idx + 1
+      break
+    }
+  }
+
+  return `<span style="${baseStyle}">${value.slice(0, splitAt)}<br/>${value.slice(splitAt)}</span>`
 }

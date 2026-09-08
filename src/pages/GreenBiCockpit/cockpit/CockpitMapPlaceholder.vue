@@ -9,6 +9,7 @@
 import * as echarts from 'echarts'
 import chinaJson from './assets/china.json'
 import { buildCockpitMapOptions } from './utils/cockpitMapOptions'
+import cockpitViewportMixin from './mixins/cockpitViewport'
 
 let chinaMapRegistered = false
 
@@ -20,6 +21,7 @@ function registerChinaMap() {
 
 export default {
   name: 'CockpitMapPlaceholder',
+  mixins: [cockpitViewportMixin],
   props: {
     data: {
       type: Array,
@@ -27,6 +29,9 @@ export default {
     }
   },
   watch: {
+    viewportWidth() {
+      this.updateChart()
+    },
     data: {
       deep: true,
       handler() {
@@ -54,7 +59,7 @@ export default {
     },
     updateChart() {
       if (!this.chart) return
-      this.chart.setOption(buildCockpitMapOptions(this.data), true)
+      this.chart.setOption(buildCockpitMapOptions(this.data, this.viewportWidth), true)
     },
     handleResize() {
       if (this.chart) {
@@ -74,13 +79,11 @@ export default {
   line-height: 1.5;
 
   &__title {
-    font-size: 14px;
     font-weight: 600;
     margin-bottom: 4px;
   }
 
   &__row {
-    font-size: 12px;
     color: rgba(255, 255, 255, 0.9);
   }
 }

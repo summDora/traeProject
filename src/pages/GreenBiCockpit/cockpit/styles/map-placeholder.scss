@@ -15,9 +15,9 @@
   &__glow {
     position: absolute;
     z-index: 0;
-    bottom: -2%;
+    bottom: vw(-28);
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(calc(-50% + #{vw(20)}));
     transform-origin: center bottom;
     width: 90%;
     height: 56%;

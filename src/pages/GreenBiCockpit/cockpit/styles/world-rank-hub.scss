@@ -10,7 +10,7 @@
   min-width: 0;
   min-height: 0;
   padding: vw(2) 0;
-  overflow: hidden;
+  overflow: visible;
 
   &__row {
     display: grid;
@@ -24,9 +24,11 @@
     min-width: 0;
     display: flex;
     align-items: flex-end;
+    overflow: visible;
 
     &--left {
       justify-content: flex-start;
+      padding-right: vw(2);
 
       .world-rank__entry {
         width: 100%;
@@ -35,17 +37,18 @@
       .world-rank__text {
         margin-right: auto;
         margin-left: 0;
-        text-align: left;
+        justify-content: flex-start;
       }
 
       .world-rank__entry--bent .world-rank__text,
       .world-rank__entry--middle .world-rank__text {
-        width: calc(100% * 110 / 164);
+        max-width: calc(100% * 110 / 164);
       }
     }
 
     &--right {
       justify-content: flex-end;
+      padding-left: vw(2);
 
       .world-rank__entry {
         width: 100%;
@@ -54,12 +57,8 @@
       .world-rank__text {
         margin-left: auto;
         margin-right: 0;
-        text-align: right;
-      }
-
-      .world-rank__entry--bent .world-rank__text,
-      .world-rank__entry--middle .world-rank__text {
-        width: calc(100% * 110 / 164);
+        justify-content: flex-end;
+        max-width: 100%;
       }
     }
   }
@@ -75,19 +74,28 @@
   &__text {
     position: relative;
     z-index: 2;
-    white-space: nowrap;
+    display: flex;
+    align-items: baseline;
+    gap: vw(6);
+    max-width: 100%;
     font-size: vw(16);
-    line-height: 1;
+    line-height: 1.2;
     margin-bottom: 0;
     padding-bottom: 0;
   }
 
   &__name {
-    margin-right: vw(8);
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #ffffffcc;
   }
 
   &__value {
+    flex: 0 0 auto;
+    white-space: nowrap;
     color: #fff;
     font-weight: 700;
     letter-spacing: vw(0.5);

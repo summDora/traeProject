@@ -124,15 +124,21 @@ export default {
     trendOptions() {
       const d = n => this.d(n)
       return {
-        chart: { type: 'areaspline', marginTop: d(22), marginBottom: d(20) },
+        chart: { type: 'areaspline', marginTop: d(22), marginBottom: d(48) },
         xAxis: {
           categories: this.trendYears,
-          tickmarkPlacement: 'between',
-          startOnTick: false,
-          endOnTick: false,
+          tickmarkPlacement: 'on',
+          lineWidth: 1,
+          lineColor: AXIS_LINE_COLOR,
+          tickLength: 0,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
-          gridLineColor: GRID_LINE_COLOR
+          gridLineColor: GRID_LINE_COLOR,
+          labels: {
+            align: 'center',
+            style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize },
+            y: d(16)
+          }
         },
         yAxis: {
           min: 0,
@@ -199,7 +205,7 @@ export default {
         chart: {
           type: 'bar',
           marginLeft: Math.max(d(148), maxLabelLen * d(11) + d(16)),
-          marginRight: d(56),
+          marginRight: d(64),
           marginTop: d(22),
           marginBottom: d(8),
           spacingTop: d(4)
@@ -210,7 +216,7 @@ export default {
           labels: {
             style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize },
             align: 'right',
-            x: d(-6),
+            x: d(-14),
             reserveSpace: true
           },
           lineWidth: 0,
@@ -232,7 +238,7 @@ export default {
               return this.value === 0 ? '0' : (this.value / 10000) + '万'
             },
             style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN },
-            y: d(2)
+            x: d(10)
           },
           lineColor: AXIS_LINE_COLOR,
           tickColor: AXIS_LINE_COLOR,
