@@ -57,16 +57,27 @@
       <div class="left-main__rankings">
         <div class="inner-block rank-block rank-block--region">
           <CockpitSectionTitle sub title="全国绿色专利授权量区域排名" />
-          <ul class="rank-list rank-list--region">
-            <li v-for="item in regionRankingDisplay" :key="item.rank" class="rank-list__item">
-              <span
-                class="rank-list__badge"
-                :class="item.rank <= 3 ? 'rank-list__badge--' + item.rank : 'rank-list__badge--default'"
-              >{{ item.rank }}</span>
-              <span class="rank-list__name">{{ item.name }}</span>
-              <span class="rank-list__value">{{ formatNumber(item.value) }}</span>
-            </li>
-          </ul>
+          <div ref="regionRankViewport" class="rank-scroll-viewport">
+            <ul
+              class="rank-list rank-list--region rank-scroll-track"
+              :class="{ 'rank-scroll-track--scroll': regionCanScroll }"
+              :style="regionScrollStyle"
+            >
+              <li
+                v-for="(item, index) in regionRankTrack"
+                :key="'region-' + item.rank + '-' + index"
+                class="rank-list__item"
+                :style="regionItemStyle"
+              >
+                <span
+                  class="rank-list__badge"
+                  :class="item.rank <= 3 ? 'rank-list__badge--' + item.rank : 'rank-list__badge--default'"
+                >{{ item.rank }}</span>
+                <span class="rank-list__name">{{ item.name }}</span>
+                <span class="rank-list__value">{{ item.value }}<span class="rank-list__unit">件</span></span>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="inner-block rank-block rank-block--grantee">
           <CockpitSectionTitle sub title="绿色专利授权权人排名" />
@@ -79,16 +90,27 @@
               @click="granteeTab = tab.key"
             >{{ tab.label }}</span>
           </div>
-          <ul class="grantee-list">
-            <li v-for="item in currentGranteeList" :key="item.rank" class="grantee-list__item">
-              <span
-                class="grantee-list__badge"
-                :class="item.rank <= 3 ? 'grantee-list__badge--' + item.rank : 'grantee-list__badge--default'"
-              >{{ item.rank }}</span>
-              <span class="grantee-list__name">{{ item.name }}</span>
-              <span class="grantee-list__value">{{ item.value }}<span class="grantee-list__unit">件</span></span>
-            </li>
-          </ul>
+          <div ref="granteeRankViewport" class="rank-scroll-viewport">
+            <ul
+              class="grantee-list rank-scroll-track"
+              :class="{ 'rank-scroll-track--scroll': granteeCanScroll }"
+              :style="granteeScrollStyle"
+            >
+              <li
+                v-for="(item, index) in granteeRankTrack"
+                :key="'grantee-' + granteeTab + '-' + item.rank + '-' + index"
+                class="grantee-list__item"
+                :style="granteeItemStyle"
+              >
+                <span
+                  class="grantee-list__badge"
+                  :class="item.rank <= 3 ? 'grantee-list__badge--' + item.rank : 'grantee-list__badge--default'"
+                >{{ item.rank }}</span>
+                <span class="grantee-list__name">{{ item.name }}</span>
+                <span class="grantee-list__value">{{ item.value }}<span class="grantee-list__unit">件</span></span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <CockpitMapPlaceholder :data="mapProvinceData" />
@@ -106,20 +128,23 @@ import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
 import CockpitMapPlaceholder from './CockpitMapPlaceholder.vue'
 import cockpitViewportMixin from './mixins/cockpitViewport'
+import cockpitRankScrollMixin from './mixins/cockpitRankScroll'
 import {
-  formatNumber,
-  FONT_DIN,
   getPieChartColor,
   getTrendLineColor,
   getApplyBarGradient,
   getApplyBarTopColor,
   normalizeSeriesValues,
+  FONT_DIN,
   AXIS_LABEL_COLOR,
   GRID_LINE_COLOR,
   POLAR_GRID_LINE_COLOR,
   AXIS_LINE_COLOR,
   formatRadarAxisLabel
 } from './utils/chartTheme'
+
+const REGION_VISIBLE_COUNT = 5
+const GRANTEE_VISIBLE_COUNT = 10
 
 /** 雷达图各维度数值标签位置（设计稿 px） */
 const RADAR_LABEL_LAYOUT = {
@@ -136,7 +161,7 @@ HighchartsMore(Highcharts)
 export default {
   name: 'CockpitLeftMainPanel',
   components: { CockpitSectionTitle, CockpitHighchartsBase, CockpitMapPlaceholder, CockpitWorldRankHub },
-  mixins: [cockpitViewportMixin],
+  mixins: [cockpitViewportMixin, cockpitRankScrollMixin],
   props: {
     data: {
       type: Object,
@@ -154,7 +179,11 @@ export default {
       applyTabs: [
         { key: 'countries', label: '申请人前5国' },
         { key: 'offices', label: '申请量前5专利局' }
-      ]
+      ],
+      regionItemHeight: 0,
+      regionScrollDistance: 0,
+      granteeItemHeight: 0,
+      granteeScrollDistance: 0
     }
   },
   computed: {
@@ -231,11 +260,41 @@ export default {
       return names.map(name => this.countryStats.find(item => item.name === name)).filter(Boolean)
     },
     currentGranteeList() {
-      const list = this.granteeTab === 'domestic' ? this.granteeDomestic : this.granteeGlobal
-      return list.slice(0, 10)
+      return this.granteeTab === 'domestic' ? this.granteeDomestic : this.granteeGlobal
     },
-    regionRankingDisplay() {
-      return this.regionRanking.slice(0, 5)
+    regionRankTrack() {
+      return this.buildRankScrollTrack(this.regionRanking, REGION_VISIBLE_COUNT)
+    },
+    granteeRankTrack() {
+      return this.buildRankScrollTrack(this.currentGranteeList, GRANTEE_VISIBLE_COUNT)
+    },
+    regionCanScroll() {
+      return this.canRankScroll(this.regionRanking, REGION_VISIBLE_COUNT) && this.regionScrollDistance > 0
+    },
+    granteeCanScroll() {
+      return this.canRankScroll(this.currentGranteeList, GRANTEE_VISIBLE_COUNT) && this.granteeScrollDistance > 0
+    },
+    regionScrollStyle() {
+      return this.createRankTrackStyle({
+        canScroll: this.regionCanScroll,
+        scrollDistance: this.regionScrollDistance,
+        itemHeight: this.regionItemHeight,
+        listLength: this.regionRanking.length
+      })
+    },
+    granteeScrollStyle() {
+      return this.createRankTrackStyle({
+        canScroll: this.granteeCanScroll,
+        scrollDistance: this.granteeScrollDistance,
+        itemHeight: this.granteeItemHeight,
+        listLength: this.currentGranteeList.length
+      })
+    },
+    regionItemStyle() {
+      return this.createRankItemStyle(this.regionItemHeight)
+    },
+    granteeItemStyle() {
+      return this.createRankItemStyle(this.granteeItemHeight)
     },
     currentApplyData() {
       return this.applyTab === 'countries' ? this.applyTrendCountries : this.applyTrendOffices
@@ -552,7 +611,69 @@ export default {
       }
     }
   },
-  methods: { formatNumber }
+  watch: {
+    regionRanking() {
+      this.resetRegionScroll()
+    },
+    currentGranteeList() {
+      this.resetGranteeScroll()
+    },
+    granteeTab() {
+      this.resetGranteeScroll()
+    },
+    viewportWidth() {
+      this.$nextTick(this.measureRankScrollLayouts)
+    }
+  },
+  mounted() {
+    this.$nextTick(this.measureRankScrollLayouts)
+    window.addEventListener('resize', this.measureRankScrollLayouts, { passive: true })
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.measureRankScrollLayouts)
+  },
+  methods: {
+    measureRankScrollLayouts() {
+      this.measureRegionScrollLayout()
+      this.measureGranteeScrollLayout()
+    },
+    measureRegionScrollLayout() {
+      this.measureRankScrollArea(
+        'regionRankViewport',
+        REGION_VISIBLE_COUNT,
+        this.regionRanking,
+        'regionItemHeight',
+        'regionScrollDistance'
+      )
+    },
+    measureGranteeScrollLayout() {
+      this.measureRankScrollArea(
+        'granteeRankViewport',
+        GRANTEE_VISIBLE_COUNT,
+        this.currentGranteeList,
+        'granteeItemHeight',
+        'granteeScrollDistance'
+      )
+    },
+    resetRegionScroll() {
+      this.resetRankScrollArea(
+        'regionRankViewport',
+        REGION_VISIBLE_COUNT,
+        this.regionRanking,
+        'regionItemHeight',
+        'regionScrollDistance'
+      )
+    },
+    resetGranteeScroll() {
+      this.resetRankScrollArea(
+        'granteeRankViewport',
+        GRANTEE_VISIBLE_COUNT,
+        this.currentGranteeList,
+        'granteeItemHeight',
+        'granteeScrollDistance'
+      )
+    }
+  }
 }
 </script>
 

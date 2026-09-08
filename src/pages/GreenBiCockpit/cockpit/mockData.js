@@ -44,6 +44,11 @@ export const regionRanking = [
   { rank: 3, name: '北京', value: 157235 },
   { rank: 4, name: '浙江', value: 151982 },
   { rank: 5, name: '山东', value: 96087 },
+  { rank: 6, name: '上海', value: 88491 },
+  { rank: 7, name: '四川', value: 63856 },
+  { rank: 8, name: '安徽', value: 62552 },
+  { rank: 9, name: '湖北', value: 61574 },
+  { rank: 10, name: '陕西', value: 54643 },
 ]
 
 export const granteeRankingDomestic = [
