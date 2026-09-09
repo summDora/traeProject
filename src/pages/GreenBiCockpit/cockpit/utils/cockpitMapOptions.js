@@ -68,8 +68,8 @@ const SHADOW_LAYERS = [
 
 /** 柱体高度（geo 经纬度偏移） */
 const PILLAR_HEIGHT = {
-  min: 2.6,
-  max: 5.4,
+  min: 1,
+  max: 5.5,
 };
 
 /** 设计稿柱宽（px） */
@@ -106,9 +106,10 @@ function createPillarBodyGradient() {
     x2: 0,
     y2: 0,
     colorStops: [
-      { offset: 0, color: "rgba(255, 206, 151, 0)" },
-      { offset: 0.25, color: "rgba(255, 206, 151, 0.15)" },
-      { offset: 0.62, color: "rgba(255, 206, 151, 0.68)" },
+      { offset: 0, color: "rgba(202, 243, 155, 0.7)" },
+      { offset: 0.06, color: "rgba(159, 233, 255, 0.6)" },
+      { offset: 0.3, color: "rgba(255, 206, 151, 0.25)" },
+      { offset: 0.62, color: "rgba(255, 206, 151, 0.48)" },
       { offset: 1, color: PILLAR_TOP_COLOR },
     ],
     global: false,
@@ -401,9 +402,34 @@ export function buildCockpitMapOptions(data = [], viewportWidth) {
         silent: true,
         label: { show: false },
         itemStyle: {
-          color: "transparent",
+          color: "#71e1f5ff",
           opacity: 1,
-          borderColor: "rgba(255, 230, 210, 0.95)",
+          borderWidth: 0,
+          shadowColor: "rgba(255, 206, 151, 0.45)",
+          shadowBlur: d(6),
+        },
+        emphasis: { disabled: true },
+        data: pillar.bases,
+      },
+      {
+        type: "effectScatter",
+        rippleEffect: {
+          period: 4,
+          scale: 2,
+          number: 2,
+          brushType: "stroke",
+        },
+        name: "pillar-base-effect",
+        coordinateSystem: "geo",
+        geoIndex: 0,
+        zlevel: 6,
+        symbol: "circle",
+        symbolSize: [20,10],
+        silent: true,
+        label: { show: false },
+        itemStyle: {
+          color: "#ffffff56",
+          opacity: .4,
           borderWidth: 0,
           shadowColor: "rgba(255, 206, 151, 0.45)",
           shadowBlur: d(6),

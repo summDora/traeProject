@@ -212,6 +212,35 @@ export function applyCockpitTheme(viewportWidth = typeof window !== 'undefined' 
   })
 }
 
+/**
+ * 根据数据最大值计算 y 轴 max 与 tickInterval（整刻度，适配「万」标签）
+ * @param {number[]} values
+ * @param {{ tickCount?: number, minMax?: number }} options tickCount 期望主刻度段数
+ */
+export function computeNiceAxisScale(values, options = {}) {
+  const { tickCount = 4, minMax = 0 } = options
+  const nums = (Array.isArray(values) ? values : []).map(v => Number(v) || 0)
+  const dataMax = Math.max(...nums, minMax, 0)
+  if (dataMax <= 0) return { max: 1, tickInterval: 1 }
+
+  const rawStep = dataMax / tickCount
+  const exponent = Math.floor(Math.log10(rawStep))
+  const magnitude = Math.pow(10, exponent)
+  const multipliers = [1, 2, 2.5, 5, 10]
+
+  let tickInterval = multipliers[multipliers.length - 1] * magnitude
+  for (const mult of multipliers) {
+    const step = mult * magnitude
+    if (step >= rawStep) {
+      tickInterval = step
+      break
+    }
+  }
+
+  const max = Math.ceil(dataMax / tickInterval) * tickInterval
+  return { max, tickInterval }
+}
+
 export function formatNumber(num) {
   return Number(num).toLocaleString('zh-CN')
 }

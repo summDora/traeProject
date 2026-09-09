@@ -95,7 +95,7 @@ import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
 import cockpitViewportMixin from './mixins/cockpitViewport'
 import cockpitRankScrollMixin from './mixins/cockpitRankScroll'
-import { FONT_DIN, AXIS_LABEL_COLOR, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops } from './utils/chartTheme'
+import { FONT_DIN, AXIS_LABEL_COLOR, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops, computeNiceAxisScale } from './utils/chartTheme'
 
 const TOP50_VISIBLE_COUNT = 6
 
@@ -174,6 +174,8 @@ export default {
     },
     trendOptions() {
       const d = n => this.d(n)
+      const allValues = this.trendSeries.flatMap(s => s.data || [])
+      const { max: yMax, tickInterval } = computeNiceAxisScale(allValues, { tickCount: 2 })
       return {
         chart: { type: 'areaspline', marginTop: d(22), marginBottom: d(48) },
         xAxis: {
@@ -193,8 +195,8 @@ export default {
         },
         yAxis: {
           min: 0,
-          max: 500000,
-          tickInterval: 250000,
+          max: yMax,
+          tickInterval,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
@@ -248,7 +250,7 @@ export default {
       const values = this.techFieldData.map(d => d.value)
       const barColor = '#537FF1'
       const maxLabelLen = Math.max(...categories.map(name => name.length))
-      const axisMax = 400000
+      const { max: axisMax, tickInterval } = computeNiceAxisScale(values)
       const d = n => this.d(n)
 
       return {
@@ -278,7 +280,7 @@ export default {
         yAxis: {
           min: 0,
           max: axisMax,
-          tickInterval: 100000,
+          tickInterval,
           opposite: true,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',

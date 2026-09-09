@@ -140,7 +140,8 @@ import {
   GRID_LINE_COLOR,
   POLAR_GRID_LINE_COLOR,
   AXIS_LINE_COLOR,
-  formatRadarAxisLabel
+  formatRadarAxisLabel,
+  computeNiceAxisScale
 } from './utils/chartTheme'
 
 const REGION_VISIBLE_COUNT = 5
@@ -327,6 +328,8 @@ export default {
       }
     },
     trendOptions() {
+      const allValues = this.trendSeries.flatMap(s => s.data || [])
+      const { max: yMax, tickInterval } = computeNiceAxisScale(allValues)
       return {
         chart: { type: 'spline', marginTop: this.d(8), marginBottom: this.d(72) },
         xAxis: {
@@ -340,8 +343,8 @@ export default {
         },
         yAxis: {
           min: 0,
-          max: 40,
-          tickInterval: 10,
+          max: yMax,
+          tickInterval,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
@@ -375,8 +378,8 @@ export default {
     },
     applyTrendOptions() {
       const data = this.currentApplyData
-      const maxY = 2000000
-      const items = data.data
+      const items = data.data || []
+      const { max: maxY, tickInterval } = computeNiceAxisScale(items, { tickCount: 2 })
       const d = n => this.d(n)
       const ds = n => this.ds(n)
       const stripH = d(2)
@@ -437,7 +440,7 @@ export default {
         yAxis: {
           min: 0,
           max: maxY,
-          tickInterval: 1000000,
+          tickInterval,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
