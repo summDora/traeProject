@@ -146,6 +146,10 @@ import {
 
 const REGION_VISIBLE_COUNT = 5
 const GRANTEE_VISIBLE_COUNT = 10
+/** 区域排名单独滚动速度（pixel 模式 px/s，越大越快；默认全局 26） */
+const REGION_SCROLL_SPEED = 40
+/** 区域排名最小时长；全局 24s 会盖住更快的 speed，短列表必须单独降低 */
+const REGION_SCROLL_MIN_DURATION = 12
 
 /** 雷达图各维度数值标签位置（设计稿 px） */
 const RADAR_LABEL_LAYOUT = {
@@ -280,7 +284,9 @@ export default {
         canScroll: this.regionCanScroll,
         scrollDistance: this.regionScrollDistance,
         itemHeight: this.regionItemHeight,
-        listLength: this.regionRanking.length
+        listLength: this.regionRanking.length,
+        speed: REGION_SCROLL_SPEED,
+        minDuration: REGION_SCROLL_MIN_DURATION
       })
     },
     granteeScrollStyle() {

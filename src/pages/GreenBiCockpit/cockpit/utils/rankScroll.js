@@ -15,6 +15,7 @@
 export const RANK_SCROLL_MODE = 'pixel'
 
 // ========== 通用 ==========
+/** 一轮动画最短秒数；短列表上提高 speed 若仍不生效，说明被此项截断，需对单列表传更低的 minDuration */
 export const RANK_SCROLL_MIN_DURATION = 24
 
 // ========== 模式 A：pixel ==========
