@@ -8,8 +8,8 @@
         :default-active="activeMenu"
         mode="horizontal"
         router
-        background-color="#667eea"
-        text-color="#e8eaf6"
+        background-color="#0E7490"
+        text-color="#e6f4f6"
         active-text-color="#ffffff"
       >
         <template v-for="item in menus">
@@ -62,7 +62,7 @@ export default {
 .top-nav {
   display: flex;
   align-items: stretch;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0E7490 0%, #0C5C75 100%);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;

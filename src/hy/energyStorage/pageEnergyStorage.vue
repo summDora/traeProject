@@ -1,23 +1,27 @@
 <template>
   <div class="es-app">
     <nav class="es-step-tabs">
-      <button
-        v-for="item in tabs"
-        :key="item.id"
-        type="button"
-        class="es-step-tab"
-        :class="{ 'is-active': tab === item.id }"
-        @click="tab = item.id"
-      >
-        {{ item.no }}. {{ item.label }}
-      </button>
+      <div class="es-step-tabs-inner">
+        <button
+          v-for="item in tabs"
+          :key="item.id"
+          type="button"
+          class="es-step-tab"
+          :class="{ 'is-active': tab === item.id }"
+          @click="tab = item.id"
+        >
+          {{ item.no }}. {{ item.label }}
+        </button>
+      </div>
     </nav>
-    <source-data-panel :active="tab === 'tab-data'" />
-    <storage-params-panel :active="tab === 'tab-storage'" />
-    <optimize-panel :active="tab === 'tab-optimize'" />
-    <results-panel :active="tab === 'tab-results'" />
-    <cost-panel :active="tab === 'tab-cost'" />
-    <econ-panel :active="tab === 'tab-econ'" />
+    <div class="es-body">
+      <source-data-panel :active="tab === 'tab-data'" />
+      <storage-params-panel :active="tab === 'tab-storage'" />
+      <optimize-panel :active="tab === 'tab-optimize'" />
+      <results-panel :active="tab === 'tab-results'" />
+      <cost-panel :active="tab === 'tab-cost'" />
+      <econ-panel :active="tab === 'tab-econ'" />
+    </div>
   </div>
 </template>
 

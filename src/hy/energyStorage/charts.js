@@ -5,12 +5,14 @@
  */
 import * as echarts from 'echarts'
 
+/** 取得可用的 echarts 实例（兼容 4.9 default 导出与 5.x namespace 导出） */
 export function getEcharts() {
   if (echarts && typeof echarts.init === 'function') return echarts
   if (typeof window !== 'undefined' && window.echarts) return window.echarts
   throw new Error('echarts 未加载')
 }
 
+/** 销毁图表，避免切换页签或重绘时残留实例 */
 export function disposeChart(chart) {
   if (chart && typeof chart.dispose === 'function') {
     try {
@@ -21,20 +23,22 @@ export function disposeChart(chart) {
   }
 }
 
+/** 在指定 DOM 上渲染/更新 option；已有实例则复用，否则重新 init */
 export function renderChart(el, option, existed) {
   if (!el) return null
-  const echarts = getEcharts()
+  const echartsNs = getEcharts()
   let chart = existed
   if (chart && typeof chart.isDisposed === 'function' && chart.isDisposed()) {
     chart = null
   }
   if (!chart) {
-    chart = echarts.init(el)
+    chart = echartsNs.init(el)
   }
   chart.setOption(option, true)
   return chart
 }
 
+/** 将时间标签压成短格式，如 2023-03-01 00:00:00 → 03/01 00:00 */
 export function formatTickLabel(label) {
   if (!label) return ''
   const m = String(label).match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):/)
@@ -42,12 +46,16 @@ export function formatTickLabel(label) {
   return String(label)
 }
 
+/** 计算类目轴 interval，保证可见刻度数不超过 maxTicks */
 function axisInterval(len, maxTicks) {
   if (!len || len <= maxTicks) return 0
   return Math.ceil(len / maxTicks) - 1
 }
 
-/** 标签过多时倾斜，对齐原 Chart.js maxRotation / matplotlib autofmt_xdate */
+/**
+ * 生成类目 x 轴。
+ * 标签过多时自动旋转 45°（对齐原 Chart.js maxRotation / matplotlib autofmt_xdate）
+ */
 export function categoryAxis(labels, opts) {
   opts = opts || {}
   const len = (labels && labels.length) || 0
@@ -68,6 +76,7 @@ export function categoryAxis(labels, opts) {
   }
 }
 
+/** 按是否旋转 x 轴，预留底部空间，避免刻度被裁切 */
 function chartGrid(labels, extra, opts) {
   opts = opts || {}
   const len = (labels && labels.length) || 0
@@ -82,6 +91,7 @@ function chartGrid(labels, extra, opts) {
   }, extra || {})
 }
 
+/** 源荷数据页：负荷 / 新能源 / 净负荷曲线 */
 export function sourceLoadOption(labels, load, renewable, net) {
   return {
     color: ['#3b82f6', '#22c55e', '#f97316'],
@@ -119,6 +129,7 @@ export function sourceLoadOption(labels, load, renewable, net) {
   }
 }
 
+/** 储能负荷柱：充电为正色、放电为负色 */
 function storageBarData(values) {
   return (values || []).map(function (v) {
     return {
@@ -130,6 +141,7 @@ function storageBarData(values) {
   })
 }
 
+/** 结果页：储能负荷柱 + 分时电价线（双 y 轴） */
 export function chargeDischargeOption(labels, storageLoad, price) {
   return {
     tooltip: { trigger: 'axis' },
@@ -161,6 +173,7 @@ export function chargeDischargeOption(labels, storageLoad, price) {
   }
 }
 
+/** 结果页：储能负荷柱 + SOC 曲线（双 y 轴） */
 export function socStorageOption(labels, storageLoad, socPct) {
   return {
     tooltip: { trigger: 'axis' },
@@ -192,6 +205,7 @@ export function socStorageOption(labels, storageLoad, socPct) {
   }
 }
 
+/** 结果页：削峰填谷对比曲线（系列由勾选配置动态传入） */
 export function peakShavingOption(labels, seriesList) {
   return {
     tooltip: { trigger: 'axis' },
@@ -213,6 +227,7 @@ export function peakShavingOption(labels, seriesList) {
   }
 }
 
+/** 电费页：三条功率序列的月度净电费柱状对比 */
 export function costMonthlyOption(months, seriesList) {
   return {
     color: ['#3b82f6', '#f97316', '#22c55e'],
@@ -227,6 +242,7 @@ export function costMonthlyOption(months, seriesList) {
   }
 }
 
+/** 电费页：年度费用构成环形图（echarts 4.9 用 pie + radius） */
 export function costPieOption(feeLabels, values, colors) {
   const total = (values || []).reduce(function (a, b) { return a + b }, 0)
   return {
@@ -248,16 +264,22 @@ export function costPieOption(feeLabels, values, colors) {
     series: [
       {
         type: 'pie',
-        radius: ['42%', '68%'],
-        center: ['50%', '46%'],
+        radius: ['35%', '76%'],
+        center: ['50%', '44%'],
         avoidLabelOverlap: true,
+        itemStyle: {
+          borderColor: '#fff',
+          borderWidth: 2
+        },
         label: {
           normal: {
             show: true,
+            position: 'inside',
             formatter: function (p) {
-              return p.percent < 3 ? '' : p.percent.toFixed(1) + '%'
+              if (p.percent < 3) return ''
+              return p.percent.toFixed(1) + '%'
             },
-            textStyle: { color: '#fff', fontSize: 11 },
+            textStyle: { color: 'rgba(255,255,255,0.85)', fontSize: 12, fontWeight: 'bold' },
           },
         },
         labelLine: { normal: { show: false } },
@@ -269,6 +291,7 @@ export function costPieOption(feeLabels, values, colors) {
   }
 }
 
+/** 经济性评价页：全投资/资本金年度现金流（柱）+ 累计现金流（线） */
 export function econCashFlowOption(labels, totalCf, equityCf, cumTotal, cumEquity) {
   return {
     tooltip: {

@@ -182,11 +182,21 @@ const router = new VueRouter({
       path: '/energy-storage',
       name: 'EnergyStorage',
       component: () => import('../hy/energyStorage/pageEnergyStorage.vue'),
-      meta: { title: '储能优化' }
+      meta: { title: '储能优化调度' }
     },
     {
       path: '/energy-storage/:rest',
       redirect: '/energy-storage'
+    },
+    {
+      path: '/green-direct',
+      name: 'GreenDirect',
+      component: () => import('../hy/pageGreenDirect.vue'),
+      meta: { title: '绿电直连评估' }
+    },
+    {
+      path: '/green-direct/:rest',
+      redirect: '/green-direct'
     },
     {
       path: '/green-bi-cockpit',
@@ -225,8 +235,11 @@ export const navMenus = [
   },
 
   {
-    path: '/energy-storage',
-    title: '储能优化'
+    title: 'python 迁移',
+    children: [
+      { path: '/energy-storage', title: '储能优化调度' },
+      { path: '/green-direct', title: '绿电直连评估' },
+    ],
   },
   {
     title: "政策图谱",
