@@ -179,6 +179,16 @@ const router = new VueRouter({
       meta: { title: '需求模板管理' }
     },
     {
+      path: '/energy-storage',
+      name: 'EnergyStorage',
+      component: () => import('../hy/energyStorage/pageEnergyStorage.vue'),
+      meta: { title: '储能优化' }
+    },
+    {
+      path: '/energy-storage/:rest',
+      redirect: '/energy-storage'
+    },
+    {
       path: '/green-bi-cockpit',
       name: 'GreenBiCockpit',
       component: () => import('../pages/GreenBiCockpit/GreenEnergyDashboar.vue'),
@@ -214,6 +224,10 @@ export const navMenus = [
     ],
   },
 
+  {
+    path: '/energy-storage',
+    title: '储能优化'
+  },
   {
     title: "政策图谱",
     children: [

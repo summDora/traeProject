@@ -72,6 +72,9 @@ const PILLAR_HEIGHT = {
   max: 5.5,
 };
 
+/** 柱高映射：'linear' | 'log' | 'tier'（按数量级分档：个/十/百/千/万…） */
+const PILLAR_HEIGHT_SCALE = "tier";
+
 /** 设计稿柱宽（px） */
 const PILLAR_WIDTH_DESIGN = 12;
 
@@ -116,13 +119,56 @@ function createPillarBodyGradient() {
   };
 }
 
-/** 将数值映射为 0~1（线性 min-max） */
+function pillarMagnitude(value) {
+  const num = Math.max(Number(value) || 0, 1);
+  return Math.floor(Math.log10(num));
+}
+
+function pillarScaledValue(value) {
+  const num = Math.max(Number(value) || 0, 0);
+  if (PILLAR_HEIGHT_SCALE === "log") {
+    return Math.log10(1 + num);
+  }
+  return num;
+}
+
+/** 数量级分档：每档占等高区间，档内按 1~9.9… 微调 */
+function pillarTierHeight(value, minValue, maxValue) {
+  if (maxValue <= minValue) {
+    return PILLAR_HEIGHT.max;
+  }
+
+  const minMag = pillarMagnitude(minValue);
+  const maxMag = pillarMagnitude(maxValue);
+  const tierCount = Math.max(maxMag - minMag + 1, 1);
+  const span = PILLAR_HEIGHT.max - PILLAR_HEIGHT.min;
+  const tierBand = span / tierCount;
+
+  const num = Math.max(Number(value) || 0, 1);
+  const mag = pillarMagnitude(num);
+  const tierIndex = Math.max(0, Math.min(tierCount - 1, mag - minMag));
+  const tierBase = PILLAR_HEIGHT.min + tierIndex * tierBand;
+
+  const decadeBase = Math.pow(10, mag);
+  const withinTier = Math.min(1, Math.max(0, (num / decadeBase - 1) / 9));
+
+  return tierBase + withinTier * tierBand;
+}
+
+/** 将数值映射为 0~1（min-max；log 模式下先 log10(1+value) 再归一化） */
 function valueToRatio(value, minValue, maxValue) {
   if (maxValue <= minValue) return 1;
-  return (value - minValue) / (maxValue - minValue);
+  const scaled = pillarScaledValue(value);
+  const scaledMin = pillarScaledValue(minValue);
+  const scaledMax = pillarScaledValue(maxValue);
+  if (scaledMax <= scaledMin) return 1;
+  return (scaled - scaledMin) / (scaledMax - scaledMin);
 }
 
 function pillarHeight(value, minValue, maxValue) {
+  if (PILLAR_HEIGHT_SCALE === "tier") {
+    return pillarTierHeight(value, minValue, maxValue);
+  }
   const ratio = valueToRatio(value, minValue, maxValue);
   return PILLAR_HEIGHT.min + ratio * (PILLAR_HEIGHT.max - PILLAR_HEIGHT.min);
 }

@@ -17,6 +17,13 @@ module.exports = {
       poll: 1000,
       ignored: /node_modules/,
     },
+    proxy: {
+      "/pv-storage-api": {
+        target: "http://127.0.0.1:8011",
+        changeOrigin: true,
+        pathRewrite: { "^/pv-storage-api": "" },
+      },
+    },
   },
   chainWebpack: (config) => {
     config.resolve.alias
