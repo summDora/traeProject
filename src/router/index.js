@@ -1,14 +1,11 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import TableWithExplanation from '../components/TableWithExplanation.vue'
 
 Vue.use(VueRouter)
 
 const xcyPages = [
-  { path: '/xcy/page4', name: 'Page4', component: () => import('../hy/page4.vue'), meta: { title: '页面 4' } },
   { path: '/xcy/page6', name: 'Page6', component: () => import('../hy/page6.vue'), meta: { title: '页面 6' } },
   { path: '/xcy/page10', name: 'Page10', component: () => import('../hy/page10.vue'), meta: { title: '页面 10' } },
-  { path: '/xcy/page11', name: 'Page11', component: () => import('../hy/page11.vue'), meta: { title: '页面 11' } },
   { path: '/xcy/page12', name: 'Page12', component: () => import('../hy/page12.vue'), meta: { title: '页面 12' } }
 ]
 
@@ -17,9 +14,9 @@ const router = new VueRouter({
   routes: [
     {
       path: '/',
-      name: 'UserBehavior',
-      component: TableWithExplanation,
-      meta: { title: '用户行为分析' }
+      name: 'Home',
+      component: () => import('../pages/Home/pageHome.vue'),
+      meta: { title: '首页' }
     },
     ...xcyPages,
     {
@@ -214,16 +211,15 @@ const router = new VueRouter({
 export default router
 
 export const navMenus = [
-  { path: "/", title: "用户行为分析" },
   {
-    title: "xcy",
+    title: "元素",
     children: xcyPages.map((route) => ({
       path: route.path,
       title: route.meta.title,
     })),
   },
   {
-    title: "多表格",
+    title: "业务工具",
     children: [
       { path: "/multi-table/page13", title: "页面 13" },
       { path: "/brain-map", title: "脑图维护" },
@@ -239,6 +235,12 @@ export const navMenus = [
     children: [
       { path: '/energy-storage', title: '储能优化调度' },
       { path: '/green-direct', title: '绿电直连评估' },
+    ],
+  },
+  {
+    title: '大屏',
+    children: [
+      { path: '/green-bi-cockpit', title: '知识产权驾驶舱' },
     ],
   },
   {

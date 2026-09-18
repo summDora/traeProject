@@ -1,8 +1,8 @@
 <template>
   <header class="top-nav">
-    <div class="nav-brand">
+    <router-link to="/" class="nav-brand">
       <span class="brand-title">SUMMERDORA</span>
-    </div>
+    </router-link>
     <div class="nav-menu-wrap">
       <el-menu
         :default-active="activeMenu"
@@ -71,6 +71,12 @@ export default {
   padding: 0 24px;
   flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.2);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-brand:hover .brand-title {
+  opacity: 0.86;
 }
 
 .brand-title {
