@@ -191,7 +191,7 @@ const router = new VueRouter({
     {
       path: '/green-direct',
       name: 'GreenDirect',
-      component: () => import('../hy/pageGreenDirect.vue'),
+      component: () => import('../hy/greenDirect/pageGreenDirect.vue'),
       meta: { title: '绿电直连评估' }
     },
     {

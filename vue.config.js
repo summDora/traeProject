@@ -23,6 +23,11 @@ module.exports = {
         changeOrigin: true,
         pathRewrite: { "^/pv-storage-api": "" },
       },
+      "/green-power-api": {
+        target: "http://127.0.0.1:8003",
+        changeOrigin: true,
+        pathRewrite: { "^/green-power-api": "" },
+      },
     },
   },
   chainWebpack: (config) => {

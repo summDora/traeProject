@@ -12,18 +12,22 @@
 
     <div v-else>
       <div class="form-row chart-date-row" style="margin-bottom:12px">
-        <div class="form-group"><label>起始日期</label><input type="date" v-model="chartStart" :min="dateMin" :max="dateMax"></div>
-        <div class="form-group"><label>结束日期</label><input type="date" v-model="chartEnd" :min="dateMin" :max="dateMax"></div>
+        <div class="form-group"><label>起始日期</label>
+          <el-date-picker class="es-date" v-model="chartStart" type="date" size="small" value-format="yyyy-MM-dd" format="yyyy-MM-dd" placeholder="选择日期" :clearable="false" :picker-options="chartPickerOptions" popper-class="es-date-popper"></el-date-picker>
+        </div>
+        <div class="form-group"><label>结束日期</label>
+          <el-date-picker class="es-date" v-model="chartEnd" type="date" size="small" value-format="yyyy-MM-dd" format="yyyy-MM-dd" placeholder="选择日期" :clearable="false" :picker-options="chartPickerOptions" popper-class="es-date-popper"></el-date-picker>
+        </div>
         <button class="btn secondary" @click="reloadCharts">加载图表</button>
       </div>
       <div class="card">
         <h2>削峰填谷效果</h2>
         <div class="series-checkboxes">
-          <label><input type="checkbox" v-model="peakSeries.net_load"> 净负荷(负荷-新能源)</label>
-          <label><input type="checkbox" v-model="peakSeries.net_with_storage"> 优化后净负荷(含储能)</label>
-          <label><input type="checkbox" v-model="peakSeries.load"> 调整后负荷</label>
-          <label><input type="checkbox" v-model="peakSeries.renewable"> 新能源发电</label>
-          <label><input type="checkbox" v-model="peakSeries.storage_load"> 储能负荷</label>
+          <el-checkbox v-model="peakSeries.net_load">净负荷(负荷-新能源)</el-checkbox>
+          <el-checkbox v-model="peakSeries.net_with_storage">优化后净负荷(含储能)</el-checkbox>
+          <el-checkbox v-model="peakSeries.load">调整后负荷</el-checkbox>
+          <el-checkbox v-model="peakSeries.renewable">新能源发电</el-checkbox>
+          <el-checkbox v-model="peakSeries.storage_load">储能负荷</el-checkbox>
         </div>
         <div class="chart-wrap"><div ref="peakChart" class="chart-el"></div></div>
       </div>
@@ -38,8 +42,12 @@
       <div class="card">
         <h2>关键数据列表（预览第1行，完整数据请下载CSV）</h2>
         <div class="form-row chart-date-row" style="margin-bottom:10px">
-          <div class="form-group"><label>数据下载起始日期</label><input type="date" v-model="downloadStart" :min="dateMin" :max="dateMax"></div>
-          <div class="form-group"><label>数据下载结束日期</label><input type="date" v-model="downloadEnd" :min="dateMin" :max="dateMax"></div>
+          <div class="form-group"><label>数据下载起始日期</label>
+            <el-date-picker class="es-date" v-model="downloadStart" type="date" size="small" value-format="yyyy-MM-dd" format="yyyy-MM-dd" placeholder="选择日期" :clearable="true" :picker-options="chartPickerOptions" popper-class="es-date-popper"></el-date-picker>
+          </div>
+          <div class="form-group"><label>数据下载结束日期</label>
+            <el-date-picker class="es-date" v-model="downloadEnd" type="date" size="small" value-format="yyyy-MM-dd" format="yyyy-MM-dd" placeholder="选择日期" :clearable="true" :picker-options="chartPickerOptions" popper-class="es-date-popper"></el-date-picker>
+          </div>
           <button class="btn secondary" @click="downloadFiltered">下载筛选数据 (CSV)</button>
           <button class="btn secondary" style="margin-left:4px" @click="downloadAll">下载全量数据 (CSV)</button>
         </div>
@@ -61,12 +69,14 @@ import {
   buildNetStats,
   buildDetailPreview,
   sliceOptimizeResult,
-  downloadCsv
+  downloadCsv,
+  datePickerOptions
 } from '../helpers'
 import { COLUMN_CONFIG, DETAIL_CSV_FIELDS, PEAK_SERIES_CONFIG } from '../config'
 import {
   disposeChart,
   renderChart,
+  whenChartVisible,
   chargeDischargeOption,
   socStorageOption,
   peakShavingOption
@@ -117,6 +127,9 @@ export default {
     },
     detailRows: function () {
       return this.detailPreview ? [this.detailPreview] : []
+    },
+    chartPickerOptions: function () {
+      return datePickerOptions(this.dateMin, this.dateMax)
     }
   },
   mounted: function () {
@@ -127,9 +140,7 @@ export default {
   },
   watch: {
     active: function (val) {
-      if (val && this.hasResult) {
-        this.$nextTick(this.drawCharts)
-      }
+      if (val && this.hasResult) this.$nextTick(this.restoreCharts)
     },
     'es.optimizeResult': function (val) {
       if (val && val.detail_chart_labels && val.detail_chart_labels.length) {
@@ -168,6 +179,14 @@ export default {
     },
     reloadCharts: function () {
       this.drawCharts()
+    },
+    restoreCharts: function () {
+      const self = this
+      if (!this.hasResult) return
+      whenChartVisible([this.$refs.peakChart, this.$refs.cdChart, this.$refs.socChart], function () {
+        self.disposeAll()
+        self.drawCharts()
+      })
     },
     drawCharts: function () {
       if (!this.hasResult) return

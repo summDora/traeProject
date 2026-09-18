@@ -23,6 +23,25 @@ export function disposeChart(chart) {
   }
 }
 
+/** 页签从隐藏恢复后：等容器有宽高再回调，避免 echarts 按 0 尺寸排版 */
+export function whenChartVisible(el, cb, tries) {
+  tries = tries == null ? 16 : tries
+  if (typeof cb !== 'function') return
+  const list = Array.isArray(el) ? el.filter(Boolean) : (el ? [el] : [])
+  if (!list.length) return
+  const ready = list.every(function (node) {
+    return node.clientWidth >= 8 && node.clientHeight >= 8
+  })
+  if (ready) {
+    cb()
+    return
+  }
+  if (tries <= 0) return
+  requestAnimationFrame(function () {
+    whenChartVisible(el, cb, tries - 1)
+  })
+}
+
 /** 在指定 DOM 上渲染/更新 option；已有实例则复用，否则重新 init */
 export function renderChart(el, option, existed) {
   if (!el) return null
@@ -32,9 +51,13 @@ export function renderChart(el, option, existed) {
     chart = null
   }
   if (!chart) {
+    if (el.clientWidth < 8 || el.clientHeight < 8) return null
     chart = echartsNs.init(el)
   }
   chart.setOption(option, true)
+  if (el.clientWidth >= 8 && el.clientHeight >= 8 && typeof chart.resize === 'function') {
+    chart.resize()
+  }
   return chart
 }
 
@@ -91,15 +114,74 @@ function chartGrid(labels, extra, opts) {
   }, extra || {})
 }
 
+/** 纵向面积渐变：顶部带色、底部淡出，避免两块面积叠成脏色 */
+function areaFade(rgb, topAlpha) {
+  return {
+    type: 'linear',
+    x: 0,
+    y: 0,
+    x2: 0,
+    y2: 1,
+    colorStops: [
+      { offset: 0, color: 'rgba(' + rgb + ',' + topAlpha + ')' },
+      { offset: 1, color: 'rgba(' + rgb + ',0.02)' }
+    ]
+  }
+}
+
 /** 源荷数据页：负荷 / 新能源 / 净负荷曲线 */
 export function sourceLoadOption(labels, load, renewable, net) {
+  const xAxis = categoryAxis(labels, { maxTicks: 18, formatter: formatTickLabel })
+  xAxis.boundaryGap = false
+  xAxis.axisTick = { show: false }
+  xAxis.axisLine = { lineStyle: { color: '#E5E7EB' } }
+  xAxis.axisLabel = Object.assign({}, xAxis.axisLabel, { color: '#64748B', fontSize: 11 })
+
   return {
-    color: ['#3b82f6', '#22c55e', '#f97316'],
-    tooltip: { trigger: 'axis' },
-    legend: { data: ['负荷 (MW)', '新能源 (MW)', '净负荷 (MW)'], top: 0 },
-    grid: chartGrid(labels, null, { maxTicks: 24 }),
-    xAxis: categoryAxis(labels, { maxTicks: 24, formatter: formatTickLabel }),
-    yAxis: { type: 'value', name: 'MW' },
+    color: ['#0E7490', '#10B981', '#F59E0B'],
+    animation: false,
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(15, 23, 42, 0.92)',
+      borderWidth: 0,
+      padding: [10, 12],
+      textStyle: { color: '#F8FAFC', fontSize: 12 },
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#94A3B8', width: 1, type: 'dashed' }
+      },
+      formatter: function (params) {
+        if (!params || !params.length) return ''
+        var lines = [params[0].axisValue]
+        for (var i = 0; i < params.length; i++) {
+          var p = params[i]
+          var v = p.value == null ? '-' : Number(p.value).toFixed(2)
+          lines.push((p.marker || '') + p.seriesName + '　<b>' + v + '</b> MW')
+        }
+        return lines.join('<br/>')
+      }
+    },
+    legend: {
+      data: ['负荷 (MW)', '新能源 (MW)', '净负荷 (MW)'],
+      top: 2,
+      icon: 'roundRect',
+      itemWidth: 16,
+      itemHeight: 8,
+      itemGap: 22,
+      textStyle: { color: '#475569', fontSize: 12 }
+    },
+    grid: chartGrid(labels, { left: 52, right: 20, top: 44 }, { maxTicks: 18 }),
+    xAxis: xAxis,
+    yAxis: {
+      type: 'value',
+      name: 'MW',
+      nameGap: 12,
+      nameTextStyle: { color: '#64748B', fontSize: 11, padding: [0, 8, 0, 0] },
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { lineStyle: { color: '#EEF2F6', width: 1 } },
+      axisLabel: { color: '#64748B', fontSize: 11 }
+    },
     series: [
       {
         name: '负荷 (MW)',
@@ -107,7 +189,10 @@ export function sourceLoadOption(labels, load, renewable, net) {
         data: load,
         smooth: 0.1,
         showSymbol: false,
-        areaStyle: { color: 'rgba(59,130,246,0.12)' },
+        z: 2,
+        lineStyle: { width: 2, color: '#0E7490' },
+        itemStyle: { color: '#0E7490' },
+        areaStyle: { color: areaFade('14,116,144', 0.22) }
       },
       {
         name: '新能源 (MW)',
@@ -115,7 +200,10 @@ export function sourceLoadOption(labels, load, renewable, net) {
         data: renewable,
         smooth: 0.1,
         showSymbol: false,
-        areaStyle: { color: 'rgba(34,197,94,0.12)' },
+        z: 3,
+        lineStyle: { width: 2, color: '#10B981' },
+        itemStyle: { color: '#10B981' },
+        areaStyle: { color: areaFade('16,185,129', 0.16) }
       },
       {
         name: '净负荷 (MW)',
@@ -123,9 +211,11 @@ export function sourceLoadOption(labels, load, renewable, net) {
         data: net,
         smooth: 0.1,
         showSymbol: false,
-        lineStyle: { type: 'dashed' },
-      },
-    ],
+        z: 4,
+        lineStyle: { width: 2.5, color: '#F59E0B' },
+        itemStyle: { color: '#F59E0B' }
+      }
+    ]
   }
 }
 
@@ -242,8 +332,12 @@ export function costMonthlyOption(months, seriesList) {
   }
 }
 
+/** 电费页年度费用构成：终端电能 / 输配电 / 政府基金 / 容需量 */
+export var COST_PIE_COLORS = ['#5E6AFE', '#FFB320', '#00D4D8', '#6CD623']
+
 /** 电费页：年度费用构成环形图（echarts 4.9 用 pie + radius） */
 export function costPieOption(feeLabels, values, colors) {
+  colors = colors && colors.length ? colors : COST_PIE_COLORS
   const total = (values || []).reduce(function (a, b) { return a + b }, 0)
   return {
     color: colors,
@@ -257,9 +351,11 @@ export function costPieOption(feeLabels, values, colors) {
     legend: {
       orient: 'horizontal',
       bottom: 0,
+      icon: 'roundRect',
       itemWidth: 12,
-      itemHeight: 12,
-      textStyle: { fontSize: 11 },
+      itemHeight: 8,
+      itemGap: 10,
+      textStyle: { fontSize: 11, color: '#475569' },
     },
     series: [
       {
@@ -301,7 +397,11 @@ export function econCashFlowOption(labels, totalCf, equityCf, cumTotal, cumEquit
         var lines = [params[0].axisValue]
         params.forEach(function (p) {
           var v = p.value == null ? '-' : Number(p.value).toLocaleString('zh-CN', { maximumFractionDigits: 0 })
-          lines.push(p.seriesName + ': ' + v + ' 万元')
+          var marker = p.marker
+          if (!marker && p.color) {
+            marker = '<span style="display:inline-block;margin-right:6px;border-radius:50%;width:8px;height:8px;background-color:' + p.color + '"></span>'
+          }
+          lines.push((marker || '') + p.seriesName + ': ' + v + ' 万元')
         })
         return lines.join('<br/>')
       },

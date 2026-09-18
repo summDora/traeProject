@@ -7,6 +7,79 @@ export const PAGE_TABS = [
   { id: 'tab-econ', no: 6, label: '经济性评价' }
 ]
 
+/**
+ * 经济性评价 — 按项目类型的默认单价/费率。切换类型时回填 store.econ。
+ *
+ * 本表键 → store.econ → 后端 EconomicEvalRequest（Java 对齐用后者）
+ *   epc                       → re_epc_price              → re_epc_price                 万元/MW 含税
+ *   om                        → om_rate（页面为%）        → om_rate                      接口为小数
+ *   storage_epc               → storage_epc_price         → storage_epc_price            万元/MWh 含税
+ *   storage_lifespan          → storage_lifespan          → storage_lifespan             年
+ *   storage_replacement_ratio → storage_replacement_ratio → storage_replacement_ratio
+ *   capacity_ratio            → capacity_ratio            → capacity_ratio               容配比
+ *   loan_ratio                → loan_ratio（页面为%）     → loan_ratio                   接口为小数
+ *   loan_rate                 → loan_rate（页面为%）      → loan_rate                    接口为小数
+ *   loan_years                → loan_years                → loan_years
+ *   overhead[电压]            → overhead_price            → overhead_line_price          万元/km
+ *   cable[电压]               → cable_price               → cable_price                  万元/km
+ *
+ * project_type：distributed_pv / centralized_pv / onshore_wind / offshore_wind
+ */
+export const ECON_DEFAULTS = {
+  distributed_pv: {
+    epc: 300, // 本体EPC 万元/MW
+    om: 0.8, // 运维费率 %
+    storage_epc: 100, // 储能EPC 万元/MWh
+    storage_lifespan: 10, // 储能寿命 年
+    storage_replacement_ratio: 0.6, // 更换成本占首次储能投资比例
+    capacity_ratio: 1.2, // 容配比
+    loan_ratio: 70, // 贷款比例 %
+    loan_rate: 4.0, // 贷款年利率 %
+    loan_years: 12, // 贷款期限 年
+    overhead: { '10kV': 50, '35kV': 80, '110kV': 150, '220kV': 250 }, // 架空线单价 万元/km
+    cable: { '10kV': 100, '35kV': 200, '110kV': 400, '220kV': 600 } // 电缆单价 万元/km
+  },
+  centralized_pv: {
+    epc: 330, // 本体EPC 万元/MW
+    om: 1.5, // 运维费率 %
+    storage_epc: 70, // 储能EPC 万元/MWh
+    storage_lifespan: 10, // 储能寿命 年
+    storage_replacement_ratio: 0.7, // 更换成本占首次储能投资比例
+    capacity_ratio: 1.2, // 容配比
+    loan_ratio: 70, // 贷款比例 %
+    loan_rate: 4.0, // 贷款年利率 %
+    loan_years: 15, // 贷款期限 年
+    overhead: { '10kV': 30, '35kV': 50, '110kV': 100, '220kV': 180 }, // 架空线单价 万元/km
+    cable: { '10kV': 60, '35kV': 90, '110kV': 150, '220kV': 250 } // 电缆单价 万元/km
+  },
+  onshore_wind: {
+    epc: 550, // 本体EPC 万元/MW
+    om: 2.0, // 运维费率 %
+    storage_epc: 90, // 储能EPC 万元/MWh
+    storage_lifespan: 10, // 储能寿命 年
+    storage_replacement_ratio: 0.6, // 更换成本占首次储能投资比例
+    capacity_ratio: 1.0, // 容配比
+    loan_ratio: 70, // 贷款比例 %
+    loan_rate: 4.0, // 贷款年利率 %
+    loan_years: 15, // 贷款期限 年
+    overhead: { '10kV': 30, '35kV': 80, '110kV': 160, '220kV': 300 }, // 架空线单价 万元/km
+    cable: { '10kV': 100, '35kV': 200, '110kV': 450, '220kV': 900 } // 电缆单价 万元/km
+  },
+  offshore_wind: {
+    epc: 1550, // 本体EPC 万元/MW
+    om: 2.5, // 运维费率 %
+    storage_epc: 90, // 储能EPC 万元/MWh
+    storage_lifespan: 10, // 储能寿命 年
+    storage_replacement_ratio: 0.8, // 更换成本占首次储能投资比例
+    capacity_ratio: 1.0, // 容配比
+    loan_ratio: 80, // 贷款比例 %
+    loan_rate: 3.5, // 贷款年利率 %
+    loan_years: 15, // 贷款期限 年
+    overhead: { '10kV': 40, '35kV': 70, '110kV': 140, '220kV': 250 }, // 架空线单价 万元/km
+    cable: { '10kV': 60, '35kV': 120, '110kV': 220, '220kV': 450 } // 电缆单价 万元/km
+  }
+}
+
 function col(prop, label, extra) {
   const item = { prop: prop, label: label, align: 'center' }
   if (extra) {
@@ -76,44 +149,44 @@ export const COLUMN_CONFIG = {
   ],
 
   econCashFlow: [
-    col('year', '年份', { minWidth: 70, width: 70 }),
+    col('year', '年份', { minWidth: 70, width: 70, labelClassName: 'es-cf-h-year' }),
     {
       label: '现金流入 (+)',
       labelClassName: 'es-cf-h-inflow',
       children: [
-        col('revenue', '营业收入', { minWidth: 88, format: 'dashMoney' }),
-        col('input_tax_credit', '进项税\n抵扣', { minWidth: 80, format: 'dashMoney' }),
-        col('salvage_value', '回收\n余值', { minWidth: 72, format: 'dashMoney' })
+        col('revenue', '营业收入', { minWidth: 88, format: 'dashMoney', labelClassName: 'es-cf-h-inflow' }),
+        col('input_tax_credit', '进项税\n抵扣', { minWidth: 80, format: 'dashMoney', labelClassName: 'es-cf-h-inflow' }),
+        col('salvage_value', '回收\n余值', { minWidth: 72, format: 'dashMoney', labelClassName: 'es-cf-h-inflow' })
       ]
     },
     {
       label: '现金流出 (−)',
       labelClassName: 'es-cf-h-outflow',
       children: [
-        col('operating_cost', '运维\n成本', { minWidth: 72, format: 'dashMoney' }),
-        col('surcharge_tax', '附加税', { minWidth: 72, format: 'dashMoney' }),
-        col('storage_replacement', '储能\n更换', { minWidth: 72, format: 'dashMoney', color: 'replace', weight: 'bold' }),
-        col('income_tax_total', '全投资\n所得税', { minWidth: 80, format: 'dashMoney' }),
-        col('income_tax_equity', '资本金\n所得税', { minWidth: 80, format: 'dashMoney' }),
-        col('loan_payment', '还本\n付息', { minWidth: 72, format: 'dashMoney' }),
-        col('construction_investment', '建设\n投资', { minWidth: 72, format: 'dashMoney' }),
-        col('equity_investment', '资本金\n投入', { minWidth: 72, format: 'dashMoney' })
+        col('operating_cost', '运维\n成本', { minWidth: 72, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' }),
+        col('surcharge_tax', '附加税', { minWidth: 72, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' }),
+        col('storage_replacement', '储能\n更换', { minWidth: 72, format: 'dashMoney', color: 'replace', weight: 'bold', labelClassName: 'es-cf-h-outflow' }),
+        col('income_tax_total', '全投资\n所得税', { minWidth: 80, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' }),
+        col('income_tax_equity', '资本金\n所得税', { minWidth: 80, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' }),
+        col('loan_payment', '还本\n付息', { minWidth: 72, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' }),
+        col('construction_investment', '建设\n投资', { minWidth: 72, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' }),
+        col('equity_investment', '资本金\n投入', { minWidth: 72, format: 'dashMoney', labelClassName: 'es-cf-h-outflow' })
       ]
     },
     {
       label: '净现金流',
       labelClassName: 'es-cf-h-net',
       children: [
-        col('total_cf', '全投资', { minWidth: 88, format: 'money', color: 'signed', weight: 'bold' }),
-        col('equity_cf', '资本金', { minWidth: 88, format: 'money', color: 'signed', weight: 'bold' })
+        col('total_cf', '全投资', { minWidth: 88, format: 'money', color: 'signed', weight: 'bold', labelClassName: 'es-cf-h-net' }),
+        col('equity_cf', '资本金', { minWidth: 88, format: 'money', color: 'signed', weight: 'bold', labelClassName: 'es-cf-h-net' })
       ]
     },
     {
       label: '参考项·非付现',
       labelClassName: 'es-cf-h-ref',
       children: [
-        col('depreciation', '折旧', { minWidth: 72, format: 'dashMoney', color: 'muted' }),
-        col('interest', '利息', { minWidth: 72, format: 'dashMoney', color: 'muted' })
+        col('depreciation', '折旧', { minWidth: 72, format: 'dashMoney', color: 'muted', labelClassName: 'es-cf-h-ref' }),
+        col('interest', '利息', { minWidth: 72, format: 'dashMoney', color: 'muted', labelClassName: 'es-cf-h-ref' })
       ]
     }
   ]

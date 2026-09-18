@@ -1,7 +1,7 @@
 <template>
   <header class="top-nav">
     <div class="nav-brand">
-      <span class="brand-title">数据看板</span>
+      <span class="brand-title">SUMMERDORA</span>
     </div>
     <div class="nav-menu-wrap">
       <el-menu
@@ -20,11 +20,7 @@
           >
             {{ item.title }}
           </el-menu-item>
-          <el-submenu
-            v-else
-            :key="'submenu-' + item.title"
-            :index="item.title"
-          >
+          <el-submenu v-else :key="'submenu-' + item.title" :index="item.title">
             <template slot="title">{{ item.title }}</template>
             <el-menu-item
               v-for="child in item.children"
@@ -41,28 +37,28 @@
 </template>
 
 <script>
-import { navMenus } from '../router'
+import { navMenus } from "../router";
 
 export default {
-  name: 'TopNav',
+  name: "TopNav",
   data() {
     return {
-      menus: navMenus
-    }
+      menus: navMenus,
+    };
   },
   computed: {
     activeMenu() {
-      return this.$route.path
-    }
-  }
-}
+      return this.$route.path;
+    },
+  },
+};
 </script>
 
 <style scoped>
 .top-nav {
   display: flex;
   align-items: stretch;
-  background: linear-gradient(135deg, #0E7490 0%, #0C5C75 100%);
+  background: linear-gradient(135deg, #0e7490 0%, #0c5c75 100%);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;

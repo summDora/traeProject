@@ -11,6 +11,24 @@ export function downsample(arr, n) {
   return result
 }
 
+/** Element 日期面板：禁用 min/max 之外的日期（min/max 为 YYYY-MM-DD） */
+export function datePickerOptions(minStr, maxStr) {
+  return {
+    disabledDate: function (time) {
+      const t = time.getTime()
+      if (minStr) {
+        const min = new Date(String(minStr).replace(/-/g, '/') + ' 00:00:00').getTime()
+        if (!isNaN(min) && t < min) return true
+      }
+      if (maxStr) {
+        const max = new Date(String(maxStr).replace(/-/g, '/') + ' 23:59:59').getTime()
+        if (!isNaN(max) && t > max) return true
+      }
+      return false
+    }
+  }
+}
+
 export function parseOrNull(v) {
   if (v == null) return null
   const s = String(v).trim()

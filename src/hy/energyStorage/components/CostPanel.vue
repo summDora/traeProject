@@ -7,13 +7,19 @@
         <span style="font-size:12px;color:#999;margin-left:12px">{{ marketBrief }}</span>
       </div>
       <div v-show="marketOpen" style="margin-top:12px">
-        <div class="form-row">
-          <button class="btn secondary" @click="loadMarket">加载市场电价参数</button>
-          <div class="form-group" style="margin-left:12px">
+        <div class="upload-row">
+          <div class="upload-box">
             <label>上传市场电价 Excel</label>
             <input type="file" accept=".xlsx,.xls" @change="onPickMarket">
+            <span class="hint">{{ hintMarket }}</span>
           </div>
-          <button class="btn secondary" @click="uploadMarket">上传电价 Excel</button>
+          <div class="upload-actions">
+            <span class="upload-actions-label" aria-hidden="true">&nbsp;</span>
+            <div class="upload-actions-btns">
+              <button class="btn secondary" @click="loadMarket">加载市场电价参数</button>
+              <button class="btn secondary" @click="uploadMarket">上传电价 Excel</button>
+            </div>
+          </div>
         </div>
         <div class="status" :style="{ color: marketStatusColor }">{{ marketStatus }}</div>
         <div v-if="marketData">
@@ -29,25 +35,24 @@
       <div class="form-grid col3">
         <div class="form-group">
           <label>电压等级 <small style="color:#999">含电价制度</small></label>
-          <select v-model="es.cost.voltageValue">
-            <option v-if="!es.voltageLevels.length" value="">待加载...</option>
-            <option v-for="v in es.voltageLevels" :key="v.value" :value="v.value">{{ v.label }}</option>
-          </select>
+          <el-select v-model="es.cost.voltageValue" size="small" placeholder="待加载..." popper-class="es-select-dropdown">
+            <el-option v-for="v in es.voltageLevels" :key="v.value" :label="v.label" :value="v.value"></el-option>
+          </el-select>
         </div>
         <div class="form-group" v-show="!isSingle">
           <label>计费方式</label>
-          <select v-model="es.cost.billingMethod">
-            <option value="demand">按需量</option>
-            <option value="capacity">按容量</option>
-          </select>
+          <el-select v-model="es.cost.billingMethod" size="small" popper-class="es-select-dropdown">
+            <el-option label="按需量" value="demand"></el-option>
+            <el-option label="按容量" value="capacity"></el-option>
+          </el-select>
         </div>
         <div class="form-group" v-show="showTransformer">
           <label>变压器容量 (MW)</label>
-          <input type="number" v-model.number="es.cost.transformerCapacity" step="0.1" min="0">
+          <el-input size="small" type="number" v-model.number="es.cost.transformerCapacity" :step="0.1" :min="0"></el-input>
         </div>
         <div class="form-group">
           <label>上网电价 (元/MWh)</label>
-          <input type="number" v-model.number="es.cost.exportPrice" step="1">
+          <el-input size="small" type="number" v-model.number="es.cost.exportPrice" :step="1"></el-input>
         </div>
       </div>
       <div style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
@@ -75,11 +80,11 @@
 
       <div class="card">
         <h2>月度电费明细
-          <select v-model.number="monthlyIdx" style="font-size:12px;padding:3px 8px;margin-left:12px;border:1px solid #ddd;border-radius:4px">
-            <option :value="0">调整后负荷</option>
-            <option :value="1">源荷净负荷</option>
-            <option :value="2">源荷储净负荷</option>
-          </select>
+          <el-select v-model="monthlyIdx" size="mini" class="es-inline-select" popper-class="es-select-dropdown">
+            <el-option :value="0" label="调整后负荷"></el-option>
+            <el-option :value="1" label="源荷净负荷"></el-option>
+            <el-option :value="2" label="源荷储净负荷"></el-option>
+          </el-select>
         </h2>
         <es-table :data="monthlyTableRows" :columns="columns.costMonthly" :max-height="500" :visible="active" />
       </div>
@@ -107,7 +112,7 @@ import API from '../api'
 import { esMixin } from '../store'
 import { buildCostSummaryRows } from '../helpers'
 import { COLUMN_CONFIG, buildMarketColumns, buildMarketRows } from '../config'
-import { disposeChart, renderChart, costMonthlyOption, costPieOption } from '../charts'
+import { disposeChart, renderChart, whenChartVisible, costMonthlyOption, costPieOption, COST_PIE_COLORS } from '../charts'
 import EsTable from './EsTable.vue'
 
 export default {
@@ -121,6 +126,7 @@ export default {
     return {
       marketOpen: false,
       marketFile: null,
+      hintMarket: '未选择文件',
       marketData: null,
       marketStatus: '',
       marketStatusType: '',
@@ -196,7 +202,7 @@ export default {
     active: function (val) {
       if (val) {
         if (!this.es.voltageLevels.length) this.loadMarketSilent()
-        this.$nextTick(this.resizeAll)
+        this.$nextTick(this.restoreCharts)
       }
     },
     'es.costResult': function (val) {
@@ -249,6 +255,7 @@ export default {
     },
     onPickMarket: function (e) {
       this.marketFile = e.target.files && e.target.files[0]
+      this.hintMarket = this.marketFile ? this.marketFile.name : '未选择文件'
     },
     uploadMarket: function () {
       const self = this
@@ -313,6 +320,20 @@ export default {
         self.calculating = false
       })
     },
+    restoreCharts: function () {
+      const self = this
+      if (!this.es.costResult) return
+      const els = [this.$refs.monthlyChart]
+      for (let i = 0; i < 3; i++) {
+        const el = this.$refs['pie' + i]
+        const node = Array.isArray(el) ? el[0] : el
+        if (node) els.push(node)
+      }
+      whenChartVisible(els, function () {
+        self.disposeAll()
+        self.drawCharts()
+      })
+    },
     drawCharts: function () {
       const response = this.es.costResult
       if (!response) return
@@ -324,7 +345,7 @@ export default {
 
       this.pieCharts.forEach(disposeChart)
       this.pieCharts = []
-      const colorMap = ['#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444']
+      const colorMap = COST_PIE_COLORS
       const feeLabels = ['终端电能电费', '电度输配电费', '政府性基金', '容/需量电费']
       const self = this
       response.results.forEach(function (s, i) {

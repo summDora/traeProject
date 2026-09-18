@@ -12,19 +12,19 @@
           <div class="econ-grid">
             <div class="form-group">
               <label>年度效益 (万元,含税) <small style="color:#999">来自Tab5</small></label>
-              <input type="number" v-model.number="es.econ.annual_benefit" step="1" min="0" @input="onManualBenefit">
+              <el-input size="small" type="number" v-model.number="es.econ.annual_benefit" :step="1" :min="0" @input="onManualBenefit"></el-input>
             </div>
             <div class="form-group">
               <label>收益扣除 (万元) <small style="color:#999">自发自用缴费</small></label>
-              <input type="number" v-model.number="es.econ.revenue_deduction" step="1" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.revenue_deduction" :step="1" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>年衰减率 (%)</label>
-              <input type="number" v-model.number="es.econ.degradation_rate" step="0.1" min="0" max="5">
+              <el-input size="small" type="number" v-model.number="es.econ.degradation_rate" :step="0.1" :min="0" :max="5"></el-input>
             </div>
             <div class="form-group">
               <label>首年扣除后收益 (不含税) <small style="color:#999">自动</small></label>
-              <input type="text" :value="netRevenueHint" readonly style="background:#f5f5f5">
+              <el-input size="small" :value="netRevenueHint" readonly></el-input>
             </div>
           </div>
         </div>
@@ -34,36 +34,36 @@
           <div class="econ-grid">
             <div class="form-group">
               <label>项目类型</label>
-              <select v-model="es.econ.project_type" @change="onProjectTypeChange">
-                <option value="distributed_pv">分布式工商业光伏</option>
-                <option value="centralized_pv">集中式光伏</option>
-                <option value="onshore_wind">陆上风电</option>
-                <option value="offshore_wind">海上风电</option>
-              </select>
+              <el-select v-model="es.econ.project_type" size="small" popper-class="es-select-dropdown" @change="onProjectTypeChange">
+                <el-option label="分布式工商业光伏" value="distributed_pv"></el-option>
+                <el-option label="集中式光伏" value="centralized_pv"></el-option>
+                <el-option label="陆上风电" value="onshore_wind"></el-option>
+                <el-option label="海上风电" value="offshore_wind"></el-option>
+              </el-select>
             </div>
             <div class="form-group">
               <label>最大发电功率 (MW) <small style="color:#999">取自Tab1</small></label>
-              <input type="number" v-model.number="es.econ.re_max_power" step="0.1" min="0" @input="onMaxPowerInput">
+              <el-input size="small" type="number" v-model.number="es.econ.re_max_power" :step="0.1" :min="0" @input="onMaxPowerInput"></el-input>
             </div>
             <div class="form-group">
               <label>容配比</label>
-              <input type="number" v-model.number="es.econ.capacity_ratio" step="0.05" min="1" max="2" @input="syncCapacity">
+              <el-input size="small" type="number" v-model.number="es.econ.capacity_ratio" :step="0.05" :min="1" :max="2" @input="syncCapacity"></el-input>
             </div>
             <div class="form-group">
               <label>装机容量 (MW) <span style="color:#1565c0;font-size:11px">{{ outputRateHint }}</span></label>
-              <input type="number" v-model.number="es.econ.re_capacity" step="0.1" min="0" @input="onCapacityInput">
+              <el-input size="small" type="number" v-model.number="es.econ.re_capacity" :step="0.1" :min="0" @input="onCapacityInput"></el-input>
             </div>
             <div class="form-group">
               <label>本体EPC单价 (万元/MW,含税)</label>
-              <input type="number" v-model.number="es.econ.re_epc_price" step="10" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.re_epc_price" :step="10" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>其它费用 (万元) <small style="color:#999">设计/监理/土地</small></label>
-              <input type="number" v-model.number="es.econ.other_costs" step="10" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.other_costs" :step="10" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>新能源项目投资 (万元) <small style="color:#999">本体+线路·自动</small></label>
-              <input type="text" :value="derived.rePlusLine" readonly style="background:var(--surface-2)">
+              <el-input size="small" :value="derived.rePlusLine" readonly></el-input>
             </div>
           </div>
         </div>
@@ -73,44 +73,44 @@
           <div class="econ-grid">
             <div class="form-group">
               <label>储能容量 (MWh) <small style="color:#999">取自Tab2</small></label>
-              <input type="number" v-model.number="es.econ.storage_capacity" step="1" min="0" @input="onManualStorage">
+              <el-input size="small" type="number" v-model.number="es.econ.storage_capacity" :step="1" :min="0" @input="onManualStorage"></el-input>
             </div>
             <div class="form-group">
               <label>储能EPC单价 (万元/MWh,含税)</label>
-              <input type="number" v-model.number="es.econ.storage_epc_price" step="5" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.storage_epc_price" :step="5" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>储能寿命 (年)</label>
-              <input type="number" v-model.number="es.econ.storage_lifespan" step="1" min="1" max="30">
+              <el-input size="small" type="number" v-model.number="es.econ.storage_lifespan" :step="1" :min="1" :max="30"></el-input>
             </div>
             <div class="form-group">
               <label>更换成本比例 <small style="color:#999">占首次储能投资</small></label>
-              <input type="number" v-model.number="es.econ.storage_replacement_ratio" step="0.05" min="0" max="1">
+              <el-input size="small" type="number" v-model.number="es.econ.storage_replacement_ratio" :step="0.05" :min="0" :max="1"></el-input>
             </div>
             <div class="form-group">
               <label>电压等级</label>
-              <select v-model="es.econ.voltage_level" @change="onVoltageLevelChange">
-                <option value="10kV">10kV</option>
-                <option value="35kV">35kV</option>
-                <option value="110kV">110kV</option>
-                <option value="220kV">220kV</option>
-              </select>
+              <el-select v-model="es.econ.voltage_level" size="small" popper-class="es-select-dropdown" @change="onVoltageLevelChange">
+                <el-option label="10kV" value="10kV"></el-option>
+                <el-option label="35kV" value="35kV"></el-option>
+                <el-option label="110kV" value="110kV"></el-option>
+                <el-option label="220kV" value="220kV"></el-option>
+              </el-select>
             </div>
             <div class="form-group">
               <label>架空线单价 (万元/km)</label>
-              <input type="number" v-model.number="es.econ.overhead_price" step="5" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.overhead_price" :step="5" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>架空线距离 (km)</label>
-              <input type="number" v-model.number="es.econ.overhead_distance" step="0.1" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.overhead_distance" :step="0.1" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>电缆单价 (万元/km)</label>
-              <input type="number" v-model.number="es.econ.cable_price" step="5" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.cable_price" :step="5" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>电缆距离 (km)</label>
-              <input type="number" v-model.number="es.econ.cable_distance" step="0.1" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.cable_distance" :step="0.1" :min="0"></el-input>
             </div>
           </div>
         </div>
@@ -120,30 +120,30 @@
           <div class="econ-grid">
             <div class="form-group">
               <label>经营期 (年)</label>
-              <input type="number" v-model.number="es.econ.operating_years" step="1" min="1">
+              <el-input size="small" type="number" v-model.number="es.econ.operating_years" :step="1" :min="1"></el-input>
             </div>
             <div class="form-group">
               <label>贷款比例 (%)</label>
-              <input type="number" v-model.number="es.econ.loan_ratio" step="5" min="0" max="100">
+              <el-input size="small" type="number" v-model.number="es.econ.loan_ratio" :step="5" :min="0" :max="100"></el-input>
             </div>
             <div class="form-group">
               <label>贷款年利率 (%)</label>
-              <input type="number" v-model.number="es.econ.loan_rate" step="0.1" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.loan_rate" :step="0.1" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>贷款期限 (年)</label>
-              <input type="number" v-model.number="es.econ.loan_years" step="1" min="1" max="30">
+              <el-input size="small" type="number" v-model.number="es.econ.loan_years" :step="1" :min="1" :max="30"></el-input>
             </div>
             <div class="form-group">
               <label>还款方式</label>
-              <select v-model="es.econ.repay_method">
-                <option value="equal_pi">等额本息</option>
-                <option value="equal_p">等额本金</option>
-              </select>
+              <el-select v-model="es.econ.repay_method" size="small" popper-class="es-select-dropdown">
+                <el-option label="等额本息" value="equal_pi"></el-option>
+                <el-option label="等额本金" value="equal_p"></el-option>
+              </el-select>
             </div>
             <div class="form-group">
               <label>运维费率 (% 三项不含税投资)</label>
-              <input type="number" v-model.number="es.econ.om_rate" step="0.1" min="0" max="10">
+              <el-input size="small" type="number" v-model.number="es.econ.om_rate" :step="0.1" :min="0" :max="10"></el-input>
             </div>
           </div>
         </div>
@@ -153,35 +153,35 @@
           <div class="econ-grid">
             <div class="form-group">
               <label>所得税率 (%)</label>
-              <input type="number" v-model.number="es.econ.income_tax" step="1" min="0" max="100">
+              <el-input size="small" type="number" v-model.number="es.econ.income_tax" :step="1" :min="0" :max="100"></el-input>
             </div>
             <div class="form-group">
               <label>设备增值税率 (%) <small style="color:#999">投资进项</small></label>
-              <input type="number" v-model.number="es.econ.equip_vat_rate" step="1" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.equip_vat_rate" :step="1" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>电价增值税率 (%) <small style="color:#999">收入分离</small></label>
-              <input type="number" v-model.number="es.econ.price_vat_rate" step="0.5" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.price_vat_rate" :step="0.5" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>进项税抵扣年限 (年)</label>
-              <input type="number" v-model.number="es.econ.input_tax_years" step="1" min="1" max="20">
+              <el-input size="small" type="number" v-model.number="es.econ.input_tax_years" :step="1" :min="1" :max="20"></el-input>
             </div>
             <div class="form-group">
               <label>附加税率 (% 增值税)</label>
-              <input type="number" v-model.number="es.econ.surcharge_rate" step="1" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.surcharge_rate" :step="1" :min="0"></el-input>
             </div>
             <div class="form-group">
               <label>折旧年限 (年)</label>
-              <input type="number" v-model.number="es.econ.dep_years" step="1" min="1">
+              <el-input size="small" type="number" v-model.number="es.econ.dep_years" :step="1" :min="1"></el-input>
             </div>
             <div class="form-group">
               <label>残值率 (%)</label>
-              <input type="number" v-model.number="es.econ.residual_rate" step="1" min="0" max="100">
+              <el-input size="small" type="number" v-model.number="es.econ.residual_rate" :step="1" :min="0" :max="100"></el-input>
             </div>
             <div class="form-group">
               <label>折现率 / 基准收益率 (%)</label>
-              <input type="number" v-model.number="es.econ.discount_rate" step="0.5" min="0">
+              <el-input size="small" type="number" v-model.number="es.econ.discount_rate" :step="0.5" :min="0"></el-input>
             </div>
           </div>
         </div>
@@ -222,10 +222,16 @@
     </div>
 
     <div v-if="es.econResult">
-      <div class="stats-grid">
-        <div v-for="ind in indicators" :key="ind.label" :style="{ padding: '10px 12px', background: 'var(--surface-2)', borderRadius: '8px', borderLeft: '3px solid ' + ind.color }">
-          <div style="font-size:11px;color:#888;margin-bottom:3px;white-space:nowrap">{{ ind.label }}</div>
-          <div :style="{ fontSize: '17px', fontWeight: 700, color: ind.color, whiteSpace: 'nowrap' }">{{ ind.value }}</div>
+      <div class="stats-grid econ-ind-grid">
+        <div
+          v-for="ind in indicators"
+          :key="ind.label"
+          class="econ-ind"
+          :class="ind.tone"
+          :style="{ borderLeftColor: ind.color }"
+        >
+          <div class="econ-ind-label">{{ ind.label }}</div>
+          <div class="econ-ind-value" :style="{ color: ind.color }">{{ ind.value }}</div>
         </div>
       </div>
 
@@ -253,13 +259,14 @@
           <div><strong>资本金净现金流</strong> = 营业收入 + 进项税抵扣 + 回收余值 − 运维成本 − 附加税 − 储能更换 − 资本金所得税 − 还本付息 − 资本金投入</div>
           <div class="cf-note-sub">「折旧」为非付现成本、「利息」已含在「还本付息」中，二者仅作参考、不参与上式加减。自发自用项目销项税=0，附加税通常为0。第0年为建设期投入，末年含回收余值。</div>
         </div>
-        <es-table
-          :data="cashFlows"
-          :columns="columns.econCashFlow"
-          :max-height="440"
-          :summary-row="cfSummaryRow"
-          :visible="active"
-        />
+        <div class="es-cf-wrap">
+          <es-table
+            :data="cashFlows"
+            :columns="columns.econCashFlow"
+            :summary-row="cfSummaryRow"
+            :visible="active"
+          />
+        </div>
         <p class="cf-round-note">注：表中各列数值分别四舍五入（显示为整数万元），「合计」行为各列分别求和后再取整，与逐行加总可能存在 1~2 万元的舍入尾差，属正常现象。</p>
       </div>
     </div>
@@ -268,9 +275,9 @@
 
 <script>
 import API from '../api'
-import { esMixin, ECON_DEFAULTS } from '../store'
-import { disposeChart, renderChart, econCashFlowOption } from '../charts'
-import { COLUMN_CONFIG, CF_SUM_KEYS } from '../config'
+import { esMixin } from '../store'
+import { disposeChart, renderChart, whenChartVisible, econCashFlowOption } from '../charts'
+import { COLUMN_CONFIG, CF_SUM_KEYS, ECON_DEFAULTS } from '../config'
 import EsTable from './EsTable.vue'
 
 export default {
@@ -335,12 +342,12 @@ export default {
       if (!r) return []
       const fmt = this.fmt2
       return [
-        { label: '全投资内部收益率 (IRR)', value: r.total_irr.toFixed(2) + '%', color: r.total_irr > 8 ? '#2e7d32' : '#c62828' },
-        { label: '资本金内部收益率', value: r.equity_irr.toFixed(2) + '%', color: r.equity_irr > 10 ? '#2e7d32' : '#c62828' },
-        { label: '净现值 NPV (万元)', value: fmt(r.npv), color: r.npv > 0 ? '#2e7d32' : '#c62828' },
-        { label: '静态回收期 (年)', value: r.static_payback.toFixed(2), color: '#2e7d32' },
-        { label: '动态回收期 (年)', value: r.dynamic_payback.toFixed(2), color: '#2e7d32' },
-        { label: '总投资收益率 (ROI)', value: r.total_roi.toFixed(2) + '%', color: r.total_roi > 5 ? '#2e7d32' : '#c62828' }
+        { label: '全投资内部收益率 (IRR)', value: r.total_irr.toFixed(2) + '%', color: r.total_irr > 8 ? '#0F6E56' : '#B91C1C', tone: r.total_irr > 8 ? 'is-good' : 'is-bad' },
+        { label: '资本金内部收益率', value: r.equity_irr.toFixed(2) + '%', color: r.equity_irr > 10 ? '#0F6E56' : '#B91C1C', tone: r.equity_irr > 10 ? 'is-good' : 'is-bad' },
+        { label: '净现值 NPV (万元)', value: fmt(r.npv), color: r.npv > 0 ? '#0F6E56' : '#B91C1C', tone: r.npv > 0 ? 'is-good' : 'is-bad' },
+        { label: '静态回收期 (年)', value: r.static_payback.toFixed(2), color: '#0F6E56', tone: 'is-good' },
+        { label: '动态回收期 (年)', value: r.dynamic_payback.toFixed(2), color: '#0F6E56', tone: 'is-good' },
+        { label: '总投资收益率 (ROI)', value: r.total_roi.toFixed(2) + '%', color: r.total_roi > 5 ? '#0F6E56' : '#B91C1C', tone: r.total_roi > 5 ? 'is-good' : 'is-bad' }
       ]
     },
     investmentRows: function () {
@@ -396,7 +403,7 @@ export default {
     active: function (val) {
       if (val) {
         this.populateFromUpstream()
-        this.$nextTick(this.drawChart)
+        this.$nextTick(this.restoreChart)
       }
     },
     'es.econResult': function (val) {
@@ -540,6 +547,15 @@ export default {
         self.statusType = 'err'
       }).then(function () {
         self.calculating = false
+      })
+    },
+    restoreChart: function () {
+      const self = this
+      if (!this.es.econResult) return
+      whenChartVisible(this.$refs.cashflowChart, function () {
+        disposeChart(self.chart)
+        self.chart = null
+        self.drawChart()
       })
     },
     drawChart: function () {

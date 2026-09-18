@@ -91,6 +91,70 @@ const API = {
     return String(detail);
   },
 
+  /**
+   * 从 Content-Disposition 解析下载文件名（兼容 filename / filename*=UTF-8''）。
+   * Java 对接时请设置：Content-Disposition: attachment; filename="xxx.csv"
+   * 中文文件名建议同时带 filename*=UTF-8''encoded
+   */
+  filenameFromDisposition(header, fallback) {
+    if (!header) return fallback;
+    const star = /filename\*=(?:UTF-8''|utf-8'')?([^;]+)/i.exec(header);
+    if (star) {
+      try {
+        return decodeURIComponent(star[1].replace(/["']/g, '').trim());
+      } catch (e) { /* ignore */ }
+    }
+    const plain = /filename=(?:"([^"]+)"|([^;]+))/i.exec(header);
+    if (plain) return (plain[1] || plain[2] || '').trim();
+    return fallback;
+  },
+
+  downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
+
+  /**
+   * 拉取二进制文件。成功返回 { blob, filename }，filename 优先取响应头。
+   */
+  async _fetchBlob(url, options = {}, timeoutMs = 120000, fallbackName = 'download.bin') {
+    const controller = new AbortController();
+    const timer = timeoutMs > 0 ? setTimeout(() => controller.abort(), timeoutMs) : null;
+    let resp;
+    try {
+      resp = await fetch(url, { ...options, signal: controller.signal });
+    } catch (e) {
+      if (e.name === 'AbortError') {
+        throw new Error('请求超时，请检查服务是否正常运行');
+      }
+      throw new Error(`网络错误: ${e.message}`);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+
+    if (!resp.ok) {
+      let data = null;
+      const ct = resp.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        try { data = await resp.json(); } catch (e) { data = null; }
+      }
+      const detail = data && data.detail !== undefined ? data.detail : null;
+      throw new Error(this._parseErrorDetail(detail, `下载失败 (HTTP ${resp.status})`));
+    }
+    const blob = await resp.blob();
+    const filename = this.filenameFromDisposition(
+      resp.headers.get('content-disposition'),
+      fallbackName
+    );
+    return { blob, filename };
+  },
+
   // ==========================================================
   // 数据管理
   // ==========================================================
@@ -103,6 +167,25 @@ const API = {
 
   async loadDefaultData() {
     return this._fetch(`${this.BASE}/api/data/load-default`, {}, 120000);
+  },
+
+  /**
+   * 下载内置示例数据。kind: load | renewable | market
+   * Java 对接：GET {BASE}/api/data/download/{kind}
+   */
+  async downloadSample(kind) {
+    const fallback = {
+      load: '1_工商业用户负荷(金属制品10MW).csv',
+      renewable: '1_新能源发电出力(光伏4MW).csv',
+      market: '1_市场电价参数.xlsx',
+    }[kind] || `${kind}.bin`;
+    const { blob, filename } = await this._fetchBlob(
+      `${this.BASE}/api/data/download/${encodeURIComponent(kind)}`,
+      {},
+      120000,
+      fallback
+    );
+    this.downloadBlob(blob, filename);
   },
 
   async getStats() {

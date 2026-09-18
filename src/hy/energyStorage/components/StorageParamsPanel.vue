@@ -5,38 +5,38 @@
       <div class="form-grid">
         <div class="form-group">
           <label>额定充放电功率 (MW)</label>
-          <input type="number" v-model.number="es.storage.rated_power" step="0.1" min="0.1">
+          <el-input size="small" type="number" v-model.number="es.storage.rated_power" :step="0.1" :min="0.1"></el-input>
         </div>
         <div class="form-group">
           <label>储能容量 (MWh)</label>
-          <input type="number" v-model.number="es.storage.energy_capacity" step="0.1" min="0.1">
+          <el-input size="small" type="number" v-model.number="es.storage.energy_capacity" :step="0.1" :min="0.1"></el-input>
         </div>
         <div class="form-group">
           <label>充电效率</label>
-          <input type="number" v-model.number="es.storage.charge_efficiency" step="0.01" min="0.01" max="1">
+          <el-input size="small" type="number" v-model.number="es.storage.charge_efficiency" :step="0.01" :min="0.01" :max="1"></el-input>
         </div>
         <div class="form-group">
           <label>放电效率</label>
-          <input type="number" v-model.number="es.storage.discharge_efficiency" step="0.01" min="0.01" max="1">
+          <el-input size="small" type="number" v-model.number="es.storage.discharge_efficiency" :step="0.01" :min="0.01" :max="1"></el-input>
         </div>
         <div class="form-group">
           <label>SOC 下限</label>
-          <input type="number" v-model.number="es.storage.soc_min" step="0.01" min="0" max="1">
+          <el-input size="small" type="number" v-model.number="es.storage.soc_min" :step="0.01" :min="0" :max="1"></el-input>
         </div>
         <div class="form-group">
           <label>SOC 上限</label>
-          <input type="number" v-model.number="es.storage.soc_max" step="0.01" min="0" max="1">
+          <el-input size="small" type="number" v-model.number="es.storage.soc_max" :step="0.01" :min="0" :max="1"></el-input>
         </div>
         <div class="form-group">
           <label>起始 SOC</label>
-          <input type="number" v-model.number="es.storage.initial_soc" step="0.01" min="0" max="1">
+          <el-input size="small" type="number" v-model.number="es.storage.initial_soc" :step="0.01" :min="0" :max="1"></el-input>
         </div>
         <div class="form-group">
           <label>日循环约束</label>
-          <select v-model="cycleFlag">
-            <option value="false">否 (每日SOC终值自由)</option>
-            <option value="true">是 (SOC回归初值)</option>
-          </select>
+          <el-select v-model="cycleFlag" size="small" popper-class="es-select-dropdown">
+            <el-option label="否 (每日SOC终值自由)" value="false"></el-option>
+            <el-option label="是 (SOC回归初值)" value="true"></el-option>
+          </el-select>
         </div>
       </div>
       <div class="param-summary">{{ summary }}</div>

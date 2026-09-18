@@ -5,31 +5,31 @@
       <div class="form-grid col3">
         <div class="form-group">
           <label>起始日期</label>
-          <input type="text" v-model="es.opt.start_date" placeholder="YYYY-M-D">
+          <el-date-picker class="es-date" v-model="es.opt.start_date" type="date" size="small" value-format="yyyy-MM-dd" format="yyyy-MM-dd" placeholder="选择日期" :clearable="false" popper-class="es-date-popper"></el-date-picker>
         </div>
         <div class="form-group">
           <label>结束日期</label>
-          <input type="text" v-model="es.opt.end_date" placeholder="YYYY-M-D">
+          <el-date-picker class="es-date" v-model="es.opt.end_date" type="date" size="small" value-format="yyyy-MM-dd" format="yyyy-MM-dd" placeholder="选择日期" :clearable="false" popper-class="es-date-popper"></el-date-picker>
         </div>
         <div class="form-group">
           <label>时间步长 (h)</label>
-          <input type="number" v-model.number="es.opt.dt_hours" step="0.25" min="0.25">
+          <el-input size="small" type="number" v-model.number="es.opt.dt_hours" :step="0.25" :min="0.25"></el-input>
         </div>
         <div class="form-group">
           <label>平段基准电价 (元/MWh)</label>
-          <input type="number" v-model.number="es.opt.base_price" step="1">
+          <el-input size="small" type="number" v-model.number="es.opt.base_price" :step="1"></el-input>
         </div>
         <div class="form-group">
           <label>上网电价 (元/MWh)</label>
-          <input type="number" v-model.number="es.opt.export_price" step="1">
+          <el-input size="small" type="number" v-model.number="es.opt.export_price" :step="1"></el-input>
         </div>
         <div class="form-group">
           <label>净功率下限 (MW, 空=无约束)</label>
-          <input type="text" v-model="es.opt.grid_power_min" placeholder="None">
+          <el-input size="small" v-model="es.opt.grid_power_min" placeholder="None"></el-input>
         </div>
         <div class="form-group">
           <label>净功率上限 (MW, 空=无约束)</label>
-          <input type="text" v-model="es.opt.grid_power_max" placeholder="None">
+          <el-input size="small" v-model="es.opt.grid_power_max" placeholder="None"></el-input>
         </div>
       </div>
       <div style="margin-top:18px">
