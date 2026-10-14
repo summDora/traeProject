@@ -122,7 +122,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       marketOpen: false,
       marketFile: null,
@@ -141,35 +141,35 @@ export default {
     }
   },
   computed: {
-    isSingle: function () {
+    isSingle() {
       const cat = (this.es.cost.voltageValue || '').split('|')[0]
       return cat === '单一制'
     },
-    showTransformer: function () {
+    showTransformer() {
       return !this.isSingle && this.es.cost.billingMethod === 'capacity'
     },
-    marketStatusColor: function () {
+    marketStatusColor() {
       if (this.marketStatusType === 'ok') return 'green'
       if (this.marketStatusType === 'err') return 'red'
       return ''
     },
-    costStatusColor: function () {
+    costStatusColor() {
       if (this.costStatusType === 'ok') return 'green'
       if (this.costStatusType === 'err') return 'red'
       return '#666'
     },
-    summaryRows: function () {
+    summaryRows() {
       const response = this.es.costResult
       if (!response || !response.results) return []
       return buildCostSummaryRows(response.results)
     },
-    marketColumns: function () {
+    marketColumns() {
       return buildMarketColumns(this.marketData && this.marketData.sample_periods)
     },
-    marketRows: function () {
+    marketRows() {
       return buildMarketRows(this.marketData && this.marketData.sample_prices)
     },
-    monthlyTableRows: function () {
+    monthlyTableRows() {
       const s = this.currentSeries
       if (!s) return []
       const rows = (s.monthly || []).slice()
@@ -183,39 +183,39 @@ export default {
       }
       return rows
     },
-    currentSeries: function () {
+    currentSeries() {
       const r = this.es.costResult
       if (!r || !r.results) return null
       return r.results[this.monthlyIdx] || r.results[0]
     },
-    pieTitles: function () {
+    pieTitles() {
       const r = this.es.costResult
       if (!r || !r.results) return []
-      return r.results.map(function (s) { return s.series_label })
+      return r.results.map((s) => { return s.series_label })
     }
   },
-  mounted: function () {
+  mounted() {
     this.loadMarketSilent()
     if (this.es.costResult) this.$nextTick(this.drawCharts)
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) {
         if (!this.es.voltageLevels.length) this.loadMarketSilent()
         this.$nextTick(this.restoreCharts)
       }
     },
-    'es.costResult': function (val) {
+    'es.costResult'(val) {
       if (val) this.$nextTick(this.drawCharts)
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     this.disposeAll()
   },
   methods: {
-    applyVoltageLevels: function (data) {
+    applyVoltageLevels(data) {
       if (!data || !data.voltage_levels) return
-      this.es.voltageLevels = data.voltage_levels.map(function (v) {
+      this.es.voltageLevels = data.voltage_levels.map((v) => {
         const label = [v.category, v.voltage].filter(Boolean).join(' ')
         return {
           value: (v.category || '') + '|' + (v.voltage || ''),
@@ -226,60 +226,56 @@ export default {
         this.es.cost.voltageValue = this.es.voltageLevels[0].value
       }
     },
-    loadMarketSilent: function () {
-      const self = this
-      API.getMarketParams().then(function (data) {
-        self.marketData = data
-        self.marketBrief = data.message || ''
-        self.marketStatus = data.message || ''
-        self.marketStatusType = 'ok'
-        self.applyVoltageLevels(data)
-      }).catch(function () {
-        self.marketBrief = '未加载'
+    loadMarketSilent() {
+      API.getMarketParams().then((data) => {
+        this.marketData = data
+        this.marketBrief = data.message || ''
+        this.marketStatus = data.message || ''
+        this.marketStatusType = 'ok'
+        this.applyVoltageLevels(data)
+      }).catch(() => {
+        this.marketBrief = '未加载'
       })
     },
-    loadMarket: function () {
-      const self = this
+    loadMarket() {
       this.marketStatus = '加载中...'
       this.marketStatusType = ''
-      API.getMarketParams().then(function (data) {
-        self.marketData = data
-        self.marketStatus = data.message
-        self.marketStatusType = 'ok'
-        self.marketBrief = data.message || ''
-        self.applyVoltageLevels(data)
-      }).catch(function (e) {
-        self.marketStatus = '加载失败: ' + e.message
-        self.marketStatusType = 'err'
+      API.getMarketParams().then((data) => {
+        this.marketData = data
+        this.marketStatus = data.message
+        this.marketStatusType = 'ok'
+        this.marketBrief = data.message || ''
+        this.applyVoltageLevels(data)
+      }).catch((e) => {
+        this.marketStatus = '加载失败: ' + e.message
+        this.marketStatusType = 'err'
       })
     },
-    onPickMarket: function (e) {
+    onPickMarket(e) {
       this.marketFile = e.target.files && e.target.files[0]
       this.hintMarket = this.marketFile ? this.marketFile.name : '未选择文件'
     },
-    uploadMarket: function () {
-      const self = this
+    uploadMarket() {
       if (!this.marketFile) {
         alert('请先选择市场电价文件')
         return
       }
       this.marketStatus = '上传中...'
       this.marketStatusType = ''
-      API.uploadMarketPrice(this.marketFile).then(function (data) {
-        self.marketStatus = data.message || '上传成功'
-        self.marketStatusType = 'ok'
+      API.uploadMarketPrice(this.marketFile).then((data) => {
+        this.marketStatus = data.message || '上传成功'
+        this.marketStatusType = 'ok'
         return API.getMarketParams()
-      }).then(function (marketData) {
-        self.marketData = marketData
-        self.marketBrief = marketData.message || ''
-        self.applyVoltageLevels(marketData)
-      }).catch(function (e) {
-        self.marketStatus = '上传失败: ' + e.message
-        self.marketStatusType = 'err'
+      }).then((marketData) => {
+        this.marketData = marketData
+        this.marketBrief = marketData.message || ''
+        this.applyVoltageLevels(marketData)
+      }).catch((e) => {
+        this.marketStatus = '上传失败: ' + e.message
+        this.marketStatusType = 'err'
       })
     },
-    calcCost: function () {
-      const self = this
+    calcCost() {
       if (!this.es.optimizeResult) {
         alert('请先在"优化计算"页运行优化')
         return
@@ -306,22 +302,21 @@ export default {
       this.calculating = true
       this.costStatus = '正在计算...'
       this.costStatusType = ''
-      API.calculateElectricityCost(params).then(function (result) {
-        self.es.costResult = result
+      API.calculateElectricityCost(params).then((result) => {
+        this.es.costResult = result
         const adjustedNetFee = result.results[0] ? result.results[0].annual.net_fee : 0
         const storageNetFee = result.results[2] ? result.results[2].annual.net_fee : 0
-        self.es.annualBenefit = (adjustedNetFee - storageNetFee) / 10000
-        self.costStatus = '计算完成'
-        self.costStatusType = 'ok'
-      }).catch(function (e) {
-        self.costStatus = e.message
-        self.costStatusType = 'err'
-      }).then(function () {
-        self.calculating = false
+        this.es.annualBenefit = (adjustedNetFee - storageNetFee) / 10000
+        this.costStatus = '计算完成'
+        this.costStatusType = 'ok'
+      }).catch((e) => {
+        this.costStatus = e.message
+        this.costStatusType = 'err'
+      }).then(() => {
+        this.calculating = false
       })
     },
-    restoreCharts: function () {
-      const self = this
+    restoreCharts() {
       if (!this.es.costResult) return
       const els = [this.$refs.monthlyChart]
       for (let i = 0; i < 3; i++) {
@@ -329,17 +324,17 @@ export default {
         const node = Array.isArray(el) ? el[0] : el
         if (node) els.push(node)
       }
-      whenChartVisible(els, function () {
-        self.disposeAll()
-        self.drawCharts()
+      whenChartVisible(els, () => {
+        this.disposeAll()
+        this.drawCharts()
       })
     },
-    drawCharts: function () {
+    drawCharts() {
       const response = this.es.costResult
       if (!response) return
-      const months = response.results[0].monthly.map(function (m) { return m.month_label })
-      const seriesList = response.results.map(function (s) {
-        return { name: s.series_label, data: s.monthly.map(function (m) { return m.net_fee }) }
+      const months = response.results[0].monthly.map((m) => { return m.month_label })
+      const seriesList = response.results.map((s) => {
+        return { name: s.series_label, data: s.monthly.map((m) => { return m.net_fee }) }
       })
       this.monthlyChart = renderChart(this.$refs.monthlyChart, costMonthlyOption(months, seriesList), this.monthlyChart)
 
@@ -347,9 +342,8 @@ export default {
       this.pieCharts = []
       const colorMap = COST_PIE_COLORS
       const feeLabels = ['终端电能电费', '电度输配电费', '政府性基金', '容/需量电费']
-      const self = this
-      response.results.forEach(function (s, i) {
-        const el = self.$refs['pie' + i]
+      response.results.forEach((s, i) => {
+        const el = this.$refs['pie' + i]
         const node = Array.isArray(el) ? el[0] : el
         if (!node) return
         const values = [
@@ -358,21 +352,21 @@ export default {
           s.annual.gov_fund_fee,
           s.annual.capacity_demand_fee
         ]
-        self.pieCharts.push(renderChart(node, costPieOption(feeLabels, values, colorMap), null))
+        this.pieCharts.push(renderChart(node, costPieOption(feeLabels, values, colorMap), null))
       })
       this.resizeAll()
     },
-    resizeAll: function () {
+    resizeAll() {
       if (this.monthlyChart && this.monthlyChart.resize) {
         try { this.monthlyChart.resize() } catch (e) {}
       }
-      this.pieCharts.forEach(function (c) {
+      this.pieCharts.forEach((c) => {
         if (c && c.resize) {
           try { c.resize() } catch (e) {}
         }
       })
     },
-    disposeAll: function () {
+    disposeAll() {
       disposeChart(this.monthlyChart)
       this.monthlyChart = null
       this.pieCharts.forEach(disposeChart)

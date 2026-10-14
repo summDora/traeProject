@@ -90,7 +90,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       chartStart: '',
       chartEnd: '',
@@ -112,37 +112,37 @@ export default {
     }
   },
   computed: {
-    hasResult: function () {
+    hasResult() {
       const r = this.es.optimizeResult
       return !!(r && r.detail_chart_labels && r.detail_chart_labels.length)
     },
-    netStats: function () {
+    netStats() {
       if (!this.hasResult) return null
       return buildNetStats(this.es.optimizeResult, this.es.optimizeParams)
     },
-    detailPreview: function () {
+    detailPreview() {
       if (!this.hasResult) return null
       const base = (this.es.optimizeParams && this.es.optimizeParams.base_price) || 500
       return buildDetailPreview(this.es.optimizeResult, base)
     },
-    detailRows: function () {
+    detailRows() {
       return this.detailPreview ? [this.detailPreview] : []
     },
-    chartPickerOptions: function () {
+    chartPickerOptions() {
       return datePickerOptions(this.dateMin, this.dateMax)
     }
   },
-  mounted: function () {
+  mounted() {
     if (this.hasResult) {
       this.applyResultRange(this.es.optimizeResult)
       this.$nextTick(this.drawCharts)
     }
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val && this.hasResult) this.$nextTick(this.restoreCharts)
     },
-    'es.optimizeResult': function (val) {
+    'es.optimizeResult'(val) {
       if (val && val.detail_chart_labels && val.detail_chart_labels.length) {
         this.applyResultRange(val)
         this.$nextTick(this.drawCharts)
@@ -152,16 +152,16 @@ export default {
     },
     peakSeries: {
       deep: true,
-      handler: function () {
+      handler() {
         if (this.hasResult) this.drawPeak()
       }
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     this.disposeAll()
   },
   methods: {
-    applyResultRange: function (result) {
+    applyResultRange(result) {
       const labels = result.detail_chart_labels
       const first = extractDateFromLabel(labels[0])
       const last = extractDateFromLabel(labels[labels.length - 1])
@@ -174,41 +174,39 @@ export default {
         this.dateMax = last.substring(0, 4) + '-12-31'
       }
     },
-    filteredResult: function () {
+    filteredResult() {
       return sliceOptimizeResult(this.es.optimizeResult, this.chartStart, this.chartEnd) || this.es.optimizeResult
     },
-    reloadCharts: function () {
+    reloadCharts() {
       this.drawCharts()
     },
-    restoreCharts: function () {
-      const self = this
+    restoreCharts() {
       if (!this.hasResult) return
-      whenChartVisible([this.$refs.peakChart, this.$refs.cdChart, this.$refs.socChart], function () {
-        self.disposeAll()
-        self.drawCharts()
+      whenChartVisible([this.$refs.peakChart, this.$refs.cdChart, this.$refs.socChart], () => {
+        this.disposeAll()
+        this.drawCharts()
       })
     },
-    drawCharts: function () {
+    drawCharts() {
       if (!this.hasResult) return
       this.drawPeak()
       this.drawChargeDischarge()
       this.drawSoc()
       this.resizeAll()
     },
-    drawPeak: function () {
+    drawPeak() {
       const result = this.filteredResult()
       const N = Math.min(result.detail_chart_labels.length, 600)
-      const ds = function (arr) { return downsample(arr, N) }
-      const self = this
+      const ds = (arr) => { return downsample(arr, N) }
       const seriesList = []
-      PEAK_SERIES_CONFIG.forEach(function (s) {
-        if (self.peakSeries[s.key]) {
+      PEAK_SERIES_CONFIG.forEach((s) => {
+        if (this.peakSeries[s.key]) {
           seriesList.push({ name: s.name, data: ds(result[s.field]), color: s.color, width: s.width })
         }
       })
       this.peakChart = renderChart(this.$refs.peakChart, peakShavingOption(ds(result.detail_chart_labels), seriesList), this.peakChart)
     },
-    drawChargeDischarge: function () {
+    drawChargeDischarge() {
       const result = this.filteredResult()
       const N = Math.min(result.detail_chart_labels.length, 600)
       this.cdChart = renderChart(
@@ -221,10 +219,10 @@ export default {
         this.cdChart
       )
     },
-    drawSoc: function () {
+    drawSoc() {
       const result = this.filteredResult()
       const N = Math.min(result.detail_chart_labels.length, 600)
-      const socPct = downsample(result.detail_soc.map(function (v) { return v * 100 }), N)
+      const socPct = downsample(result.detail_soc.map((v) => { return v * 100 }), N)
       this.socChart = renderChart(
         this.$refs.socChart,
         socStorageOption(
@@ -235,14 +233,14 @@ export default {
         this.socChart
       )
     },
-    resizeAll: function () {
-      ;[this.peakChart, this.cdChart, this.socChart].forEach(function (c) {
+    resizeAll() {
+      ;[this.peakChart, this.cdChart, this.socChart].forEach((c) => {
         if (c && c.resize) {
           try { c.resize() } catch (e) {}
         }
       })
     },
-    disposeAll: function () {
+    disposeAll() {
       disposeChart(this.peakChart)
       disposeChart(this.cdChart)
       disposeChart(this.socChart)
@@ -250,23 +248,23 @@ export default {
       this.cdChart = null
       this.socChart = null
     },
-    csvRows: function (result) {
+    csvRows(result) {
       const allPrices = result.detail_price || []
       const base = (this.es.optimizeParams && this.es.optimizeParams.base_price) || 500
-      const header = DETAIL_CSV_FIELDS.map(function (f) { return f.header }).join(',')
+      const header = DETAIL_CSV_FIELDS.map((f) => { return f.header }).join(',')
       const rows = []
       for (let i = 0; i < result.detail_chart_labels.length; i++) {
-        rows.push(DETAIL_CSV_FIELDS.map(function (f) {
+        rows.push(DETAIL_CSV_FIELDS.map((f) => {
           return f.get(result, i, base, allPrices, classifyPeakValley)
         }).join(','))
       }
       return { header: header, rows: rows }
     },
-    downloadFiltered: function () {
+    downloadFiltered() {
       const sliced = sliceOptimizeResult(this.es.optimizeResult, this.downloadStart, this.downloadEnd)
       this.downloadAll(sliced || this.es.optimizeResult)
     },
-    downloadAll: function (result) {
+    downloadAll(result) {
       const src = result && result.detail_chart_labels ? result : this.es.optimizeResult
       if (!src) return
       const csv = this.csvRows(src)

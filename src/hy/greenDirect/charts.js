@@ -29,7 +29,7 @@ export function whenChartVisible(el, cb, tries) {
   if (typeof cb !== 'function') return
   const list = Array.isArray(el) ? el.filter(Boolean) : (el ? [el] : [])
   if (!list.length) return
-  const ready = list.every(function (node) {
+  const ready = list.every((node) => {
     return node.clientWidth >= 8 && node.clientHeight >= 8
   })
   if (ready) {
@@ -37,7 +37,7 @@ export function whenChartVisible(el, cb, tries) {
     return
   }
   if (tries <= 0) return
-  requestAnimationFrame(function () {
+  requestAnimationFrame(() => {
     whenChartVisible(el, cb, tries - 1)
   })
 }
@@ -66,7 +66,7 @@ export function formatTickLabel(label) {
   if (!label) return ''
   const m = String(label).match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})[ T](\d{1,2}):(\d{2})/)
   if (!m) return String(label)
-  const p = function (x) { return String(x).padStart ? String(x).padStart(2, '0') : ('0' + x).slice(-2) }
+  const p = (x) => { return String(x).padStart ? String(x).padStart(2, '0') : ('0' + x).slice(-2) }
   return p(m[2]) + '/' + p(m[3]) + ' ' + p(m[4]) + ':' + m[5]
 }
 
@@ -151,7 +151,7 @@ export function sourceLoadOption(labels, load, renewable, net) {
         type: 'line',
         lineStyle: { color: '#94A3B8', width: 1, type: 'dashed' }
       },
-      formatter: function (params) {
+      formatter(params) {
         if (!params || !params.length) return ''
         var lines = [params[0].axisValue]
         for (var i = 0; i < params.length; i++) {
@@ -239,7 +239,7 @@ export function sizingCurveOption(labels, r2, r6, r3) {
 
 /** 储能负荷柱：充电为正色、放电为负色 */
 function storageBarData(values) {
-  return (values || []).map(function (v) {
+  return (values || []).map((v) => {
     return {
       value: v,
       itemStyle: { color: v >= 0 ? 'rgba(6,182,212,0.7)' : 'rgba(249,115,22,0.7)' }
@@ -310,11 +310,11 @@ export function socStorageOption(labels, socMwh, storageLoad) {
 export function peakShavingOption(labels, seriesList) {
   return {
     tooltip: { trigger: 'axis' },
-    legend: { data: seriesList.map(function (s) { return s.name }), top: 0 },
+    legend: { data: seriesList.map((s) => { return s.name }), top: 0 },
     grid: chartGrid(labels, null, { maxTicks: 30 }),
     xAxis: categoryAxis(labels, { maxTicks: 30, formatter: formatTickLabel }),
     yAxis: { type: 'value', name: 'MW' },
-    series: seriesList.map(function (s) {
+    series: seriesList.map((s) => {
       return {
         name: s.name,
         type: 'line',
@@ -345,11 +345,11 @@ export function costMonthlyOption(months, seriesList) {
   return {
     color: ['#3b82f6', '#f97316', '#22c55e'],
     tooltip: { trigger: 'axis' },
-    legend: { data: seriesList.map(function (s) { return s.name }), top: 0 },
+    legend: { data: seriesList.map((s) => { return s.name }), top: 0 },
     grid: chartGrid(months, { left: 60 }, { rotateAfter: 8, maxTicks: 12 }),
     xAxis: categoryAxis(months, { rotateAfter: 8, maxTicks: 12 }),
     yAxis: { type: 'value', name: '元' },
-    series: seriesList.map(function (s) {
+    series: seriesList.map((s) => {
       return { name: s.name, type: 'bar', data: s.data, barMaxWidth: 18 }
     })
   }
@@ -361,12 +361,12 @@ export var COST_PIE_COLORS = ['#5E6AFE', '#FFB320', '#00D4D8', '#6CD623']
 /** 电费页：年度费用构成环形图（echarts 4.9 用 pie + radius） */
 export function costPieOption(feeLabels, values, colors) {
   colors = colors && colors.length ? colors : COST_PIE_COLORS
-  const total = (values || []).reduce(function (a, b) { return a + b }, 0)
+  const total = (values || []).reduce((a, b) => { return a + b }, 0)
   return {
     color: colors,
     tooltip: {
       trigger: 'item',
-      formatter: function (p) {
+      formatter(p) {
         const pct = total > 0 ? ((p.value / total) * 100).toFixed(1) : '0.0'
         return p.name + ': ' + Number(p.value).toLocaleString() + ' 元 (' + pct + '%)'
       }
@@ -391,7 +391,7 @@ export function costPieOption(feeLabels, values, colors) {
           normal: {
             show: true,
             position: 'inside',
-            formatter: function (p) {
+            formatter(p) {
               if (p.percent < 3) return ''
               return p.percent.toFixed(1) + '%'
             },
@@ -399,7 +399,7 @@ export function costPieOption(feeLabels, values, colors) {
           }
         },
         labelLine: { normal: { show: false } },
-        data: feeLabels.map(function (name, i) {
+        data: feeLabels.map((name, i) => {
           return { name: name, value: values[i] }
         })
       }
@@ -412,10 +412,10 @@ export function econCashFlowOption(labels, totalCf, equityCf, cumTotal, cumEquit
   return {
     tooltip: {
       trigger: 'axis',
-      formatter: function (params) {
+      formatter(params) {
         if (!params || !params.length) return ''
         var lines = [params[0].axisValue]
-        params.forEach(function (p) {
+        params.forEach((p) => {
           var v = p.value == null ? '-' : Number(p.value).toLocaleString('zh-CN', { maximumFractionDigits: 0 })
           var marker = p.marker
           if (!marker && p.color) {

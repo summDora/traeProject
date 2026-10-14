@@ -5,24 +5,11 @@
         <div class="home-hero-copy">
           <p class="home-kicker">内部演示台</p>
           <h1>SUMMERDORA</h1>
-          <p class="home-lead">从元素示例、业务表格到储能评估与驾驶舱，按模块进入对应页面。</p>
+          <p class="home-lead">
+            从元素示例、业务表格到储能评估与驾驶舱，按模块进入对应页面。
+          </p>
         </div>
-        <svg class="home-palm" viewBox="0 0 280 220" aria-hidden="true">
-          <g fill="#fff">
-            <path d="M168 46c-28-18-68-28-108-18 36 4 72 18 108 18z"/>
-            <path d="M168 46c-32 2-76 18-108 48 40-18 78-36 108-48z"/>
-            <path d="M168 46c-22 16-52 48-70 84 28-28 52-58 70-84z"/>
-            <path d="M168 46c-4-30-2-64 12-96-2 32-6 64-12 96z"/>
-            <path d="M168 46c22-26 62-40 104-36-36 12-72 24-104 36z"/>
-            <path d="M168 46c32-8 78-4 118 20-38-6-80-12-118-20z"/>
-            <path d="M168 46c30 10 72 36 100 72-34-24-70-52-100-72z"/>
-            <path d="M168 46c16 22 28 56 30 90-8-32-18-62-30-90z"/>
-            <ellipse cx="156" cy="58" rx="7" ry="6"/>
-            <ellipse cx="170" cy="64" rx="6.5" ry="5.5"/>
-            <ellipse cx="162" cy="70" rx="6" ry="5"/>
-            <path d="M132 218c2-50 14-98 40-156l16 3c-22 56-32 104-28 153z"/>
-          </g>
-        </svg>
+        <img class="home-mascot" :src="mascotSrc" alt="" />
       </div>
     </section>
 
@@ -46,8 +33,12 @@
             type="button"
             class="home-tag"
             @click.stop="enter(child.path)"
-          >{{ child.title }}</button>
-          <span v-if="group.more" class="home-tag is-more">+{{ group.more }}</span>
+          >
+            {{ child.title }}
+          </button>
+          <span v-if="group.more" class="home-tag is-more"
+            >+{{ group.more }}</span
+          >
         </div>
       </div>
     </section>
@@ -55,82 +46,105 @@
 </template>
 
 <script>
-import { navMenus } from '../../router'
+import { navMenus } from "../../router";
 
 const GROUP_META = {
-  '元素': { blurb: '表格、表单与基础组件示例', tone: 'teal' },
-  '业务工具': { blurb: '时间联动、价格预测与任务监控', tone: 'blue' },
-  'python 迁移': { blurb: '储能优化调度与绿电直连评估', tone: 'green' },
-  '大屏': { blurb: '全屏驾驶舱与可视化大屏', tone: 'violet' },
-  '政策图谱': { blurb: '政策检索、图谱与知识关系', tone: 'amber' },
-  '成效页面': { blurb: '需求管理、评审与项目成效', tone: 'slate' }
-}
+  元素: { blurb: "表格、表单与基础组件示例", tone: "teal" },
+  业务工具: { blurb: "时间联动、价格预测与任务监控", tone: "blue" },
+  "python 迁移": { blurb: "储能优化调度与绿电直连评估", tone: "green" },
+  大屏: { blurb: "全屏驾驶舱与可视化大屏", tone: "violet" },
+  政策图谱: { blurb: "政策检索、图谱与知识关系", tone: "amber" },
+  成效页面: { blurb: "需求管理、评审与项目成效", tone: "slate" },
+};
 
 export default {
-  name: 'PageHome',
+  name: "PageHome",
+  data: function () {
+    return {
+      mascotSrc: require("./mascot.png"),
+    };
+  },
   computed: {
     groups: function () {
-      return (navMenus || []).map(function (item) {
-        const children = item.children || (item.path ? [{ path: item.path, title: item.title }] : [])
-        const meta = GROUP_META[item.title] || { blurb: '进入该模块下的页面', tone: 'teal' }
-        return {
-          title: item.title,
-          blurb: meta.blurb,
-          tone: meta.tone,
-          children: children,
-          preview: children.slice(0, 4),
-          more: children.length > 4 ? children.length - 4 : 0,
-          entry: children[0] && children[0].path
-        }
-      }).filter(function (g) { return g.entry })
-    }
+      return (navMenus || [])
+        .map(function (item) {
+          const children =
+            item.children ||
+            (item.path ? [{ path: item.path, title: item.title }] : []);
+          const meta = GROUP_META[item.title] || {
+            blurb: "进入该模块下的页面",
+            tone: "teal",
+          };
+          return {
+            title: item.title,
+            blurb: meta.blurb,
+            tone: meta.tone,
+            children: children,
+            preview: children.slice(0, 4),
+            more: children.length > 4 ? children.length - 4 : 0,
+            entry: children[0] && children[0].path,
+          };
+        })
+        .filter(function (g) {
+          return g.entry;
+        });
+    },
   },
   methods: {
     enter: function (path) {
-      if (path) this.$router.push(path)
-    }
-  }
-}
+      if (path) this.$router.push(path);
+    },
+  },
+};
 </script>
 
 <style scoped>
 .home-page {
   min-height: calc(100vh - 56px);
-  background:
-    radial-gradient(1200px 420px at 8% -10%, rgba(14, 116, 144, 0.10), transparent 55%),
-    radial-gradient(900px 360px at 100% 8%, rgba(94, 106, 254, 0.08), transparent 50%),
+  background: radial-gradient(
+      1200px 420px at 8% -10%,
+      rgba(14, 116, 144, 0.1),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 360px at 100% 8%,
+      rgba(94, 106, 254, 0.08),
+      transparent 50%
+    ),
     #f4f7f8;
 }
 
 .home-hero {
   position: relative;
-  overflow: hidden;
-  padding: 48px 40px 36px;
+  overflow: visible;
+  padding: 90px 40px 70px;
   background: linear-gradient(135deg, #0e7490 0%, #0c5c75 58%, #164e63 100%);
   color: #fff;
+  z-index: 1;
 }
 
 .home-hero-inner {
+  position: relative;
   max-width: 1120px;
   margin: 0 auto;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 32px;
 }
 
 .home-hero-copy {
   min-width: 0;
-  padding-bottom: 4px;
+  max-width: 640px;
 }
 
-.home-palm {
-  width: 300px;
-  height: 200px;
-  flex-shrink: 0;
+.home-mascot {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 320px;
+  width: auto;
   pointer-events: none;
-  margin-right: -12px;
-  margin-bottom: -36px;
+  display: block;
+  background: transparent;
+  z-index: 2;
 }
 
 .home-kicker {
@@ -175,7 +189,8 @@ export default {
   padding: 20px 20px 16px;
   cursor: pointer;
   box-shadow: 0 1px 2px rgba(15, 33, 27, 0.04);
-  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  transition: transform 0.18s ease, box-shadow 0.18s ease,
+    border-color 0.18s ease;
   border-top: 3px solid #0e7490;
 }
 
@@ -185,12 +200,24 @@ export default {
   border-color: #cfe3e8;
 }
 
-.home-card.is-blue { border-top-color: #5B9FE8; }
-.home-card.is-green { border-top-color: #3CB89A; }
-.home-card.is-violet { border-top-color: #5E6AFE; }
-.home-card.is-amber { border-top-color: #E9A825; }
-.home-card.is-slate { border-top-color: #64748B; }
-.home-card.is-teal { border-top-color: #0E7490; }
+.home-card.is-blue {
+  border-top-color: #5b9fe8;
+}
+.home-card.is-green {
+  border-top-color: #3cb89a;
+}
+.home-card.is-violet {
+  border-top-color: #5e6afe;
+}
+.home-card.is-amber {
+  border-top-color: #e9a825;
+}
+.home-card.is-slate {
+  border-top-color: #64748b;
+}
+.home-card.is-teal {
+  border-top-color: #0e7490;
+}
 
 .home-card-top {
   display: flex;
@@ -257,14 +284,27 @@ export default {
 }
 
 @media (max-width: 1024px) {
-  .home-body { grid-template-columns: 1fr 1fr; padding: 24px 20px 40px; }
-  .home-hero { padding: 36px 20px 28px; }
-  .home-palm { width: 220px; height: 148px; margin-bottom: -28px; }
+  .home-body {
+    grid-template-columns: 1fr 1fr;
+    padding: 24px 20px 40px;
+  }
+  .home-hero {
+    padding: 36px 20px 28px;
+  }
+  .home-mascot {
+    height: 250px;
+  }
 }
 
 @media (max-width: 640px) {
-  .home-body { grid-template-columns: 1fr; }
-  .home-hero h1 { font-size: 28px; }
-  .home-palm { display: none; }
+  .home-body {
+    grid-template-columns: 1fr;
+  }
+  .home-hero h1 {
+    font-size: 28px;
+  }
+  .home-mascot {
+    display: none;
+  }
 }
 </style>

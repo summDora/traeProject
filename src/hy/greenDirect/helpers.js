@@ -14,7 +14,7 @@ export function downsample(arr, n) {
 /** Element 日期面板：禁用 min/max 之外的日期（min/max 为 YYYY-MM-DD） */
 export function datePickerOptions(minStr, maxStr) {
   return {
-    disabledDate: function (time) {
+    disabledDate(time) {
       const t = time.getTime()
       if (minStr) {
         const min = new Date(String(minStr).replace(/-/g, '/') + ' 00:00:00').getTime()
@@ -43,8 +43,8 @@ export function fmtPct(v, d) {
 
 export function buildCostSummaryRows(results) {
   if (!results || results.length < 3) return []
-  return COST_SUMMARY_METRICS.map(function (m) {
-    const cell = function (s) {
+  return COST_SUMMARY_METRICS.map((m) => {
+    const cell = (s) => {
       let v = s.annual[m.key]
       if (v == null) return '-'
       if (m.kind === 'fee') v = v / 1e4
@@ -69,7 +69,7 @@ export function buildAnaCompareRows(res) {
     ['指标3 自用占用电比例', ind.r3Net, ind.r3Opt, true],
     ['指标2 倒送比例', ind.r2Net, ind.r2Opt, true]
   ]
-  return rows.map(function (r) {
+  return rows.map((r) => {
     const delta = r[2] - r[1]
     return {
       metric: r[0],
@@ -98,7 +98,7 @@ export function buildResStatsRows(ps) {
   const ind = ps.indicators || {}
   const st = ps.storage || {}
   const D = '-'
-  const cell = function (v, isPct) {
+  const cell = (v, isPct) => {
     if (v === D || v == null) return D
     return isPct ? fmtPct(v) : fmt(v)
   }

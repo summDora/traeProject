@@ -97,7 +97,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       loadFile: null,
       renewableFile: null,
@@ -112,50 +112,49 @@ export default {
     }
   },
   computed: {
-    canUpload: function () {
+    canUpload() {
       return !!(this.loadFile && this.renewableFile)
     }
   },
-  mounted: function () {
+  mounted() {
     this.autoLoad()
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) {
         if (this.gd.dataLoaded && !this.gd.sourceChart) this.reloadChart()
         else this.$nextTick(this.restoreChart)
       }
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     disposeChart(this.chart)
     this.chart = null
   },
   methods: {
-    fmt2: function (v) { return v == null ? '-' : Number(v).toFixed(2) },
-    fmt0: function (v) {
+    fmt2(v) { return v == null ? '-' : Number(v).toFixed(2) },
+    fmt0(v) {
       return v == null ? '-' : Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })
     },
-    downloadSample: function (kind) {
-      const self = this
+    downloadSample(kind) {
       if (this.downloadingSample) return
       this.downloadingSample = true
-      API.downloadSample(kind).catch(function (e) {
-        self.uploadStatus = '下载失败: ' + e.message
-        self.statusColor = '#c62828'
-      }).then(function () {
-        self.downloadingSample = false
+      API.downloadSample(kind).catch((e) => {
+        this.uploadStatus = '下载失败: ' + e.message
+        this.statusColor = '#c62828'
+      }).then(() => {
+        this.downloadingSample = false
       })
     },
-    onPickLoad: function (e) {
+    onPickLoad(e) {
       this.loadFile = e.target.files && e.target.files[0]
       this.hintLoad = this.loadFile ? this.loadFile.name : '未选择文件'
     },
-    onPickRenewable: function (e) {
+    onPickRenewable(e) {
       this.renewableFile = e.target.files && e.target.files[0]
       this.hintRenewable = this.renewableFile ? this.renewableFile.name : '未选择文件'
     },
-    applyLoaded: function (data, msg) {
+    applyLoaded(data, msg) {
       if (!data || !data.row_count) {
         throw new Error('未返回有效统计数据')
       }
@@ -177,23 +176,22 @@ export default {
       }
       this.reloadChart()
     },
-    autoLoad: function () {
-      const self = this
+    autoLoad() {
       if (this.gd.dataLoaded) {
         this.$nextTick(this.drawAndResize)
         return
       }
-      API.getStats().then(function (s) {
+      API.getStats().then((s) => {
         if (s && s.row_count > 0) {
-          self.applyLoaded(s, '已恢复上次上传数据：' + s.row_count + ' 行')
+          this.applyLoaded(s, '已恢复上次上传数据：' + s.row_count + ' 行')
           return
         }
-        return self.loadDefault()
-      }).catch(function () {
-        self.loadDefault()
+        return this.loadDefault()
+      }).catch(() => {
+        this.loadDefault()
       })
     },
-    drawChart: function () {
+    drawChart() {
       const src = this.gd.sourceChart
       const el = this.$refs.sourceChart
       if (!src || !el || !src.labels || !src.labels.length) return
@@ -204,78 +202,73 @@ export default {
         downsample(src.net, 360)
       ), this.chart)
     },
-    resizeChart: function () {
+    resizeChart() {
       if (this.chart && this.chart.resize) {
         try { this.chart.resize() } catch (e) {}
       }
     },
-    drawAndResize: function () {
+    drawAndResize() {
       this.drawChart()
       this.resizeChart()
     },
-    restoreChart: function () {
-      const self = this
-      whenChartVisible(this.$refs.sourceChart, function () {
-        disposeChart(self.chart)
-        self.chart = null
-        self.drawAndResize()
+    restoreChart() {
+      whenChartVisible(this.$refs.sourceChart, () => {
+        disposeChart(this.chart)
+        this.chart = null
+        this.drawAndResize()
       })
     },
-    reloadChart: function () {
-      const self = this
+    reloadChart() {
       if (!this.gd.dataLoaded) return
-      API.getChartData(this.gd.chartDateStart, this.gd.chartDateEnd, this.gd.loadScale, this.gd.renewableScale).then(function (chartData) {
-        self.gd.sourceChart = {
+      API.getChartData(this.gd.chartDateStart, this.gd.chartDateEnd, this.gd.loadScale, this.gd.renewableScale).then((chartData) => {
+        this.gd.sourceChart = {
           labels: chartData.labels || [],
           load: chartData.load || [],
           renewable: chartData.renewable || [],
           net: chartData.net || []
         }
-        if (!self.gd.sourceChart.labels.length) {
-          self.uploadStatus = '当前日期范围内没有曲线点，请调整起止日期后重新加载'
-          self.statusColor = '#c62828'
+        if (!this.gd.sourceChart.labels.length) {
+          this.uploadStatus = '当前日期范围内没有曲线点，请调整起止日期后重新加载'
+          this.statusColor = '#c62828'
         }
-        self.$nextTick(function () {
-          self.drawAndResize()
+        this.$nextTick(() => {
+          this.drawAndResize()
         })
-      }).catch(function (e) {
-        self.uploadStatus = '图表加载失败: ' + e.message
-        self.statusColor = '#c62828'
+      }).catch((e) => {
+        this.uploadStatus = '图表加载失败: ' + e.message
+        this.statusColor = '#c62828'
       })
     },
-    loadDefault: function () {
-      const self = this
+    loadDefault() {
       this.loadingDefault = true
       this.uploadStatus = '正在加载示例数据…'
       this.statusColor = '#666'
-      return API.loadDefaultData().then(function (data) {
-        self.applyLoaded(data, '示例数据已加载：' + data.row_count + ' 行，' + data.date_start + ' ~ ' + data.date_end)
-      }).catch(function (e) {
-        self.uploadStatus = '错误: ' + e.message
-        self.statusColor = '#c62828'
-      }).then(function () {
-        self.loadingDefault = false
+      return API.loadDefaultData().then((data) => {
+        this.applyLoaded(data, '示例数据已加载：' + data.row_count + ' 行，' + data.date_start + ' ~ ' + data.date_end)
+      }).catch((e) => {
+        this.uploadStatus = '错误: ' + e.message
+        this.statusColor = '#c62828'
+      }).then(() => {
+        this.loadingDefault = false
       })
     },
-    upload: function () {
-      const self = this
+    upload() {
       this.uploading = true
       this.uploadStatus = ''
-      API.uploadData(this.loadFile, this.renewableFile).then(function (data) {
-        self.applyLoaded(data, '数据已解析')
-      }).catch(function (e) {
-        self.uploadStatus = '错误: ' + e.message
-        self.statusColor = '#c62828'
-      }).then(function () {
-        self.uploading = false
+      API.uploadData(this.loadFile, this.renewableFile).then((data) => {
+        this.applyLoaded(data, '数据已解析')
+      }).catch((e) => {
+        this.uploadStatus = '错误: ' + e.message
+        this.statusColor = '#c62828'
+      }).then(() => {
+        this.uploading = false
       })
     },
-    previewScaling: function () {
-      const self = this
-      API.previewScaling(this.gd.loadScale, this.gd.renewableScale).then(function (preview) {
-        self.gd.scalingPreview = preview
-        self.reloadChart()
-      }).catch(function (e) {
+    previewScaling() {
+      API.previewScaling(this.gd.loadScale, this.gd.renewableScale).then((preview) => {
+        this.gd.scalingPreview = preview
+        this.reloadChart()
+      }).catch((e) => {
         alert('预览失败: ' + e.message)
       })
     }

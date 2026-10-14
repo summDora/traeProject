@@ -1,36 +1,36 @@
 <script>
 const FORMATTERS = {
-  dash: function (v) {
+  dash(v) {
     return v == null || v === '' ? '-' : v
   },
-  locale: function (v) {
+  locale(v) {
     if (v == null || v === '' || v === '-') return '-'
     const n = Number(v)
     return isNaN(n) ? v : n.toLocaleString()
   },
-  fixed2: function (v) {
+  fixed2(v) {
     if (v == null || v === '' || v === '-') return '-'
     const n = Number(v)
     return isNaN(n) ? '-' : n.toFixed(2)
   },
-  fixed3: function (v) {
+  fixed3(v) {
     if (v == null || v === '' || v === '-') return '-'
     const n = Number(v)
     return isNaN(n) ? '-' : n.toFixed(3)
   },
-  fixed4: function (v) {
+  fixed4(v) {
     if (v == null || v === '' || v === '-') return '-'
     const n = Number(v)
     return isNaN(n) ? '-' : n.toFixed(4)
   },
-  percent: function (v) {
+  percent(v) {
     if (v == null || v === '' || isNaN(Number(v))) return '-'
     return (Number(v) * 100).toFixed(1) + '%'
   },
-  money: function (v) {
+  money(v) {
     return Number(v || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   },
-  dashMoney: function (v) {
+  dashMoney(v) {
     if (!v || Math.abs(Number(v)) <= 0.001) return '-'
     return Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   }
@@ -39,15 +39,15 @@ const FORMATTERS = {
 export default {
   name: 'EsTable',
   props: {
-    data: { type: Array, default: function () { return [] } },
-    columns: { type: Array, default: function () { return [] } },
+    data: { type: Array, default() { return [] } },
+    columns: { type: Array, default() { return [] } },
     maxHeight: { type: [Number, String], default: undefined },
     summaryRow: { type: Object, default: null },
     emptyText: { type: String, default: '暂无数据' },
     visible: { type: Boolean, default: true }
   },
   methods: {
-    bindCol: function (col) {
+    bindCol(col) {
       const props = {
         prop: col.prop,
         label: col.label,
@@ -62,13 +62,13 @@ export default {
       if (col.className) props.className = col.className
       return props
     },
-    cellText: function (col, row) {
+    cellText(col, row) {
       const v = row ? row[col.prop] : undefined
       if (col.format && FORMATTERS[col.format]) return FORMATTERS[col.format](v, row)
       if (v == null || v === '') return '-'
       return v
     },
-    cellStyle: function (col, row) {
+    cellStyle(col, row) {
       const style = {}
       const v = row ? row[col.prop] : undefined
       if (col.weight === 'bold') style.fontWeight = 600
@@ -81,22 +81,21 @@ export default {
       else if (color === 'replace' && row && row.storage_replacement > 0) style.color = '#e65100'
       return style
     },
-    handleSummary: function (param) {
-      const self = this
+    handleSummary(param) {
       if (!this.summaryRow) return []
-      return param.columns.map(function (c, i) {
-        if (i === 0) return self.summaryRow[c.property] != null ? self.summaryRow[c.property] : '合计'
-        const col = self.findCol(c.property)
+      return param.columns.map((c, i) => {
+        if (i === 0) return this.summaryRow[c.property] != null ? this.summaryRow[c.property] : '合计'
+        const col = this.findCol(c.property)
         const format = col && col.format === 'dashMoney' ? 'money' : (col && col.format)
-        const v = self.summaryRow[c.property]
-        if (format && FORMATTERS[format]) return FORMATTERS[format](v, self.summaryRow)
+        const v = this.summaryRow[c.property]
+        if (format && FORMATTERS[format]) return FORMATTERS[format](v, this.summaryRow)
         return v == null ? '-' : v
       })
     },
-    findCol: function (prop) {
+    findCol(prop) {
       let found = null
-      const walk = function (cols) {
-        ;(cols || []).forEach(function (c) {
+      const walk = (cols) => {
+        ;(cols || []).forEach((c) => {
           if (c.prop === prop) found = c
           if (c.children) walk(c.children)
         })
@@ -104,7 +103,7 @@ export default {
       walk(this.columns)
       return found
     },
-    handleSpan: function (meta) {
+    handleSpan(meta) {
       const row = meta.row
       if (row && row._spanEnd && meta.columnIndex >= 1) {
         if (meta.columnIndex === 1) return [1, row._spanEnd]
@@ -112,7 +111,7 @@ export default {
       }
       return [1, 1]
     },
-    handleRowClass: function (meta) {
+    handleRowClass(meta) {
       const row = meta.row
       if (!row) return ''
       const cls = []
@@ -122,15 +121,13 @@ export default {
       if (row._total) cls.push('es-row-total')
       return cls.join(' ')
     },
-    layout: function () {
-      const self = this
-      this.$nextTick(function () {
-        const table = self.$children && self.$children[0]
+    layout() {
+      this.$nextTick(() => {
+        const table = this.$children && this.$children[0]
         if (table && typeof table.doLayout === 'function') table.doLayout()
       })
     },
-    renderCol: function (h, col) {
-      const self = this
+    renderCol(h, col) {
       if (col.children && col.children.length) {
         return h('el-table-column', {
           key: 'g-' + col.label,
@@ -139,31 +136,30 @@ export default {
             align: col.align || 'center',
             labelClassName: col.labelClassName
           }
-        }, col.children.map(function (child) {
-          return self.renderCol(h, child)
+        }, col.children.map((child) => {
+          return this.renderCol(h, child)
         }))
       }
       return h('el-table-column', {
         key: col.prop || col.label,
         props: this.bindCol(col),
         scopedSlots: {
-          default: function (scope) {
-            return h('span', { style: self.cellStyle(col, scope.row) }, [self.cellText(col, scope.row)])
+          default: (scope) => {
+            return h('span', { style: this.cellStyle(col, scope.row) }, [this.cellText(col, scope.row)])
           }
         }
       })
     }
   },
   watch: {
-    visible: function (val) {
+    visible(val) {
       if (val) this.layout()
     },
-    data: function () {
+    data() {
       this.layout()
     }
   },
-  render: function (h) {
-    const self = this
+  render(h) {
     const props = {
       data: this.data,
       border: true,
@@ -179,8 +175,8 @@ export default {
       class: 'es-el-table',
       style: { width: '100%' },
       props: props
-    }, (this.columns || []).map(function (col) {
-      return self.renderCol(h, col)
+    }, (this.columns || []).map((col) => {
+      return this.renderCol(h, col)
     }))
   }
 }

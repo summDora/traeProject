@@ -287,7 +287,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       calculating: false,
       status: '',
@@ -297,19 +297,19 @@ export default {
     }
   },
   computed: {
-    statusColor: function () {
+    statusColor() {
       if (this.statusType === 'ok') return 'green'
       if (this.statusType === 'err') return 'red'
       return '#666'
     },
-    netRevenueHint: function () {
+    netRevenueHint() {
       const benefit = this.es.econ.annual_benefit || 0
       const deduction = this.es.econ.revenue_deduction || 0
       const priceVat = (this.es.econ.price_vat_rate || 6) / 100
       if (benefit <= 0) return '-'
       return (benefit / (1 + priceVat) - deduction).toFixed(2) + ' 万元'
     },
-    outputRateHint: function () {
+    outputRateHint() {
       const maxPower = this.es.econ.re_max_power || 0
       const capacity = this.es.econ.re_capacity || 0
       if (capacity > 0 && maxPower > 0) {
@@ -317,14 +317,14 @@ export default {
       }
       return ''
     },
-    derived: function () {
+    derived() {
       const e = this.es.econ
       const reBodyInv = (e.re_capacity || 0) * (e.re_epc_price || 0)
       const lineInv = (e.overhead_price || 0) * (e.overhead_distance || 0) + (e.cable_price || 0) * (e.cable_distance || 0)
       const stInv = (e.storage_capacity || 0) * (e.storage_epc_price || 0)
       const other = e.other_costs || 0
       const total = reBodyInv + lineInv + stInv + other
-      const fmt = function (v) {
+      const fmt = (v) => {
         return Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
       }
       return {
@@ -337,7 +337,7 @@ export default {
         rePlusLine: (reBodyInv + lineInv).toFixed(2)
       }
     },
-    indicators: function () {
+    indicators() {
       const r = this.es.econResult
       if (!r) return []
       const fmt = this.fmt2
@@ -350,12 +350,12 @@ export default {
         { label: '总投资收益率 (ROI)', value: r.total_roi.toFixed(2) + '%', color: r.total_roi > 5 ? '#0F6E56' : '#B91C1C', tone: r.total_roi > 5 ? 'is-good' : 'is-bad' }
       ]
     },
-    investmentRows: function () {
+    investmentRows() {
       const r = this.es.econResult
       if (!r) return []
       const total = r.total_investment
       const fmt = this.fmt2
-      const pct = function (v) { return total > 0 ? (v / total * 100).toFixed(1) + '%' : '-' }
+      const pct = (v) => { return total > 0 ? (v / total * 100).toFixed(1) + '%' : '-' }
       const rated = (this.es.optimizeParams && this.es.optimizeParams.storage && this.es.optimizeParams.storage.rated_power) || 0
       return [
         { name: '新能源本体', amount: fmt(r.re_investment), pct: pct(r.re_investment) },
@@ -367,7 +367,7 @@ export default {
         { name: '储能规模', amount: (r.storage_capacity_mwh || 0) + ' MWh / ' + rated + ' MW', _muted: true, _spanEnd: 2 }
       ]
     },
-    financeCards: function () {
+    financeCards() {
       const r = this.es.econResult
       if (!r) return []
       const fmt = this.fmt2
@@ -380,45 +380,45 @@ export default {
         { label: '首年还本付息 (万元)', value: fmt(r.annual_loan_payment) }
       ]
     },
-    cashFlows: function () {
+    cashFlows() {
       return (this.es.econResult && this.es.econResult.cash_flows) || []
     },
-    cfSums: function () {
+    cfSums() {
       const sums = {}
-      CF_SUM_KEYS.forEach(function (k) { sums[k] = 0 })
-      this.cashFlows.forEach(function (cf) {
-        CF_SUM_KEYS.forEach(function (k) { sums[k] += cf[k] || 0 })
+      CF_SUM_KEYS.forEach((k) => { sums[k] = 0 })
+      this.cashFlows.forEach((cf) => {
+        CF_SUM_KEYS.forEach((k) => { sums[k] += cf[k] || 0 })
       })
       return sums
     },
-    cfSummaryRow: function () {
+    cfSummaryRow() {
       return Object.assign({ year: '合计' }, this.cfSums)
     }
   },
-  mounted: function () {
+  mounted() {
     this.populateFromUpstream()
     if (this.es.econResult) this.$nextTick(this.drawChart)
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) {
         this.populateFromUpstream()
         this.$nextTick(this.restoreChart)
       }
     },
-    'es.econResult': function (val) {
+    'es.econResult'(val) {
       if (val) this.$nextTick(this.drawChart)
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     disposeChart(this.chart)
     this.chart = null
   },
   methods: {
-    fmt2: function (v) {
+    fmt2(v) {
       return Number(v || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
-    populateFromUpstream: function () {
+    populateFromUpstream() {
       const e = this.es.econ
       if (this.es.optimizeResult && this.es.optimizeResult.detail_renewable) {
         const arr = this.es.optimizeResult.detail_renewable
@@ -446,17 +446,17 @@ export default {
         e.autoBenefit = true
       }
     },
-    onManualBenefit: function () {
+    onManualBenefit() {
       this.es.econ.autoBenefit = false
     },
-    onManualStorage: function () {
+    onManualStorage() {
       this.es.econ.autoStorage = false
     },
-    onMaxPowerInput: function () {
+    onMaxPowerInput() {
       this.es.econ.autoMaxPower = false
       this.syncCapacity()
     },
-    syncCapacity: function () {
+    syncCapacity() {
       const maxP = this.es.econ.re_max_power || 0
       const ratio = this.es.econ.capacity_ratio || 1.2
       if (maxP > 0) {
@@ -464,7 +464,7 @@ export default {
         this.es.econ.autoCapacity = true
       }
     },
-    onCapacityInput: function () {
+    onCapacityInput() {
       this.es.econ.autoCapacity = false
       const maxP = this.es.econ.re_max_power || 0
       const cap = this.es.econ.re_capacity || 0
@@ -472,7 +472,7 @@ export default {
         this.es.econ.capacity_ratio = Number((cap / maxP).toFixed(3))
       }
     },
-    applyTypeDefaults: function () {
+    applyTypeDefaults() {
       const defs = ECON_DEFAULTS[this.es.econ.project_type] || ECON_DEFAULTS.distributed_pv
       const e = this.es.econ
       e.re_epc_price = defs.epc
@@ -487,20 +487,19 @@ export default {
       this.applyVoltagePrices()
       this.syncCapacity()
     },
-    applyVoltagePrices: function () {
+    applyVoltagePrices() {
       const defs = ECON_DEFAULTS[this.es.econ.project_type] || ECON_DEFAULTS.distributed_pv
       const voltage = this.es.econ.voltage_level || '35kV'
       this.es.econ.overhead_price = (defs.overhead && defs.overhead[voltage]) || 30
       this.es.econ.cable_price = (defs.cable && defs.cable[voltage]) || 80
     },
-    onProjectTypeChange: function () {
+    onProjectTypeChange() {
       this.applyTypeDefaults()
     },
-    onVoltageLevelChange: function () {
+    onVoltageLevelChange() {
       this.applyVoltagePrices()
     },
-    calcEcon: function () {
-      const self = this
+    calcEcon() {
       const e = this.es.econ
       const params = {
         annual_benefit: e.annual_benefit || 0,
@@ -538,37 +537,36 @@ export default {
       this.calculating = true
       this.status = '正在计算...'
       this.statusType = ''
-      API.calculateEconomicEval(params).then(function (result) {
-        self.es.econResult = result
-        self.status = '计算完成'
-        self.statusType = 'ok'
-      }).catch(function (err) {
-        self.status = err.message
-        self.statusType = 'err'
-      }).then(function () {
-        self.calculating = false
+      API.calculateEconomicEval(params).then((result) => {
+        this.es.econResult = result
+        this.status = '计算完成'
+        this.statusType = 'ok'
+      }).catch((err) => {
+        this.status = err.message
+        this.statusType = 'err'
+      }).then(() => {
+        this.calculating = false
       })
     },
-    restoreChart: function () {
-      const self = this
+    restoreChart() {
       if (!this.es.econResult) return
-      whenChartVisible(this.$refs.cashflowChart, function () {
-        disposeChart(self.chart)
-        self.chart = null
-        self.drawChart()
+      whenChartVisible(this.$refs.cashflowChart, () => {
+        disposeChart(this.chart)
+        this.chart = null
+        this.drawChart()
       })
     },
-    drawChart: function () {
+    drawChart() {
       const r = this.es.econResult
       if (!r || !this.$refs.cashflowChart) return
-      const labels = r.cash_flows.map(function (cf) { return '第' + cf.year + '年' })
-      const totalCf = r.cash_flows.map(function (cf) { return cf.total_cf })
-      const equityCf = r.cash_flows.map(function (cf) { return cf.equity_cf })
+      const labels = r.cash_flows.map((cf) => { return '第' + cf.year + '年' })
+      const totalCf = r.cash_flows.map((cf) => { return cf.total_cf })
+      const equityCf = r.cash_flows.map((cf) => { return cf.equity_cf })
       let cumT = 0
       let cumE = 0
       const cumTotalArr = []
       const cumEquityArr = []
-      r.cash_flows.forEach(function (cf) {
+      r.cash_flows.forEach((cf) => {
         cumT += cf.total_cf
         cumE += cf.equity_cf
         cumTotalArr.push(cumT)

@@ -21,7 +21,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       generating: false,
       status: '',
@@ -29,28 +29,27 @@ export default {
     }
   },
   computed: {
-    statusColor: function () {
+    statusColor() {
       if (this.statusType === 'ok') return '#2e7d32'
       if (this.statusType === 'err') return '#c62828'
       return '#666'
     }
   },
   methods: {
-    generate: function () {
-      const self = this
+    generate() {
       this.generating = true
       this.status = '报告生成中…'
       this.statusType = ''
-      API.generateReport().then(function (res) {
+      API.generateReport().then((res) => {
         const ts = new Date().toISOString().slice(0, 19).replace(/[-T:]/g, '')
         API.downloadBlob(res.blob, res.filename || ('绿电直连项目评估报告_' + ts + '.docx'))
-        self.status = '报告已生成并开始下载'
-        self.statusType = 'ok'
-      }).catch(function (e) {
-        self.status = e.message
-        self.statusType = 'err'
-      }).then(function () {
-        self.generating = false
+        this.status = '报告已生成并开始下载'
+        this.statusType = 'ok'
+      }).catch((e) => {
+        this.status = e.message
+        this.statusType = 'err'
+      }).then(() => {
+        this.generating = false
       })
     }
   }

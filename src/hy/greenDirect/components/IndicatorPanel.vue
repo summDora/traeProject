@@ -85,7 +85,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       running: false,
       status: '',
@@ -94,22 +94,22 @@ export default {
     }
   },
   computed: {
-    summary: function () {
+    summary() {
       const s = this.gd.storage
       return s.rated_power + 'MW / ' + s.energy_capacity + 'MWh · η' + s.eta +
         ' · SOC ' + (s.soc_min * 100).toFixed(0) + '%~' + (s.soc_max * 100).toFixed(0) +
         '% · 初值 ' + (s.initial_soc * 100).toFixed(0) + '%'
     },
-    statusColor: function () {
+    statusColor() {
       if (this.statusType === 'ok') return '#2e7d32'
       if (this.statusType === 'err') return '#c62828'
       return '#666'
     },
-    indicatorCards: function () {
+    indicatorCards() {
       const res = this.gd.analysisResult
       if (!res || !res.indicators) return []
       const ind = res.indicators
-      const mk = function (label, net, opt, reverse) {
+      const mk = (label, net, opt, reverse) => {
         const delta = (opt - net) * 100
         const good = reverse ? delta <= 0 : delta >= 0
         return {
@@ -125,18 +125,18 @@ export default {
         mk('指标2 倒送比例', ind.r2Net, ind.r2Opt, true)
       ]
     },
-    compareRows: function () {
+    compareRows() {
       return buildAnaCompareRows(this.gd.analysisResult)
     },
-    powerRows: function () {
+    powerRows() {
       return this.gd.analysisResult ? buildAnaPowerRows(this.gd.analysisResult.power_stats) : []
     },
-    checks: function () {
+    checks() {
       return (this.gd.analysisResult && this.gd.analysisResult.checks) || []
     }
   },
   methods: {
-    storageBody: function () {
+    storageBody() {
       const s = this.gd.storage
       return {
         P: s.rated_power,
@@ -148,8 +148,7 @@ export default {
         base_price: this.gd.basePrice
       }
     },
-    run632: function () {
-      const self = this
+    run632() {
       if (!this.gd.dataLoaded) {
         alert('请先在「源荷数据」页上传或加载数据')
         return Promise.resolve()
@@ -159,16 +158,16 @@ export default {
       this.running = true
       this.status = '运行632分析中…'
       this.statusType = ''
-      return API.run632(this.storageBody()).then(function (res) {
-        self.gd.analysisResult = res
-        self.gd.analysisDone = true
-        self.status = '632分析完成'
-        self.statusType = 'ok'
-      }).catch(function (e) {
-        self.status = e.message
-        self.statusType = 'err'
-      }).then(function () {
-        self.running = false
+      return API.run632(this.storageBody()).then((res) => {
+        this.gd.analysisResult = res
+        this.gd.analysisDone = true
+        this.status = '632分析完成'
+        this.statusType = 'ok'
+      }).catch((e) => {
+        this.status = e.message
+        this.statusType = 'err'
+      }).then(() => {
+        this.running = false
       })
     }
   }

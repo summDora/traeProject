@@ -83,7 +83,7 @@ export const ECON_DEFAULTS = {
 function col(prop, label, extra) {
   const item = { prop: prop, label: label, align: 'center' }
   if (extra) {
-    Object.keys(extra).forEach(function (k) { item[k] = extra[k] })
+    Object.keys(extra).forEach((k) => { item[k] = extra[k] })
   }
   return item
 }
@@ -206,18 +206,18 @@ export const COST_SUMMARY_METRICS = [
 ]
 
 export const DETAIL_CSV_FIELDS = [
-  { header: '时间', get: function (r, i) { return r.detail_chart_labels[i] || '' } },
-  { header: '调整后负荷(MW)', get: function (r, i) { return r.detail_load[i] != null ? r.detail_load[i].toFixed(3) : '' } },
-  { header: '调整后新能源(MW)', get: function (r, i) { return r.detail_renewable[i] != null ? r.detail_renewable[i].toFixed(3) : '' } },
-  { header: '源荷净负荷(MW)', get: function (r, i) { return r.detail_net_load[i] != null ? r.detail_net_load[i].toFixed(3) : '' } },
-  { header: '储能充放电(MW)', get: function (r, i) { return r.detail_storage_load[i] != null ? r.detail_storage_load[i].toFixed(3) : '' } },
-  { header: '源荷储净负荷(MW)', get: function (r, i) { return r.detail_net_with_storage[i] != null ? r.detail_net_with_storage[i].toFixed(3) : '' } },
-  { header: 'SOC(%)', get: function (r, i) { return r.detail_soc[i] != null ? (r.detail_soc[i] * 100).toFixed(1) + '%' : '' } },
-  { header: '分时电价浮动比例', get: function (r, i, base) {
+  { header: '时间', get(r, i) { return r.detail_chart_labels[i] || '' } },
+  { header: '调整后负荷(MW)', get(r, i) { return r.detail_load[i] != null ? r.detail_load[i].toFixed(3) : '' } },
+  { header: '调整后新能源(MW)', get(r, i) { return r.detail_renewable[i] != null ? r.detail_renewable[i].toFixed(3) : '' } },
+  { header: '源荷净负荷(MW)', get(r, i) { return r.detail_net_load[i] != null ? r.detail_net_load[i].toFixed(3) : '' } },
+  { header: '储能充放电(MW)', get(r, i) { return r.detail_storage_load[i] != null ? r.detail_storage_load[i].toFixed(3) : '' } },
+  { header: '源荷储净负荷(MW)', get(r, i) { return r.detail_net_with_storage[i] != null ? r.detail_net_with_storage[i].toFixed(3) : '' } },
+  { header: 'SOC(%)', get(r, i) { return r.detail_soc[i] != null ? (r.detail_soc[i] * 100).toFixed(1) + '%' : '' } },
+  { header: '分时电价浮动比例', get(r, i, base) {
     const price = r.detail_price[i] != null ? r.detail_price[i] : 0
     return base > 0 ? (price / base).toFixed(2) : '1.00'
   } },
-  { header: '峰谷时段', get: function (r, i, base, allPrices, classify) {
+  { header: '峰谷时段', get(r, i, base, allPrices, classify) {
     const price = r.detail_price[i] != null ? r.detail_price[i] : 0
     return classify(price, allPrices)
   } }
@@ -239,7 +239,7 @@ export const CF_SUM_KEYS = [
 
 export function buildMarketColumns(periods) {
   const cols = [col('label', '时段', { minWidth: 70, width: 70, fixed: true })]
-  ;(periods || []).forEach(function (p, i) {
+  ;(periods || []).forEach((p, i) => {
     cols.push(col('p' + i, String(p), { minWidth: 72, format: 'fixed4' }))
   })
   return cols
@@ -247,7 +247,7 @@ export function buildMarketColumns(periods) {
 
 export function buildMarketRows(prices) {
   const row = { label: '电价' }
-  ;(prices || []).forEach(function (p, i) {
+  ;(prices || []).forEach((p, i) => {
     row['p' + i] = p
   })
   return [row]

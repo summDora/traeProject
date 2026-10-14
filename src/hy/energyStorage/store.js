@@ -1,7 +1,7 @@
 import Vue from "vue";
 
 export const esStore = new Vue({
-  data: function () {
+  data() {
     return {
       // —— 源荷数据 ——
       dataLoaded: false, // 是否已加载/上传源荷数据
@@ -103,7 +103,7 @@ export const esStore = new Vue({
     };
   },
   methods: {
-    resetSource: function () {
+    resetSource() {
       this.dataLoaded = false;
       this.sourceStats = null;
       this.sourceChart = null;
@@ -119,7 +119,7 @@ export const esStore = new Vue({
 
 export const esMixin = {
   computed: {
-    es: function () {
+    es() {
       return esStore;
     },
   },

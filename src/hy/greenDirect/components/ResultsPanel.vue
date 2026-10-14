@@ -79,7 +79,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       chartStart: '',
       chartEnd: '',
@@ -100,88 +100,85 @@ export default {
     }
   },
   computed: {
-    statsRows: function () {
+    statsRows() {
       return buildResStatsRows(this.gd.powerStats)
     },
-    detailRows: function () {
+    detailRows() {
       return buildDetailRows(this.gd.lastDetail, 48)
     },
-    chartPickerOptions: function () {
+    chartPickerOptions() {
       return datePickerOptions(this.gd.dateStart, this.gd.dateEnd)
     }
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val && this.gd.analysisDone) {
         if (!this.loaded) this.loadResults()
         else this.$nextTick(this.restoreCharts)
       }
     },
-    'gd.analysisDone': function (val) {
+    'gd.analysisDone'(val) {
       if (val && this.active) this.loadResults()
     },
     peakSeries: {
       deep: true,
-      handler: function () {
+      handler() {
         if (this.gd.lastDetail) this.drawPeak()
       }
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     this.disposeAll()
   },
   methods: {
-    ensureDates: function () {
+    ensureDates() {
       if (!this.chartStart && this.gd.dateStart) this.chartStart = this.gd.dateStart
       if (!this.chartEnd && this.gd.dateStart) this.chartEnd = this.gd.dateStart
     },
-    loadResults: function () {
-      const self = this
+    loadResults() {
       if (!this.gd.analysisDone) {
         alert('请先运行632分析')
         return
       }
       this.ensureDates()
-      API.getPowerStats().then(function (ps) {
-        self.gd.powerStats = ps
-        return API.getDetail(self.chartStart, self.chartEnd)
-      }).then(function (d) {
-        self.gd.lastDetail = d
-        self.loaded = true
-        self.$nextTick(self.drawCharts)
-      }).catch(function (e) {
+      API.getPowerStats().then((ps) => {
+        this.gd.powerStats = ps
+        return API.getDetail(this.chartStart, this.chartEnd)
+      }).then((d) => {
+        this.gd.lastDetail = d
+        this.loaded = true
+        this.$nextTick(this.drawCharts)
+      }).catch((e) => {
         alert(e.message)
       })
     },
-    drawCharts: function () {
+    drawCharts() {
       this.drawPeak()
       this.drawChargeDischarge()
       this.drawSoc()
       this.resizeAll()
     },
-    restoreCharts: function () {
-      const self = this
+    restoreCharts() {
       if (!this.gd.lastDetail) return
-      whenChartVisible([this.$refs.peakChart, this.$refs.cdChart, this.$refs.socChart], function () {
-        self.disposeAll()
-        self.drawCharts()
+      whenChartVisible([this.$refs.peakChart, this.$refs.cdChart, this.$refs.socChart], () => {
+        this.disposeAll()
+        this.drawCharts()
       })
     },
-    drawPeak: function () {
+    drawPeak() {
       const d = this.gd.lastDetail
       if (!d || !this.$refs.peakChart) return
       const N = Math.min((d.labels || []).length, 600)
-      const ds = function (arr) { return downsample(arr, N) }
-      const self = this
+      const ds = (arr) => { return downsample(arr, N) }
       const seriesList = []
-      PEAK_SERIES_CONFIG.forEach(function (s) {
-        if (self.peakSeries[s.key]) {
+      PEAK_SERIES_CONFIG.forEach((s) => {
+        if (this.peakSeries[s.key]) {
           seriesList.push({ name: s.name, data: ds(d[s.field]), color: s.color, width: s.width })
         }
       })
       this.peakChart = renderChart(this.$refs.peakChart, peakShavingOption(ds(d.labels), seriesList), this.peakChart)
     },
-    drawChargeDischarge: function () {
+    drawChargeDischarge() {
       const d = this.gd.lastDetail
       if (!d || !this.$refs.cdChart) return
       const N = Math.min((d.labels || []).length, 600)
@@ -191,7 +188,7 @@ export default {
         this.cdChart
       )
     },
-    drawSoc: function () {
+    drawSoc() {
       const d = this.gd.lastDetail
       if (!d || !this.$refs.socChart) return
       const N = Math.min((d.labels || []).length, 600)
@@ -201,14 +198,14 @@ export default {
         this.socChart
       )
     },
-    resizeAll: function () {
-      ;[this.peakChart, this.cdChart, this.socChart].forEach(function (c) {
+    resizeAll() {
+      ;[this.peakChart, this.cdChart, this.socChart].forEach((c) => {
         if (c && c.resize) {
           try { c.resize() } catch (e) {}
         }
       })
     },
-    disposeAll: function () {
+    disposeAll() {
       disposeChart(this.peakChart)
       disposeChart(this.cdChart)
       disposeChart(this.socChart)
@@ -216,13 +213,13 @@ export default {
       this.cdChart = null
       this.socChart = null
     },
-    downloadFiltered: function () {
-      API.downloadDetail(this.downloadStart, this.downloadEnd).catch(function (e) {
+    downloadFiltered() {
+      API.downloadDetail(this.downloadStart, this.downloadEnd).catch((e) => {
         alert(e.message || '下载失败')
       })
     },
-    downloadAll: function () {
-      API.downloadDetail('', '').catch(function (e) {
+    downloadAll() {
+      API.downloadDetail('', '').catch((e) => {
         alert(e.message || '下载失败')
       })
     }

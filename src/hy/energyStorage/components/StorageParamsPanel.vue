@@ -55,14 +55,14 @@ export default {
   },
   computed: {
     cycleFlag: {
-      get: function () {
+      get() {
         return this.es.storage.require_daily_cycle ? 'true' : 'false'
       },
-      set: function (v) {
+      set(v) {
         this.es.storage.require_daily_cycle = v === 'true'
       }
     },
-    summary: function () {
+    summary() {
       const s = this.es.storage
       return s.rated_power + 'MW / ' + s.energy_capacity + 'MWh · SOC ' +
         (s.soc_min * 100).toFixed(0) + '%~' + (s.soc_max * 100).toFixed(0) +

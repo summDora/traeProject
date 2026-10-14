@@ -49,7 +49,7 @@ export const ECON_DEFAULTS = {
 function col(prop, label, extra) {
   const item = { prop: prop, label: label, align: 'center' }
   if (extra) {
-    Object.keys(extra).forEach(function (k) { item[k] = extra[k] })
+    Object.keys(extra).forEach((k) => { item[k] = extra[k] })
   }
   return item
 }
@@ -187,7 +187,7 @@ export const CF_SUM_KEYS = [
 
 export function buildMarketColumns(periods) {
   const cols = [col('label', '时段', { minWidth: 70, width: 70, fixed: true })]
-  ;(periods || []).forEach(function (p, i) {
+  ;(periods || []).forEach((p, i) => {
     cols.push(col('p' + i, String(p), { minWidth: 72, format: 'fixed4' }))
   })
   return cols
@@ -195,7 +195,7 @@ export function buildMarketColumns(periods) {
 
 export function buildMarketRows(prices) {
   const row = { label: '电价' }
-  ;(prices || []).forEach(function (p, i) {
+  ;(prices || []).forEach((p, i) => {
     row['p' + i] = p
   })
   return [row]

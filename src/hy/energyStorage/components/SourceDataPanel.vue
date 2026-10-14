@@ -99,7 +99,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       loadFile: null,
       renewableFile: null,
@@ -114,48 +114,47 @@ export default {
     }
   },
   computed: {
-    canUpload: function () {
+    canUpload() {
       return !!(this.loadFile && this.renewableFile)
     }
   },
-  mounted: function () {
+  mounted() {
     this.autoLoad()
     if (this.es.dataLoaded) this.$nextTick(this.drawChart)
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) this.$nextTick(this.restoreChart)
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     disposeChart(this.chart)
     this.chart = null
   },
   methods: {
-    fmt1: function (v) { return v == null ? '-' : Number(v).toFixed(1) },
-    fmt0: function (v) {
+    fmt1(v) { return v == null ? '-' : Number(v).toFixed(1) },
+    fmt0(v) {
       return v == null ? '-' : Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })
     },
-    downloadSample: function (kind) {
-      const self = this
+    downloadSample(kind) {
       if (this.downloadingSample) return
       this.downloadingSample = true
-      API.downloadSample(kind).catch(function (e) {
-        self.uploadStatus = '下载失败: ' + e.message
-        self.statusColor = 'red'
-      }).then(function () {
-        self.downloadingSample = false
+      API.downloadSample(kind).catch((e) => {
+        this.uploadStatus = '下载失败: ' + e.message
+        this.statusColor = 'red'
+      }).then(() => {
+        this.downloadingSample = false
       })
     },
-    onPickLoad: function (e) {
+    onPickLoad(e) {
       this.loadFile = e.target.files && e.target.files[0]
       this.hintLoad = this.loadFile ? this.loadFile.name : '未选择文件'
     },
-    onPickRenewable: function (e) {
+    onPickRenewable(e) {
       this.renewableFile = e.target.files && e.target.files[0]
       this.hintRenewable = this.renewableFile ? this.renewableFile.name : '未选择文件'
     },
-    applyLoaded: function (data, msg) {
+    applyLoaded(data, msg) {
       this.es.dataLoaded = true
       this.uploadStatus = msg || '示例数据已加载（可重新上传替换）'
       this.statusColor = 'green'
@@ -179,7 +178,7 @@ export default {
       }
       this.$nextTick(this.drawChart)
     },
-    drawChart: function () {
+    drawChart() {
       const src = this.es.scalingPreview || this.es.sourceChart
       if (!src || !this.$refs.sourceChart) return
       this.chart = renderChart(this.$refs.sourceChart, sourceLoadOption(
@@ -189,87 +188,81 @@ export default {
         downsample(src.chart_net, 360)
       ), this.chart)
     },
-    restoreChart: function () {
-      const self = this
+    restoreChart() {
       if (!this.es.dataLoaded) return
-      whenChartVisible(this.$refs.sourceChart, function () {
-        disposeChart(self.chart)
-        self.chart = null
-        self.drawChart()
+      whenChartVisible(this.$refs.sourceChart, () => {
+        disposeChart(this.chart)
+        this.chart = null
+        this.drawChart()
       })
     },
-    resizeChart: function () {
+    resizeChart() {
       if (this.chart && this.chart.resize) this.chart.resize()
     },
-    autoLoad: function () {
-      const self = this
+    autoLoad() {
       if (this.es.dataLoaded) return
       this.loadDefault(true)
     },
-    loadDefault: function (silent) {
-      const self = this
+    loadDefault(silent) {
       if (this.loadingDefault) return
       this.loadingDefault = true
       if (!silent) {
         this.uploadStatus = '正在加载示例数据…'
         this.statusColor = '#666'
       }
-      return API.loadDefaultData().then(function (data) {
-        self.applyLoaded(data, '示例数据已加载（可重新上传替换）')
-      }).catch(function (e) {
+      return API.loadDefaultData().then((data) => {
+        this.applyLoaded(data, '示例数据已加载（可重新上传替换）')
+      }).catch((e) => {
         if (!silent) {
-          self.uploadStatus = '错误: ' + e.message
-          self.statusColor = 'red'
+          this.uploadStatus = '错误: ' + e.message
+          this.statusColor = 'red'
         }
-      }).then(function () {
-        self.loadingDefault = false
+      }).then(() => {
+        this.loadingDefault = false
       })
     },
-    upload: function () {
-      const self = this
+    upload() {
       this.uploading = true
       this.uploadStatus = ''
-      API.uploadData(this.loadFile, this.renewableFile).then(function (data) {
-        self.applyLoaded(data, '数据已解析')
-      }).catch(function (e) {
-        self.uploadStatus = '错误: ' + e.message
-        self.statusColor = 'red'
-      }).then(function () {
-        self.uploading = false
+      API.uploadData(this.loadFile, this.renewableFile).then((data) => {
+        this.applyLoaded(data, '数据已解析')
+      }).catch((e) => {
+        this.uploadStatus = '错误: ' + e.message
+        this.statusColor = 'red'
+      }).then(() => {
+        this.uploading = false
       })
     },
-    previewScaling: function () {
-      const self = this
-      const run = function () {
-        return API.previewScaling(self.es.loadScale, self.es.renewableScale)
+    previewScaling() {
+      const run = () => {
+        return API.previewScaling(this.es.loadScale, this.es.renewableScale)
       }
-      const go = this.es.dataLoaded ? Promise.resolve() : API.loadDefaultData().then(function (data) {
-        self.applyLoaded(data)
+      const go = this.es.dataLoaded ? Promise.resolve() : API.loadDefaultData().then((data) => {
+        this.applyLoaded(data)
       })
-      go.then(run).then(function (preview) {
-        self.es.scalingPreview = preview
-        self.$nextTick(self.drawChart)
-      }).catch(function (e) {
+      go.then(run).then((preview) => {
+        this.es.scalingPreview = preview
+        this.$nextTick(this.drawChart)
+      }).catch((e) => {
         alert('预览失败: ' + e.message)
       })
     },
-    reloadChart: function () {
-      const self = this
+    reloadChart() {
       if (!this.es.dataLoaded) return
-      API.getChartData(this.es.chartDateStart, this.es.chartDateEnd, this.es.loadScale, this.es.renewableScale).then(function (chartData) {
-        self.es.sourceChart = {
+      API.getChartData(this.es.chartDateStart, this.es.chartDateEnd, this.es.loadScale, this.es.renewableScale).then((chartData) => {
+        this.es.sourceChart = {
           chart_labels: chartData.labels || [],
           chart_load: chartData.load || [],
           chart_renewable: chartData.renewable || [],
           chart_net: chartData.net || []
         }
-        self.es.scalingPreview = null
-        self.$nextTick(self.drawChart)
-      }).catch(function (e) {
+        this.es.scalingPreview = null
+        this.$nextTick(this.drawChart)
+      }).catch((e) => {
         console.error(e)
       })
     },
-    resetUpload: function () {
+    resetUpload() {
       disposeChart(this.chart)
       this.chart = null
       this.es.resetSource()

@@ -276,7 +276,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       calculating: false,
       status: '',
@@ -290,21 +290,21 @@ export default {
     }
   },
   computed: {
-    statusColor: function () {
+    statusColor() {
       if (this.statusType === 'ok') return '#2e7d32'
       if (this.statusType === 'err') return '#c62828'
       return '#666'
     },
-    aiStatusColor: function () {
+    aiStatusColor() {
       if (this.aiStatusType === 'ok') return '#2e7d32'
       if (this.aiStatusType === 'err') return '#c62828'
       return '#666'
     },
-    netBenefitHint: function () {
+    netBenefitHint() {
       const v = (this.gd.econ.annual_benefit || 0) - (this.gd.econ.revenue_deduction || 0)
       return v.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
-    outputRateHint: function () {
+    outputRateHint() {
       const maxPower = this.gd.econ.re_max_power || 0
       const capacity = this.gd.econ.re_capacity || 0
       if (capacity > 0 && maxPower > 0) {
@@ -312,7 +312,7 @@ export default {
       }
       return ''
     },
-    derived: function () {
+    derived() {
       const e = this.gd.econ
       const reBodyInv = (e.re_capacity || 0) * (e.re_epc_price || 0)
       const lineInv = (e.overhead_price || 0) * (e.overhead_distance || 0) + (e.cable_price || 0) * (e.cable_distance || 0)
@@ -322,7 +322,7 @@ export default {
       const vat = (e.equip_vat_rate || 13) / 100
       const totalEx = reBodyInv / (1 + vat) + lineInv / (1 + vat) + stInv / (1 + vat) + other
       const om = totalEx * ((e.om_rate || 0) / 100)
-      const fmt = function (v) {
+      const fmt = (v) => {
         return Number(v).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
       }
       return {
@@ -334,7 +334,7 @@ export default {
         total: fmt(total)
       }
     },
-    indicators: function () {
+    indicators() {
       const r = this.gd.econResult
       if (!r) return []
       const f = this.fmt2
@@ -348,12 +348,12 @@ export default {
         { label: '总投资收益率', value: Number(r.total_roi).toFixed(2) + '%', color: r.total_roi > 5 ? '#0F6E56' : '#B91C1C', tone: r.total_roi > 5 ? 'is-good' : 'is-bad' }
       ]
     },
-    investmentRows: function () {
+    investmentRows() {
       const r = this.gd.econResult
       if (!r) return []
       const total = r.total_investment
       const f = this.fmt2
-      const pct = function (v) { return total > 0 ? (v / total * 100).toFixed(1) + '%' : '-' }
+      const pct = (v) => { return total > 0 ? (v / total * 100).toFixed(1) + '%' : '-' }
       return [
         { name: '新能源本体', amount: f(r.re_investment), pct: pct(r.re_investment) },
         { name: '送出线路', amount: f(r.line_investment || 0), pct: pct(r.line_investment || 0) },
@@ -364,7 +364,7 @@ export default {
         { name: '储能规模', amount: f(r.storage_capacity_mwh, 2) + ' MWh / ' + f(r.storage_power_mw, 2) + ' MW', _muted: true, _spanEnd: 2 }
       ]
     },
-    financeCards: function () {
+    financeCards() {
       const r = this.gd.econResult
       if (!r) return []
       const f = this.fmt2
@@ -377,67 +377,66 @@ export default {
         { label: '首年还本付息 (万元)', value: f(r.annual_loan_payment) }
       ]
     },
-    cashFlows: function () {
+    cashFlows() {
       return (this.gd.econResult && this.gd.econResult.cash_flows) || []
     },
-    cfSummaryRow: function () {
+    cfSummaryRow() {
       const sums = { year: '合计' }
-      CF_SUM_KEYS.forEach(function (k) { sums[k] = 0 })
-      this.cashFlows.forEach(function (cf) {
-        CF_SUM_KEYS.forEach(function (k) { sums[k] += cf[k] || 0 })
+      CF_SUM_KEYS.forEach((k) => { sums[k] = 0 })
+      this.cashFlows.forEach((cf) => {
+        CF_SUM_KEYS.forEach((k) => { sums[k] += cf[k] || 0 })
       })
       return sums
     }
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) this.$nextTick(this.restoreChart)
     },
-    'gd.econResult': function (val) {
+    'gd.econResult'(val) {
       if (val) this.$nextTick(this.drawChart)
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     disposeChart(this.chart)
     this.chart = null
   },
   methods: {
-    fmt2: function (v, d) {
+    fmt2(v, d) {
       if (d === 0) {
         return Number(v || 0).toLocaleString('zh-CN', { maximumFractionDigits: 0 })
       }
       return Number(v || 0).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
-    syncCapacityFromRatio: function () {
+    syncCapacityFromRatio() {
       const maxP = this.gd.econ.re_max_power || 0
       const ratio = this.gd.econ.capacity_ratio || 1
       if (maxP > 0) this.gd.econ.re_capacity = Number((maxP * ratio).toFixed(2))
     },
-    syncCapacityFromMaxPower: function () {
+    syncCapacityFromMaxPower() {
       this.syncCapacityFromRatio()
     },
-    syncRatioFromCapacity: function () {
+    syncRatioFromCapacity() {
       const maxP = this.gd.econ.re_max_power || 0
       const cap = this.gd.econ.re_capacity || 0
       if (maxP > 0 && cap > 0) this.gd.econ.capacity_ratio = Number((cap / maxP).toFixed(3))
     },
-    applyVoltagePrices: function () {
+    applyVoltagePrices() {
       const defs = this.defaults[this.gd.econ.project_type] || this.defaults.onshore_wind
       const voltage = this.gd.econ.voltage_level || '35kV'
       this.gd.econ.overhead_price = (defs.overhead && defs.overhead[voltage]) || 30
       this.gd.econ.cable_price = (defs.cable && defs.cable[voltage]) || 80
     },
-    onProjectTypeChange: function () {
+    onProjectTypeChange() {
       const defs = this.defaults[this.gd.econ.project_type] || this.defaults.onshore_wind
       this.gd.econ.re_epc_price = defs.epc
       if (defs.om_rate != null) this.gd.econ.om_rate = defs.om_rate
       this.applyVoltagePrices()
     },
-    onVoltageLevelChange: function () {
+    onVoltageLevelChange() {
       this.applyVoltagePrices()
     },
-    aiFetch: function () {
-      const self = this
+    aiFetch() {
       this.aiFetching = true
       this.aiStatus = '正在通过AI获取参数...'
       this.aiStatusType = ''
@@ -447,64 +446,63 @@ export default {
         project_type: type,
         voltage_level: voltage,
         query_types: ['epc', 'storage', 'transmission', 'om', 'finance']
-      }).then(function (result) {
+      }).then((result) => {
         if (!result.success) throw new Error(result.message || 'AI获取失败')
         const p = result.params || {}
         const applied = []
-        const defs = self.defaults
+        const defs = this.defaults
         if (p.epc_prices && typeof p.epc_prices === 'object') {
-          Object.keys(p.epc_prices).forEach(function (k) {
+          Object.keys(p.epc_prices).forEach((k) => {
             if (p.epc_prices[k] != null && defs[k]) defs[k].epc = p.epc_prices[k]
           })
-          if (p.epc_prices[type] != null) self.gd.econ.re_epc_price = p.epc_prices[type]
+          if (p.epc_prices[type] != null) this.gd.econ.re_epc_price = p.epc_prices[type]
           applied.push('新能源EPC')
         } else if (p.re_epc_price != null) {
           if (defs[type]) defs[type].epc = p.re_epc_price
-          self.gd.econ.re_epc_price = p.re_epc_price
+          this.gd.econ.re_epc_price = p.re_epc_price
           applied.push('新能源EPC')
         }
         if (p.om_rates && typeof p.om_rates === 'object') {
-          Object.keys(p.om_rates).forEach(function (k) {
+          Object.keys(p.om_rates).forEach((k) => {
             if (p.om_rates[k] != null && defs[k]) defs[k].om_rate = p.om_rates[k]
           })
-          if (p.om_rates[type] != null) self.gd.econ.om_rate = p.om_rates[type]
+          if (p.om_rates[type] != null) this.gd.econ.om_rate = p.om_rates[type]
           applied.push('运维费率')
         } else if (p.om_rate != null) {
-          self.gd.econ.om_rate = p.om_rate
+          this.gd.econ.om_rate = p.om_rate
           applied.push('运维费率')
         }
         if (p.storage_epc_price != null) {
-          self.gd.econ.storage_epc_price = p.storage_epc_price
+          this.gd.econ.storage_epc_price = p.storage_epc_price
           applied.push('储能EPC')
         }
         if (p.overhead_prices && typeof p.overhead_prices === 'object') {
-          Object.keys(defs).forEach(function (k) {
+          Object.keys(defs).forEach((k) => {
             defs[k].overhead = Object.assign({}, defs[k].overhead || {}, p.overhead_prices)
           })
-          if (p.overhead_prices[voltage] != null) self.gd.econ.overhead_price = p.overhead_prices[voltage]
+          if (p.overhead_prices[voltage] != null) this.gd.econ.overhead_price = p.overhead_prices[voltage]
           applied.push('架空线')
         }
         if (p.cable_prices && typeof p.cable_prices === 'object') {
-          Object.keys(defs).forEach(function (k) {
+          Object.keys(defs).forEach((k) => {
             defs[k].cable = Object.assign({}, defs[k].cable || {}, p.cable_prices)
           })
-          if (p.cable_prices[voltage] != null) self.gd.econ.cable_price = p.cable_prices[voltage]
+          if (p.cable_prices[voltage] != null) this.gd.econ.cable_price = p.cable_prices[voltage]
           applied.push('电缆')
         }
-        if (p.loan_rate != null) { self.gd.econ.loan_rate = p.loan_rate; applied.push('贷款利率') }
-        if (p.loan_years != null) { self.gd.econ.loan_years = p.loan_years; applied.push('贷款期限') }
-        if (p.loan_ratio != null) { self.gd.econ.loan_ratio = p.loan_ratio; applied.push('贷款比例') }
-        self.aiStatus = applied.length ? ('已更新: ' + applied.join('、')) : (result.message || '完成')
-        self.aiStatusType = 'ok'
-      }).catch(function (e) {
-        self.aiStatus = e.message || 'AI获取失败'
-        self.aiStatusType = 'err'
-      }).then(function () {
-        self.aiFetching = false
+        if (p.loan_rate != null) { this.gd.econ.loan_rate = p.loan_rate; applied.push('贷款利率') }
+        if (p.loan_years != null) { this.gd.econ.loan_years = p.loan_years; applied.push('贷款期限') }
+        if (p.loan_ratio != null) { this.gd.econ.loan_ratio = p.loan_ratio; applied.push('贷款比例') }
+        this.aiStatus = applied.length ? ('已更新: ' + applied.join('、')) : (result.message || '完成')
+        this.aiStatusType = 'ok'
+      }).catch((e) => {
+        this.aiStatus = e.message || 'AI获取失败'
+        this.aiStatusType = 'err'
+      }).then(() => {
+        this.aiFetching = false
       })
     },
-    calcEcon: function () {
-      const self = this
+    calcEcon() {
       const e = this.gd.econ
       const params = {
         annual_benefit: (e.annual_benefit || 0) - (e.revenue_deduction || 0),
@@ -541,37 +539,36 @@ export default {
       this.calculating = true
       this.status = '经济性评价计算中…'
       this.statusType = ''
-      API.calculateEconomicEval(params).then(function (result) {
-        self.gd.econResult = result
-        self.status = result.message || '计算完成'
-        self.statusType = 'ok'
-      }).catch(function (err) {
-        self.status = err.message
-        self.statusType = 'err'
-      }).then(function () {
-        self.calculating = false
+      API.calculateEconomicEval(params).then((result) => {
+        this.gd.econResult = result
+        this.status = result.message || '计算完成'
+        this.statusType = 'ok'
+      }).catch((err) => {
+        this.status = err.message
+        this.statusType = 'err'
+      }).then(() => {
+        this.calculating = false
       })
     },
-    restoreChart: function () {
-      const self = this
+    restoreChart() {
       if (!this.gd.econResult) return
-      whenChartVisible(this.$refs.cashflowChart, function () {
-        disposeChart(self.chart)
-        self.chart = null
-        self.drawChart()
+      whenChartVisible(this.$refs.cashflowChart, () => {
+        disposeChart(this.chart)
+        this.chart = null
+        this.drawChart()
       })
     },
-    drawChart: function () {
+    drawChart() {
       const r = this.gd.econResult
       if (!r || !this.$refs.cashflowChart) return
-      const labels = r.cash_flows.map(function (cf) { return 'Y' + cf.year })
-      const totalCf = r.cash_flows.map(function (cf) { return cf.total_cf })
-      const equityCf = r.cash_flows.map(function (cf) { return cf.equity_cf })
+      const labels = r.cash_flows.map((cf) => { return 'Y' + cf.year })
+      const totalCf = r.cash_flows.map((cf) => { return cf.total_cf })
+      const equityCf = r.cash_flows.map((cf) => { return cf.equity_cf })
       let cumT = 0
       let cumE = 0
       const cumTotalArr = []
       const cumEquityArr = []
-      r.cash_flows.forEach(function (cf) {
+      r.cash_flows.forEach((cf) => {
         cumT += cf.total_cf
         cumE += cf.equity_cf
         cumTotalArr.push(cumT)

@@ -106,7 +106,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       running: false,
       applying: false,
@@ -119,16 +119,16 @@ export default {
     }
   },
   computed: {
-    statusColor: function () {
+    statusColor() {
       if (this.statusType === 'ok') return '#2e7d32'
       if (this.statusType === 'err') return '#c62828'
       return '#666'
     },
-    hasCurve: function () {
+    hasCurve() {
       const r = this.gd.sizingResult
       return !!(r && r.feasible && r.curve && r.curve.length)
     },
-    compareRows: function () {
+    compareRows() {
       const r = this.gd.sizingResult
       if (!r || !r.feasible || !r.baseline) return []
       const b = r.baseline
@@ -142,10 +142,10 @@ export default {
     }
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) this.$nextTick(this.restoreCurve)
     },
-    'gd.sizingResult': function () {
+    'gd.sizingResult'() {
       const r = this.gd.sizingResult
       if (r && r.feasible) {
         this.applyE = Number(Number(r.E).toFixed(1))
@@ -154,17 +154,16 @@ export default {
       this.$nextTick(this.drawCurve)
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     disposeChart(this.chart)
     this.chart = null
   },
   methods: {
-    fmt0: function (v) { return fmt(v, 0) },
-    fmt1: function (v) { return fmt(v, 1) },
-    fmt3: function (v) { return fmt(v, 3) },
+    fmt0(v) { return fmt(v, 0) },
+    fmt1(v) { return fmt(v, 1) },
+    fmt3(v) { return fmt(v, 3) },
     fmtPct: fmtPct,
-    runSizing: function () {
-      const self = this
+    runSizing() {
       if (!this.gd.dataLoaded) {
         alert('请先在「源荷数据」页上传或加载数据')
         return
@@ -184,41 +183,39 @@ export default {
         E_tol: z.E_tol,
         P_tol: z.P_tol,
         do_scan: true
-      }).then(function (res) {
-        self.gd.sizingResult = res
-        self.status = res.feasible ? '反推完成' : '反推结束（不可行）'
-        self.statusType = res.feasible ? 'ok' : 'err'
-      }).catch(function (e) {
-        self.status = e.message
-        self.statusType = 'err'
-      }).then(function () {
-        self.running = false
+      }).then((res) => {
+        this.gd.sizingResult = res
+        this.status = res.feasible ? '反推完成' : '反推结束（不可行）'
+        this.statusType = res.feasible ? 'ok' : 'err'
+      }).catch((e) => {
+        this.status = e.message
+        this.statusType = 'err'
+      }).then(() => {
+        this.running = false
       })
     },
-    restoreCurve: function () {
-      const self = this
+    restoreCurve() {
       if (!this.hasCurve) return
-      whenChartVisible(this.$refs.curveChart, function () {
-        disposeChart(self.chart)
-        self.chart = null
-        self.drawCurve()
+      whenChartVisible(this.$refs.curveChart, () => {
+        disposeChart(this.chart)
+        this.chart = null
+        this.drawCurve()
       })
     },
-    drawCurve: function () {
+    drawCurve() {
       if (!this.hasCurve || !this.$refs.curveChart) return
       const curve = this.gd.sizingResult.curve
       this.chart = renderChart(this.$refs.curveChart, sizingCurveOption(
-        curve.map(function (p) { return fmt(p.E, 0) }),
-        curve.map(function (p) { return +(p.r2 * 100).toFixed(2) }),
-        curve.map(function (p) { return +(p.r6 * 100).toFixed(2) }),
-        curve.map(function (p) { return +(p.r3 * 100).toFixed(2) })
+        curve.map((p) => { return fmt(p.E, 0) }),
+        curve.map((p) => { return +(p.r2 * 100).toFixed(2) }),
+        curve.map((p) => { return +(p.r6 * 100).toFixed(2) }),
+        curve.map((p) => { return +(p.r3 * 100).toFixed(2) })
       ), this.chart)
       if (this.chart && this.chart.resize) {
         try { this.chart.resize() } catch (e) {}
       }
     },
-    applySizing: function () {
-      const self = this
+    applySizing() {
       const E = this.applyE
       const P = this.applyP
       if (!(E >= 0) || !(P >= 0)) {
@@ -238,14 +235,14 @@ export default {
         soc_max_frac: this.gd.storage.soc_max,
         init_soc_frac: this.gd.storage.initial_soc,
         base_price: this.gd.basePrice
-      }).then(function (res) {
-        self.gd.analysisResult = res
-        self.gd.analysisDone = true
-        self.gd.goTab('tab-results')
-      }).catch(function (e) {
+      }).then((res) => {
+        this.gd.analysisResult = res
+        this.gd.analysisDone = true
+        this.gd.goTab('tab-results')
+      }).catch((e) => {
         alert(e.message)
-      }).then(function () {
-        self.applying = false
+      }).then(() => {
+        this.applying = false
       })
     }
   }

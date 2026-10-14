@@ -1,7 +1,7 @@
 import Vue from 'vue'
 
 export const gdStore = new Vue({
-  data: function () {
+  data() {
     return {
       tabHandler: null, // 父页注入的切 tab 函数（仅前端）
 
@@ -92,10 +92,10 @@ export const gdStore = new Vue({
     }
   },
   methods: {
-    goTab: function (id) {
+    goTab(id) {
       if (typeof this.tabHandler === 'function') this.tabHandler(id)
     },
-    resetSource: function () {
+    resetSource() {
       this.dataLoaded = false
       this.sourceStats = null
       this.sourceChart = null
@@ -115,7 +115,7 @@ export const gdStore = new Vue({
 
 export const gdMixin = {
   computed: {
-    gd: function () {
+    gd() {
       return gdStore
     }
   }

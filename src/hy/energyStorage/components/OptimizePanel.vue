@@ -90,7 +90,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       pollInFlight: false,
       startTime: 0,
@@ -99,47 +99,47 @@ export default {
     }
   },
   computed: {
-    statusColor: function () {
+    statusColor() {
       if (this.es.optimizeStatusType === 'ok') return 'green'
       if (this.es.optimizeStatusType === 'warn') return 'orange'
       if (this.es.optimizeStatusType === 'err') return 'red'
       return ''
     },
-    pct: function () {
+    pct() {
       const r = this.es.optimizeResult
       return r && r.saving_pct != null ? Number(r.saving_pct).toFixed(1) : '0.0'
     },
-    cyc: function () {
+    cyc() {
       const r = this.es.optimizeResult
       return r && r.cum_cycles != null ? Number(r.cum_cycles).toFixed(2) : '0.00'
     },
-    dailyRows: function () {
+    dailyRows() {
       const r = this.es.optimizeResult
       if (!r || !r.daily_results) return []
-      return r.daily_results.map(function (d) {
+      return r.daily_results.map((d) => {
         const badge = d.status === 'SKIP' ? '跳过' : (d.validation_ok ? '通过' : '失败')
         const color = d.status === 'SKIP' ? '#999' : (d.validation_ok ? 'green' : 'red')
         return Object.assign({}, d, { badge: badge, color: color })
       })
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     this.clearTimer()
   },
   methods: {
-    fmt: function (v) {
+    fmt(v) {
       return v == null ? '-' : Number(v).toLocaleString()
     },
-    mwh: function (v) {
+    mwh(v) {
       return v == null ? '-' : Number(v).toFixed(1)
     },
-    clearTimer: function () {
+    clearTimer() {
       if (this.pollTimer) {
         clearInterval(this.pollTimer)
         this.pollTimer = null
       }
     },
-    buildParams: function () {
+    buildParams() {
       return {
         start_date: this.es.opt.start_date,
         end_date: this.es.opt.end_date,
@@ -162,8 +162,7 @@ export default {
         }
       }
     },
-    runOptimize: function () {
-      const self = this
+    runOptimize() {
       if (!this.es.dataLoaded) {
         alert('请先在"源荷数据"页上传数据')
         return
@@ -188,54 +187,53 @@ export default {
       this.es.progressDone = 0
       this.es.progressLatest = ''
       this.clearTimer()
-      API.startOptimization(params).then(function (res) {
-        self.es.activeTaskId = res.task_id
-        self.es.progressText = '优化任务已启动，正在计算...'
-        self.pollTimer = setInterval(function () {
-          self.poll(res.task_id, totalEstimatedDays)
+      API.startOptimization(params).then((res) => {
+        this.es.activeTaskId = res.task_id
+        this.es.progressText = '优化任务已启动，正在计算...'
+        this.pollTimer = setInterval(() => {
+          this.poll(res.task_id, totalEstimatedDays)
         }, 500)
-      }).catch(function (e) {
-        self.es.optimizing = false
-        self.es.progressVisible = false
-        self.es.activeTaskId = null
-        self.es.optimizeStatus = '错误: ' + e.message
-        self.es.optimizeStatusType = 'err'
+      }).catch((e) => {
+        this.es.optimizing = false
+        this.es.progressVisible = false
+        this.es.activeTaskId = null
+        this.es.optimizeStatus = '错误: ' + e.message
+        this.es.optimizeStatusType = 'err'
       })
     },
-    poll: function (taskId, totalEstimatedDays) {
-      const self = this
+    poll(taskId, totalEstimatedDays) {
       if (this.pollInFlight) return
       this.pollInFlight = true
-      API.getProgress(taskId).then(function (progress) {
+      API.getProgress(taskId).then((progress) => {
         const completedCount = (progress.progress && progress.progress.length) || 0
-        self.es.progressDone = completedCount
-        self.es.progressPct = totalEstimatedDays > 0 ? Math.min(100, (completedCount / totalEstimatedDays) * 100) : 0
-        self.es.progressText = '已计算 ' + completedCount + ' 天'
+        this.es.progressDone = completedCount
+        this.es.progressPct = totalEstimatedDays > 0 ? Math.min(100, (completedCount / totalEstimatedDays) * 100) : 0
+        this.es.progressText = '已计算 ' + completedCount + ' 天'
         if (progress.progress && progress.progress.length) {
-          self.es.progressLatest = progress.progress[progress.progress.length - 1]
+          this.es.progressLatest = progress.progress[progress.progress.length - 1]
         }
         if (progress.status === 'completed') {
-          self.clearTimer()
-          self.es.progressText = '优化完成，正在加载结果...'
-          self.es.progressPct = 100
-          return API.getResult(taskId).then(function (result) {
-            self.finishOk(result)
+          this.clearTimer()
+          this.es.progressText = '优化完成，正在加载结果...'
+          this.es.progressPct = 100
+          return API.getResult(taskId).then((result) => {
+            this.finishOk(result)
           })
         }
         if (progress.status === 'failed') {
-          self.finishFail('优化失败: ' + (progress.error || '未知错误'))
+          this.finishFail('优化失败: ' + (progress.error || '未知错误'))
         }
         if (progress.status === 'cancelled') {
-          self.es.cancelling = false
-          self.finishWarn('任务已取消，可稍后重新发起优化')
+          this.es.cancelling = false
+          this.finishWarn('任务已取消，可稍后重新发起优化')
         }
-      }).catch(function (e) {
+      }).catch((e) => {
         console.error(e)
-      }).then(function () {
-        self.pollInFlight = false
+      }).then(() => {
+        this.pollInFlight = false
       })
     },
-    finishOk: function (result) {
+    finishOk(result) {
       this.es.optimizing = false
       this.es.progressVisible = false
       this.es.activeTaskId = null
@@ -250,7 +248,7 @@ export default {
         this.es.optimizeStatusType = 'warn'
       }
     },
-    finishFail: function (msg) {
+    finishFail(msg) {
       this.clearTimer()
       this.es.optimizing = false
       this.es.progressVisible = false
@@ -258,7 +256,7 @@ export default {
       this.es.optimizeStatus = msg
       this.es.optimizeStatusType = 'err'
     },
-    finishWarn: function (msg) {
+    finishWarn(msg) {
       this.clearTimer()
       this.es.optimizing = false
       this.es.progressVisible = false
@@ -266,15 +264,14 @@ export default {
       this.es.optimizeStatus = msg
       this.es.optimizeStatusType = 'warn'
     },
-    cancelOptimize: function () {
-      const self = this
+    cancelOptimize() {
       if (!this.es.activeTaskId) return
       this.es.cancelling = true
       this.es.progressText = '正在终止优化任务...'
-      API.cancelOptimization(this.es.activeTaskId).catch(function (e) {
-        self.es.cancelling = false
-        self.es.optimizeStatus = '终止失败: ' + e.message
-        self.es.optimizeStatusType = 'err'
+      API.cancelOptimization(this.es.activeTaskId).catch((e) => {
+        this.es.cancelling = false
+        this.es.optimizeStatus = '终止失败: ' + e.message
+        this.es.optimizeStatusType = 'err'
       })
     }
   }

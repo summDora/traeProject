@@ -48,19 +48,18 @@ export default {
     EconPanel,
     ReportPanel
   },
-  data: function () {
+  data() {
     return {
       tab: 'tab-data',
       tabs: PAGE_TABS
     }
   },
-  created: function () {
-    const self = this
-    gdStore.tabHandler = function (id) {
-      self.tab = id
+  created() {
+    gdStore.tabHandler = (id) => {
+      this.tab = id
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     gdStore.tabHandler = null
   }
 }

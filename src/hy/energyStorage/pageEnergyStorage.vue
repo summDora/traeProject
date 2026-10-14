@@ -44,7 +44,7 @@ export default {
     CostPanel,
     EconPanel
   },
-  data: function () {
+  data() {
     return {
       tab: 'tab-data',
       tabs: PAGE_TABS

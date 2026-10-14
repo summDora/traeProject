@@ -14,7 +14,7 @@ export function downsample(arr, n) {
 /** Element 日期面板：禁用 min/max 之外的日期（min/max 为 YYYY-MM-DD） */
 export function datePickerOptions(minStr, maxStr) {
   return {
-    disabledDate: function (time) {
+    disabledDate(time) {
       const t = time.getTime()
       if (minStr) {
         const min = new Date(String(minStr).replace(/-/g, '/') + ' 00:00:00').getTime()
@@ -79,9 +79,9 @@ export function filterChartDataByDateRange(labels, arrays, startDate, endDate) {
     }
   }
   if (!indices.length) return null
-  const result = { labels: indices.map(function (i) { return labels[i] }) }
-  Object.keys(arrays).forEach(function (key) {
-    result[key] = indices.map(function (i) { return arrays[key][i] })
+  const result = { labels: indices.map((i) => { return labels[i] }) }
+  Object.keys(arrays).forEach((key) => {
+    result[key] = indices.map((i) => { return arrays[key][i] })
   })
   return result
 }
@@ -98,10 +98,10 @@ export function downloadCsv(filename, header, rows) {
 }
 
 export function buildNetStats(result, optimizeParams) {
-  const fmt = function (v) {
+  const fmt = (v) => {
     return v == null || isNaN(v) ? '-' : Number(v).toFixed(2)
   }
-  const fmtPct = function (v) {
+  const fmtPct = (v) => {
     return v == null || isNaN(v) ? '-' : (v * 100).toFixed(1) + '%'
   }
   let loadStats = result.load_stats || {}
@@ -117,19 +117,19 @@ export function buildNetStats(result, optimizeParams) {
   const gridMax = optimizeParams && optimizeParams.grid_power_max != null
     ? optimizeParams.grid_power_max + ' MW' : '无限制'
   const dt = result.dt_hours || 0.5
-  const sumArr = function (arr) {
+  const sumArr = (arr) => {
     if (!arr || !arr.length) return 0
     let s = 0
     for (let i = 0; i < arr.length; i++) s += arr[i]
     return s
   }
-  const calcReverse = function (arr) {
+  const calcReverse = (arr) => {
     if (!arr || !arr.length) return 0
     let s = 0
     for (let i = 0; i < arr.length; i++) { if (arr[i] < 0) s += -arr[i] }
     return s * dt
   }
-  const calcDownward = function (arr) {
+  const calcDownward = (arr) => {
     if (!arr || !arr.length) return 0
     let s = 0
     for (let i = 0; i < arr.length; i++) { if (arr[i] > 0) s += arr[i] }
@@ -192,9 +192,9 @@ function formatCostValue(format, v) {
 
 export function buildCostSummaryRows(results) {
   if (!results || results.length < 3) return []
-  return COST_SUMMARY_METRICS.map(function (m) {
+  return COST_SUMMARY_METRICS.map((m) => {
     if (m.type === 'avgPrice') {
-      const avg = function (s) {
+      const avg = (s) => {
         const e = s.annual.downward_energy_mwh
         return e > 0 ? (s.annual.total_purchase_fee / e).toFixed(2) : '-'
       }

@@ -119,7 +119,7 @@ export default {
   props: {
     active: { type: Boolean, default: false }
   },
-  data: function () {
+  data() {
     return {
       marketOpen: false,
       marketFile: null,
@@ -139,28 +139,28 @@ export default {
     }
   },
   computed: {
-    isSingle: function () {
+    isSingle() {
       return (this.gd.cost.voltageValue || '').indexOf('single_part|') === 0
     },
-    showTransformer: function () {
+    showTransformer() {
       return !this.isSingle && this.gd.cost.billingMethod === 'capacity'
     },
-    marketStatusColor: function () {
+    marketStatusColor() {
       if (this.marketStatusType === 'ok') return '#2e7d32'
       if (this.marketStatusType === 'err') return '#c62828'
       return ''
     },
-    costStatusColor: function () {
+    costStatusColor() {
       if (this.costStatusType === 'ok') return '#2e7d32'
       if (this.costStatusType === 'err') return '#c62828'
       return '#666'
     },
-    summaryRows: function () {
+    summaryRows() {
       const response = this.gd.costResult
       if (!response || !response.results) return []
       return buildCostSummaryRows(response.results)
     },
-    monthlyTableRows: function () {
+    monthlyTableRows() {
       const s = this.currentSeries
       if (!s) return []
       const rows = (s.monthly || []).slice()
@@ -174,44 +174,44 @@ export default {
       }
       return rows
     },
-    currentSeries: function () {
+    currentSeries() {
       const r = this.gd.costResult
       if (!r || !r.results) return null
       return r.results[this.monthlyIdx] || r.results[0]
     },
-    pieTitles: function () {
+    pieTitles() {
       const r = this.gd.costResult
       if (!r || !r.results) return []
-      return r.results.map(function (s) { return s.series_label })
+      return r.results.map((s) => { return s.series_label })
     }
   },
-  mounted: function () {
+  mounted() {
     this.loadMarketSilent()
     if (this.gd.costResult) this.$nextTick(this.drawCharts)
   },
   watch: {
-    active: function (val) {
+    active(val) {
       if (val) {
         if (!this.gd.voltageLevels.length) this.loadMarketSilent()
         this.$nextTick(this.restoreCharts)
       }
     },
-    'gd.costResult': function (val) {
+    'gd.costResult'(val) {
       if (val) this.$nextTick(this.drawCharts)
     },
-    marketOpen: function (val) {
+    marketOpen(val) {
       if (val) this.$nextTick(this.restoreCharts)
     }
   },
-  beforeDestroy: function () {
+  beforeDestroy() {
     this.disposeAll()
   },
   methods: {
-    applyVoltageLevels: function (data) {
+    applyVoltageLevels(data) {
       if (!data || !data.voltage_levels) return
       const seen = {}
       const list = []
-      data.voltage_levels.forEach(function (v) {
+      data.voltage_levels.forEach((v) => {
         const tt = v.category === '单一制' ? 'single_part' : 'two_part'
         const value = tt + '|' + (v.voltage || '')
         if (seen[value]) return
@@ -226,15 +226,14 @@ export default {
         this.gd.cost.voltageValue = list[0].value
       }
     },
-    loadMarketSilent: function () {
-      const self = this
-      API.getMarketParams().then(function (data) {
-        self.applyMarket(data)
-      }).catch(function () {
-        self.marketBrief = '未加载'
+    loadMarketSilent() {
+      API.getMarketParams().then((data) => {
+        this.applyMarket(data)
+      }).catch(() => {
+        this.marketBrief = '未加载'
       })
     },
-    applyMarket: function (data) {
+    applyMarket(data) {
       this.marketData = data
       this.marketBrief = data.message || (data.months ? ('已加载 ' + data.months.length + ' 个月') : '')
       this.marketStatus = data.message || ''
@@ -242,38 +241,35 @@ export default {
       this.applyVoltageLevels(data)
       this.$nextTick(this.drawMarket)
     },
-    loadMarket: function () {
-      const self = this
+    loadMarket() {
       this.marketStatus = '加载中...'
       this.marketStatusType = ''
-      API.getMarketParams().then(function (data) {
-        self.applyMarket(data)
-      }).catch(function (e) {
-        self.marketStatus = '加载失败: ' + e.message
-        self.marketStatusType = 'err'
+      API.getMarketParams().then((data) => {
+        this.applyMarket(data)
+      }).catch((e) => {
+        this.marketStatus = '加载失败: ' + e.message
+        this.marketStatusType = 'err'
       })
     },
-    onPickMarket: function (e) {
+    onPickMarket(e) {
       this.marketFile = e.target.files && e.target.files[0]
       this.hintMarket = this.marketFile ? this.marketFile.name : '未选择文件'
     },
-    uploadMarket: function () {
-      const self = this
+    uploadMarket() {
       if (!this.marketFile) {
         alert('请先选择市场电价文件')
         return
       }
       this.marketStatus = '上传中...'
       this.marketStatusType = ''
-      API.uploadMarketPrice(this.marketFile).then(function (data) {
-        self.applyMarket(data)
-      }).catch(function (e) {
-        self.marketStatus = '上传失败: ' + e.message
-        self.marketStatusType = 'err'
+      API.uploadMarketPrice(this.marketFile).then((data) => {
+        this.applyMarket(data)
+      }).catch((e) => {
+        this.marketStatus = '上传失败: ' + e.message
+        this.marketStatusType = 'err'
       })
     },
-    restoreCharts: function () {
-      const self = this
+    restoreCharts() {
       const els = []
       if (this.$refs.monthlyChart) els.push(this.$refs.monthlyChart)
       if (this.marketOpen && this.$refs.marketChart) els.push(this.$refs.marketChart)
@@ -283,15 +279,15 @@ export default {
         if (node) els.push(node)
       }
       if (!els.length) return
-      whenChartVisible(els, function () {
-        if (self.gd.costResult) {
-          self.disposeAll()
-          self.drawCharts()
+      whenChartVisible(els, () => {
+        if (this.gd.costResult) {
+          this.disposeAll()
+          this.drawCharts()
         }
-        if (self.marketOpen) self.drawMarket()
+        if (this.marketOpen) this.drawMarket()
       })
     },
-    drawMarket: function () {
+    drawMarket() {
       if (!this.marketData || !this.$refs.marketChart) return
       this.marketChart = renderChart(
         this.$refs.marketChart,
@@ -299,8 +295,7 @@ export default {
         this.marketChart
       )
     },
-    calcCost: function () {
-      const self = this
+    calcCost() {
       if (!this.gd.analysisDone) {
         alert('请先运行632分析')
         return
@@ -322,43 +317,42 @@ export default {
         billing_method: this.gd.cost.billingMethod,
         transformer_capacity: this.gd.cost.transformerCapacity,
         export_price: this.gd.cost.exportPrice
-      }).then(function (result) {
-        self.gd.costResult = result
-        self.gd.annualBenefit = result.annual_benefit_wan
-        self.gd.econ.annual_benefit = Number(Number(result.annual_benefit_wan).toFixed(2))
-        self.costStatus = result.message || '计算完成'
-        self.costStatusType = 'ok'
-        self.updateSelfUseFeeHint()
-      }).catch(function (e) {
-        self.costStatus = e.message
-        self.costStatusType = 'err'
-      }).then(function () {
-        self.calculating = false
+      }).then((result) => {
+        this.gd.costResult = result
+        this.gd.annualBenefit = result.annual_benefit_wan
+        this.gd.econ.annual_benefit = Number(Number(result.annual_benefit_wan).toFixed(2))
+        this.costStatus = result.message || '计算完成'
+        this.costStatusType = 'ok'
+        this.updateSelfUseFeeHint()
+      }).catch((e) => {
+        this.costStatus = e.message
+        this.costStatusType = 'err'
+      }).then(() => {
+        this.calculating = false
       })
     },
-    updateSelfUseFeeHint: function () {
-      const self = this
-      API.getPowerStats().then(function (ps) {
+    updateSelfUseFeeHint() {
+      API.getPowerStats().then((ps) => {
         const selfUse = ps.energies && ps.energies.selfUseOpt
-        const st = self.gd.costResult && self.gd.costResult.results && self.gd.costResult.results[2]
+        const st = this.gd.costResult && this.gd.costResult.results && this.gd.costResult.results[2]
         const ann = st ? st.annual : null
         if (selfUse == null || !ann || !(ann.downward_energy_mwh > 0)) {
-          self.gd.selfUseFeeHint = ''
+          this.gd.selfUseFeeHint = ''
           return
         }
         const unitPrice = (ann.energy_tnd_fee + ann.gov_fund_fee) / ann.downward_energy_mwh
         const feeWan = selfUse * unitPrice / 10000
-        self.gd.selfUseFeeHint = '自发自用电量 ' + Number(selfUse).toFixed(1) + ' MWh，需缴费用 ' +
+        this.gd.selfUseFeeHint = '自发自用电量 ' + Number(selfUse).toFixed(1) + ' MWh，需缴费用 ' +
           feeWan.toFixed(2) + ' 万元（输配电费+政府性基金均价 ' + unitPrice.toFixed(2) + ' 元/MWh）'
-        self.gd.econ.revenue_deduction = Number(feeWan.toFixed(2))
-      }).catch(function () {})
+        this.gd.econ.revenue_deduction = Number(feeWan.toFixed(2))
+      }).catch(() => {})
     },
-    drawCharts: function () {
+    drawCharts() {
       const response = this.gd.costResult
       if (!response || !response.results || !response.results.length) return
-      const months = response.results[0].monthly.map(function (m) { return m.month_label })
-      const seriesList = response.results.map(function (s) {
-        return { name: s.series_label, data: s.monthly.map(function (m) { return m.net_fee }) }
+      const months = response.results[0].monthly.map((m) => { return m.month_label })
+      const seriesList = response.results.map((s) => {
+        return { name: s.series_label, data: s.monthly.map((m) => { return m.net_fee }) }
       })
       this.monthlyChart = renderChart(this.$refs.monthlyChart, costMonthlyOption(months, seriesList), this.monthlyChart)
 
@@ -366,9 +360,8 @@ export default {
       this.pieCharts = []
       const colorMap = COST_PIE_COLORS
       const feeLabels = ['终端电能电费', '电度输配电费', '政府性基金', '容/需量电费']
-      const self = this
-      response.results.forEach(function (s, i) {
-        const el = self.$refs['pie' + i]
+      response.results.forEach((s, i) => {
+        const el = this.$refs['pie' + i]
         const node = Array.isArray(el) ? el[0] : el
         if (!node) return
         const values = [
@@ -377,18 +370,18 @@ export default {
           s.annual.gov_fund_fee,
           s.annual.capacity_demand_fee
         ]
-        self.pieCharts.push(renderChart(node, costPieOption(feeLabels, values, colorMap), null))
+        this.pieCharts.push(renderChart(node, costPieOption(feeLabels, values, colorMap), null))
       })
       this.resizeAll()
     },
-    resizeAll: function () {
-      ;[this.monthlyChart, this.marketChart].concat(this.pieCharts).forEach(function (c) {
+    resizeAll() {
+      ;[this.monthlyChart, this.marketChart].concat(this.pieCharts).forEach((c) => {
         if (c && c.resize) {
           try { c.resize() } catch (e) {}
         }
       })
     },
-    disposeAll: function () {
+    disposeAll() {
       disposeChart(this.monthlyChart)
       disposeChart(this.marketChart)
       this.monthlyChart = null
