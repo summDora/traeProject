@@ -1,0 +1,23 @@
+/* 全战略态势（实验室大屏）页面专用样式
+ * 仅本页使用，不要混入其它页面；统一命名空间为 .qzlt-page
+ */
+
+.qzlt-page {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #020818;
+  background-image: url("~@/asset/images/sys/大背景@2x.png");
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  overflow: hidden;
+
+  /* 头部占位下方的内容区 */
+  .qzlt-content {
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+  }
+}

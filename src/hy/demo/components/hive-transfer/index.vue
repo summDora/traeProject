@@ -1,7 +1,7 @@
 <template>
   <div class="hive-transfer">
     <el-transfer v-bind="{ ...$attrs, ...$props }" v-on="$listeners">
-      <template v-if="$scopedSlots.default" #default="scope">
+      <template v-if="$scopedSlots.default" slot-scope="scope">
         <slot v-bind="scope"></slot>
       </template>
     </el-transfer>

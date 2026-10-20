@@ -10,203 +10,229 @@ const xcyPages = [
 ]
 
 const router = new VueRouter({
-  mode: 'hash',
+  mode: "hash",
   routes: [
     {
-      path: '/',
-      name: 'Home',
-      component: () => import('../pages/Home/pageHome.vue'),
-      meta: { title: '首页' }
+      path: "/",
+      name: "Home",
+      component: () => import("../pages/Home/pageHome.vue"),
+      meta: { title: "首页" },
     },
     ...xcyPages,
     {
-      path: '/multi-table/page13',
-      name: 'Page13',
-      component: () => import('../hy/page13.vue'),
-      meta: { title: '页面 13' }
+      path: "/multi-table/page13",
+      name: "Page13",
+      component: () => import("../hy/page13.vue"),
+      meta: { title: "页面 13" },
     },
     {
-      path: '/multi-table/time-link-cursor',
-      name: 'TimeLinkCursor',
-      component: () => import('../hy/pageTimeLinkCursor.vue'),
-      meta: { title: '时间联动-curosr' }
+      path: "/multi-table/time-link-cursor",
+      name: "TimeLinkCursor",
+      component: () => import("../hy/pageTimeLinkCursor.vue"),
+      meta: { title: "时间联动-curosr" },
     },
     {
-      path: '/multi-table/time-link',
-      name: 'TimeLink',
-      component: () => import('../hy/pageTimeLink.vue'),
-      meta: { title: '时间联动' }
+      path: "/multi-table/time-link",
+      name: "TimeLink",
+      component: () => import("../hy/pageTimeLink.vue"),
+      meta: { title: "时间联动" },
     },
     {
-      path: '/multi-table/market-price',
-      name: 'MarketPrice',
-      component: () => import('../hy/marketPrice/pageMarketPrice.vue'),
-      meta: { title: '市场价格预测' }
+      path: "/multi-table/market-price",
+      name: "MarketPrice",
+      component: () => import("../hy/marketPrice/pageMarketPrice.vue"),
+      meta: { title: "市场价格预测" },
     },
     {
-      path: '/multi-table/async-task',
-      name: 'AsyncTaskMonitor',
-      component: () => import('../hy/asyncTask/pageAsyncTaskMonitor.vue'),
-      meta: { title: '异步任务监控' }
+      path: "/multi-table/async-task",
+      name: "AsyncTaskMonitor",
+      component: () => import("../hy/asyncTask/pageAsyncTaskMonitor.vue"),
+      meta: { title: "异步任务监控" },
     },
     {
-      path: '/policy-graph',
-      name: 'PolicyGraph',
-      component: () => import('../hy/policyHome/pagePolicyHome.vue'),
-      meta: { title: '政策图谱首页' }
+      path: "/policy-graph",
+      name: "PolicyGraph",
+      component: () => import("../hy/policyHome/pagePolicyHome.vue"),
+      meta: { title: "政策图谱首页" },
     },
     {
-      path: '/policy-graph/graph',
-      name: 'PolicyGraphDetail',
-      component: () => import('../hy/pageZC.vue'),
-      meta: { title: '政策图谱' }
+      path: "/policy-graph/graph",
+      name: "PolicyGraphDetail",
+      component: () => import("../hy/pageZC.vue"),
+      meta: { title: "政策图谱" },
     },
     {
-      path: '/brain-map',
-      name: 'BrainMap',
-      component: () => import('../hy/pageBrain.vue'),
-      meta: { title: '脑图维护' }
+      path: "/brain-map",
+      name: "BrainMap",
+      component: () => import("../hy/pageBrain.vue"),
+      meta: { title: "脑图维护" },
     },
     {
-      path: '/effectiveness',
-      name: 'Effectiveness',
-      component: () => import('../hy/pageEffectiveness.vue'),
-      meta: { title: '成效概览' }
+      path: "/effectiveness",
+      name: "Effectiveness",
+      component: () => import("../hy/pageEffectiveness.vue"),
+      meta: { title: "成效概览" },
     },
     {
-      path: '/project-info',
-      name: 'ProjectInfo',
-      component: () => import('../hy/pageProjectInfo.vue'),
-      meta: { title: '项目信息分析' }
+      path: "/project-info",
+      name: "ProjectInfo",
+      component: () => import("../hy/pageProjectInfo.vue"),
+      meta: { title: "项目信息分析" },
     },
     {
-      path: '/pre-reserve',
-      name: 'PreReserveList',
-      component: () => import('../hy/preReserve/pagePreReserveList.vue'),
-      meta: { title: '预储备提报' }
+      path: "/pre-reserve",
+      name: "PreReserveList",
+      component: () => import("../hy/preReserve/pagePreReserveList.vue"),
+      meta: { title: "预储备提报" },
     },
     {
-      path: '/pre-reserve/add',
-      name: 'PreReserveAdd',
-      component: () => import('../hy/preReserve/pagePreReserveForm.vue'),
-      meta: { title: '预储备需求新增' }
+      path: "/pre-reserve/add",
+      name: "PreReserveAdd",
+      component: () => import("../hy/preReserve/pagePreReserveForm.vue"),
+      meta: { title: "预储备需求新增" },
     },
     {
-      path: '/demo/csProjectInternalAudit/csProjectInternalAudit',
-      name: 'CsProjectInternalAudit',
-      component: () => import('../hy/demo/csProjectInternalAudit/csProjectInternalAudit.vue'),
-      meta: { title: 'CS项目内审' }
+      path: "/demo/csProjectInternalAudit/csProjectInternalAudit",
+      name: "CsProjectInternalAudit",
+      component: () =>
+        import("../hy/demo/csProjectInternalAudit/csProjectInternalAudit.vue"),
+      meta: { title: "CS项目内审" },
     },
     {
-      path: '/demo/szhProjectManagement/szhProjectManagement',
-      name: 'SzhProjectManagement',
-      component: () => import('../hy/demo/szhProjectManagement/szhProjectManagement.vue'),
-      meta: { title: '数字化项目管理' }
+      path: "/demo/szhProjectManagement/szhProjectManagement",
+      name: "SzhProjectManagement",
+      component: () =>
+        import("../hy/demo/szhProjectManagement/szhProjectManagement.vue"),
+      meta: { title: "数字化项目管理" },
     },
     {
-      path: '/demo/xuqiu/demandCoordination',
-      name: 'DemandCoordination',
-      component: () => import('../hy/xuqiu/demandCoordination/demandCoordination.vue'),
-      meta: { title: '需求统筹' }
+      path: "/demo/xuqiu/demandCoordination",
+      name: "DemandCoordination",
+      component: () =>
+        import("../hy/xuqiu/demandCoordination/demandCoordination.vue"),
+      meta: { title: "需求统筹" },
     },
     {
-      path: '/demo/xuqiu/demandClosing',
-      name: 'DemandClosing',
-      component: () => import('../hy/xuqiu/demandClosing/demandClosing.vue'),
-      meta: { title: '需求收口' }
+      path: "/demo/xuqiu/demandClosing",
+      name: "DemandClosing",
+      component: () => import("../hy/xuqiu/demandClosing/demandClosing.vue"),
+      meta: { title: "需求收口" },
     },
     {
-      path: '/demo/xuqiu/demandReservePool',
-      name: 'DemandReservePool',
-      component: () => import('../hy/xuqiu/demandReservePool/demandReservePool.vue'),
-      meta: { title: '需求储备库' }
+      path: "/demo/xuqiu/demandReservePool",
+      name: "DemandReservePool",
+      component: () =>
+        import("../hy/xuqiu/demandReservePool/demandReservePool.vue"),
+      meta: { title: "需求储备库" },
     },
     {
-      path: '/demo/xuqiu/demandReportManagement',
-      name: 'DemandReportManagement',
-      component: () => import('../hy/xuqiu/demandReportManagement/demandReportManagement.vue'),
-      meta: { title: '需求报表管理' }
+      path: "/demo/xuqiu/demandReportManagement",
+      name: "DemandReportManagement",
+      component: () =>
+        import("../hy/xuqiu/demandReportManagement/demandReportManagement.vue"),
+      meta: { title: "需求报表管理" },
     },
     {
-      path: '/demo/xuqiu/demandPreliminaryReview',
-      name: 'DemandPreliminaryReview',
-      component: () => import('../hy/xuqiu/demandPreliminaryReview/demandPreliminaryReview.vue'),
-      meta: { title: '需求初审' }
+      path: "/demo/xuqiu/demandPreliminaryReview",
+      name: "DemandPreliminaryReview",
+      component: () =>
+        import(
+          "../hy/xuqiu/demandPreliminaryReview/demandPreliminaryReview.vue"
+        ),
+      meta: { title: "需求初审" },
     },
     {
-      path: '/demo/xuqiu/demandPreReservePool',
-      name: 'DemandPreReservePool',
-      component: () => import('../hy/xuqiu/demandPreReservePool/demandPreReservePool.vue'),
-      meta: { title: '预储备库' }
+      path: "/demo/xuqiu/demandPreReservePool",
+      name: "DemandPreReservePool",
+      component: () =>
+        import("../hy/xuqiu/demandPreReservePool/demandPreReservePool.vue"),
+      meta: { title: "预储备库" },
     },
     {
-      path: '/demo/xuqiu/demandDeclaration',
-      name: 'DemandDeclaration',
-      component: () => import('../hy/xuqiu/demandDeclaration/demandDeclaration.vue'),
-      meta: { title: '需求申报' }
+      path: "/demo/xuqiu/demandDeclaration",
+      name: "DemandDeclaration",
+      component: () =>
+        import("../hy/xuqiu/demandDeclaration/demandDeclaration.vue"),
+      meta: { title: "需求申报" },
     },
     {
-      path: '/demo/xuqiu/demandReviewMeeting',
-      name: 'DemandReviewMeeting',
-      component: () => import('../hy/xuqiu/demandReviewMeeting/demandReviewMeeting.vue'),
-      meta: { title: '需求评审会议安排' }
+      path: "/demo/xuqiu/demandReviewMeeting",
+      name: "DemandReviewMeeting",
+      component: () =>
+        import("../hy/xuqiu/demandReviewMeeting/demandReviewMeeting.vue"),
+      meta: { title: "需求评审会议安排" },
     },
     {
-      path: '/demo/xuqiu/expertReviewArrangement',
-      name: 'ExpertReviewArrangement',
-      component: () => import('../hy/xuqiu/expertReviewArrangement/expertReviewArrangement.vue'),
-      meta: { title: '专家评审安排' }
+      path: "/demo/xuqiu/expertReviewArrangement",
+      name: "ExpertReviewArrangement",
+      component: () =>
+        import(
+          "../hy/xuqiu/expertReviewArrangement/expertReviewArrangement.vue"
+        ),
+      meta: { title: "专家评审安排" },
     },
     {
-      path: '/demo/xuqiu/reviewSummary',
-      name: 'ReviewSummary',
-      component: () => import('../hy/xuqiu/reviewSummary/reviewSummary.vue'),
-      meta: { title: '评审汇总' }
+      path: "/demo/xuqiu/reviewSummary",
+      name: "ReviewSummary",
+      component: () => import("../hy/xuqiu/reviewSummary/reviewSummary.vue"),
+      meta: { title: "评审汇总" },
     },
     {
-      path: '/demo/xuqiu/demandTagLibrary',
-      name: 'DemandTagLibrary',
-      component: () => import('../hy/xuqiu/demandTagLibrary/demandTagLibrary.vue'),
-      meta: { title: '需求标签库' }
+      path: "/demo/xuqiu/demandTagLibrary",
+      name: "DemandTagLibrary",
+      component: () =>
+        import("../hy/xuqiu/demandTagLibrary/demandTagLibrary.vue"),
+      meta: { title: "需求标签库" },
     },
     {
-      path: '/demo/xuqiu/demandTemplateManagement',
-      name: 'DemandTemplateManagement',
-      component: () => import('../hy/xuqiu/demandTemplateManagement/demandTemplateManagement.vue'),
-      meta: { title: '需求模板管理' }
+      path: "/demo/xuqiu/demandTemplateManagement",
+      name: "DemandTemplateManagement",
+      component: () =>
+        import(
+          "../hy/xuqiu/demandTemplateManagement/demandTemplateManagement.vue"
+        ),
+      meta: { title: "需求模板管理" },
     },
     {
-      path: '/energy-storage',
-      name: 'EnergyStorage',
-      component: () => import('../hy/energyStorage/pageEnergyStorage.vue'),
-      meta: { title: '储能优化调度' }
+      path: "/energy-storage",
+      name: "EnergyStorage",
+      component: () => import("../hy/energyStorage/pageEnergyStorage.vue"),
+      meta: { title: "储能优化调度" },
     },
     {
-      path: '/energy-storage/:rest',
-      redirect: '/energy-storage'
+      path: "/energy-storage/:rest",
+      redirect: "/energy-storage",
     },
     {
-      path: '/green-direct',
-      name: 'GreenDirect',
-      component: () => import('../hy/greenDirect/pageGreenDirect.vue'),
-      meta: { title: '绿电直连评估' }
+      path: "/green-direct",
+      name: "GreenDirect",
+      component: () => import("../hy/greenDirect/pageGreenDirect.vue"),
+      meta: { title: "绿电直连评估" },
     },
     {
-      path: '/green-direct/:rest',
-      redirect: '/green-direct'
+      path: "/green-direct/:rest",
+      redirect: "/green-direct",
     },
     {
-      path: '/green-bi-cockpit',
-      name: 'GreenBiCockpit',
-      component: () => import('../pages/GreenBiCockpit/GreenEnergyDashboar.vue'),
-      meta: { title: '绿色能源驾驶舱', fullscreen: true }
+      path: "/green-bi-cockpit",
+      name: "GreenBiCockpit",
+      component: () =>
+        import("../pages/GreenBiCockpit/GreenEnergyDashboar.vue"),
+      meta: { title: "绿色能源驾驶舱", fullscreen: true },
     },
     {
-      path: '*',
-      redirect: '/'
-    }
-  ]
-})
+      path: "/sys-quanzhanlvetaishi",
+      name: "SysQuanzhanlvetaishi",
+      component: () =>
+        import("../pages/sys_page/sys_quanzhanlvetaishi/index.vue"),
+      meta: { title: "全战略态势", fullscreen: true },
+    },
+    {
+      path: "*",
+      redirect: "/",
+    },
+  ],
+});
 
 export default router
 
@@ -231,16 +257,20 @@ export const navMenus = [
   },
 
   {
-    title: 'python 迁移',
+    title: "python 迁移",
     children: [
-      { path: '/energy-storage', title: '储能优化调度' },
-      { path: '/green-direct', title: '绿电直连评估' },
+      { path: "/energy-storage", title: "储能优化调度" },
+      { path: "/green-direct", title: "绿电直连评估" },
     ],
   },
   {
-    title: '大屏',
+    title: "大屏",
     children: [
-      { path: '/green-bi-cockpit', title: '知识产权驾驶舱' },
+      { path: "/green-bi-cockpit", title: "知识产权驾驶舱" },
+      {
+        title: "实验室",
+        children: [{ path: "/sys-quanzhanlvetaishi", title: "全战略态势" }],
+      },
     ],
   },
   {
@@ -256,8 +286,14 @@ export const navMenus = [
       { path: "/effectiveness", title: "成效概览" },
       { path: "/project-info", title: "项目信息分析" },
       { path: "/pre-reserve", title: "预储备提报" },
-      { path: "/demo/csProjectInternalAudit/csProjectInternalAudit", title: "CS项目内审" },
-      { path: "/demo/szhProjectManagement/szhProjectManagement", title: "数字化项目管理" },
+      {
+        path: "/demo/csProjectInternalAudit/csProjectInternalAudit",
+        title: "CS项目内审",
+      },
+      {
+        path: "/demo/szhProjectManagement/szhProjectManagement",
+        title: "数字化项目管理",
+      },
       { path: "/demo/xuqiu/demandCoordination", title: "需求统筹" },
       { path: "/demo/xuqiu/demandClosing", title: "需求收口" },
       { path: "/demo/xuqiu/demandReservePool", title: "需求储备库" },

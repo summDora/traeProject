@@ -12,25 +12,11 @@
         text-color="#e6f4f6"
         active-text-color="#ffffff"
       >
-        <template v-for="item in menus">
-          <el-menu-item
-            v-if="!item.children"
-            :key="item.path"
-            :index="item.path"
-          >
-            {{ item.title }}
-          </el-menu-item>
-          <el-submenu v-else :key="'submenu-' + item.title" :index="item.title">
-            <template slot="title">{{ item.title }}</template>
-            <el-menu-item
-              v-for="child in item.children"
-              :key="child.path"
-              :index="child.path"
-            >
-              {{ child.title }}
-            </el-menu-item>
-          </el-submenu>
-        </template>
+        <nav-menu-item
+          v-for="item in menus"
+          :key="item.path || item.title"
+          :item="item"
+        />
       </el-menu>
     </div>
   </header>
@@ -39,8 +25,40 @@
 <script>
 import { navMenus } from "../router";
 
+// 递归渲染菜单项，支持任意层级（含三级菜单）
+const NavMenuItem = {
+  name: "NavMenuItem",
+  props: {
+    item: { type: Object, required: true },
+  },
+  render(h) {
+    const children = this.item.children || [];
+    if (!children.length) {
+      return h(
+        "el-menu-item",
+        { props: { index: this.item.path } },
+        this.item.title
+      );
+    }
+    return h(
+      "el-submenu",
+      { props: { index: this.item.title } },
+      [
+        h("span", { slot: "title" }, this.item.title),
+        ...children.map((child) =>
+          h(NavMenuItem, {
+            key: child.path || child.title,
+            props: { item: child },
+          })
+        ),
+      ]
+    );
+  },
+};
+
 export default {
   name: "TopNav",
+  components: { NavMenuItem },
   data() {
     return {
       menus: navMenus,
