@@ -14,6 +14,14 @@
           {{ tab.label }}
         </button>
       </div>
+      <div v-if="tertiaryOptions.length" class="gvs__filter">
+        <filter-select
+          :value="tertiary"
+          :options="tertiaryOptions"
+          placeholder="三级分类"
+          @input="onTertiary"
+        />
+      </div>
     </div>
     <div class="gvs__stage">
       <china-map-chart
@@ -42,20 +50,23 @@
 import ChinaMapChart from "./ChinaMapChart.vue";
 import RankBarChart from "./RankBarChart.vue";
 import ReleaseBarChart from "./ReleaseBarChart.vue";
+import FilterSelect from "../FilterSelect.vue";
 
 /**
  * 量化目标三态切换组合组件（他页可整段复用）
  * - 二级 Tab：【目标地图 | 排名列表 | 发布情况】
+ * - 右上角：三级分类筛选
  * - 下方舞台承载对应图表
  * props:
  *  - value: 当前态 "map" | "rank" | "release"（支持 v-model）
  *  - theme: "dark" | "light"
  *  - title: 头部标题（传空则隐藏）
  *  - mapData / rankData / releaseData: 三张图各自数据
+ *  - tertiary / tertiaryOptions: 三级分类筛选项
  */
 export default {
   name: "GoalVizSwitcher",
-  components: { ChinaMapChart, RankBarChart, ReleaseBarChart },
+  components: { ChinaMapChart, RankBarChart, ReleaseBarChart, FilterSelect },
   props: {
     value: { type: String, default: "map" },
     theme: { type: String, default: "dark" },
@@ -63,6 +74,8 @@ export default {
     mapData: { type: Array, default: () => [] },
     rankData: { type: Array, default: () => [] },
     releaseData: { type: Array, default: () => [] },
+    tertiary: { type: String, default: "" },
+    tertiaryOptions: { type: Array, default: () => [] },
   },
   data() {
     return {
@@ -90,6 +103,10 @@ export default {
       this.current = key;
       this.$emit("input", key);
       this.$emit("change", key);
+    },
+    onTertiary(key) {
+      this.$emit("tertiary-change", key);
+      this.$emit("update:tertiary", key);
     },
   },
 };
@@ -129,17 +146,37 @@ export default {
   gap: 8px;
 }
 
+.gvs__filter {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  /* 不用 transform 居中：transform 会成为 fixed 子元素的包含块，导致下拉面板定位错乱 */
+  margin-top: calc(-17px * var(--qzlt-s));
+  width: calc(180px * var(--qzlt-s));
+}
+
 .gvs__tab {
-  height: 28px;
-  padding: 0 18px;
-  font-size: 13px;
-  letter-spacing: 0.5px;
-  line-height: 1;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-  border: 1px solid transparent;
-  background: transparent;
+    height: calc(30px * var(--qzlt-s));
+    padding: 0 calc(24px * var(--qzlt-s));
+     border-radius: 999px;
+    border: 1px solid #00ffff80;
+    background: #6dfdfd1a;
+    color: #ffffffc7;
+    font-size: calc(16px * var(--qzlt-s));
+    letter-spacing: 1px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s;
+
+
+  // font-size: 13px;
+  // letter-spacing: 0.5px;
+  // line-height: 1;
+  // border-radius: 999px;
+  // cursor: pointer;
+  // transition: background 0.2s, border-color 0.2s, color 0.2s;
+  // border: 1px solid transparent;
+  // background: transparent;
 }
 
 .gvs__stage {

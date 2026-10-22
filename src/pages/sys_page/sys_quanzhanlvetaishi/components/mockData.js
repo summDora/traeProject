@@ -186,7 +186,7 @@ export const goalMapData = [
   { name: "湖南", value: 60 },
   { name: "广东", value: 94 },
   { name: "广西", value: 55 },
-  { name: "海南", value: 47 },
+  { name: "海南", value: 0 },
   { name: "重庆", value: 62 },
   { name: "四川", value: 70 },
   { name: "贵州", value: 51 },
@@ -635,17 +635,8 @@ export const externalFeedMap = {
   },
 };
 
-/** 中栏筛选·年份（示意用，后续接真数据时只替换数组） */
-export const yearOptions = [
-  { key: "2026", label: "2026年" },
-  { key: "2025", label: "2025年" },
-  { key: "2024", label: "2024年" },
-  { key: "2023", label: "2023年" },
-];
-
 /** 中栏筛选·一级分类 → 二级分类（联动：换一级时二级回落到该一级的首项） */
-export const categoryTree = [
-  {
+export const categoryTree = [  {
     key: "energy",
     label: "能源电力",
     children: [
@@ -684,3 +675,34 @@ export const categoryTree = [
     ],
   },
 ];
+
+/** 分类筛选项：全部 */
+export const ALL_CATEGORY_KEY = "all";
+export const allCategoryOption = { key: ALL_CATEGORY_KEY, label: "全部" };
+
+/**
+ * 三级分类（政策方向）选项
+ * 接接口后改为按「一级 + 二级 + 全部」查询后端返回的目录，这里先用方向清单兜底
+ */
+export const getTertiaryOptions = () => [
+  { ...allCategoryOption },
+  ...directionRows.map((name) => ({ key: name, label: name })),
+];
+
+/** 中间·政策画像 · 政策类型排行（按省份堆叠：激励型 / 约束型 / 混合型） */
+export const policyTypeRankData = chinaProvinces
+  .filter((name) => name !== "台湾" && name !== "香港" && name !== "澳门")
+  .map((name, i) => {
+    const seed = (i * 37 + name.length * 11) % 61;
+    const incentive = 12 + (seed % 38);
+    const constraint = 14 + ((seed * 3) % 42);
+    const mixed = 20 + ((seed * 9) % 168);
+    return {
+      name,
+      incentive,
+      constraint,
+      mixed,
+      total: incentive + constraint + mixed,
+    };
+  })
+  .sort((a, b) => b.total - a.total);

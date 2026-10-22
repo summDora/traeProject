@@ -26,6 +26,9 @@
         :map-data="chartData.map"
         :rank-data="chartData.rank"
         :release-data="chartData.release"
+        :tertiary="tertiary"
+        :tertiary-options="tertiaryOptions"
+        @tertiary-change="onTertiary"
       />
     </div>
   </div>
@@ -33,6 +36,7 @@
 
 <script>
 import GoalVizSwitcher from "@/pages/sys_page/sys_quanzhanlvetaishi/components/charts/GoalVizSwitcher.vue";
+import { fetchGoalViz } from "@/api/quanzhanlvetaishi";
 import { goalSummary, goalDataSets } from "../mockData";
 
 export default {
@@ -41,22 +45,49 @@ export default {
   props: {
     theme: { type: String, default: "dark" },
     category: { type: String, default: "" },
+    primary: { type: String, default: "" },
+    secondary: { type: String, default: "" },
+    tertiary: { type: String, default: "" },
+    tertiaryOptions: { type: Array, default: () => [] },
   },
   data() {
     return {
       summary: goalSummary,
       active: "total",
+      loadedData: null,
     };
   },
   computed: {
     chartData() {
-      return goalDataSets[this.active] || goalDataSets.total;
+      return this.loadedData || goalDataSets[this.active] || goalDataSets.total;
     },
   },
+  watch: {
+    primary: "loadData",
+    secondary: "loadData",
+    tertiary: "loadData",
+    active: "loadData",
+  },
+  mounted() {
+    this.loadData();
+  },
   methods: {
+    /** 量化目标图表数据统一走接口入口（接口层失败会回落 mock） */
+    async loadData() {
+      const res = await fetchGoalViz({
+        primary: this.primary,
+        secondary: this.secondary,
+        tertiary: this.tertiary,
+        type: this.active,
+      });
+      if (res && Array.isArray(res.map)) this.loadedData = res;
+    },
     select(key) {
       if (this.active === key) return;
       this.active = key;
+    },
+    onTertiary(key) {
+      this.$emit("update:tertiary", key);
     },
     formatNum(v) {
       return String(v).replace(/\B(?=(\d{3})+(?!\d))/g, ",");

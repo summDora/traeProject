@@ -44,19 +44,37 @@
 <script>
 import arcImg from "@/asset/images/qzlts/grid-1.png";
 import { statsCategories, statsDetailMap } from "./mockData";
+import { fetchPolicyStats } from "@/api/quanzhanlvetaishi";
 
 export default {
   name: "PolicyStatsBlock",
   data() {
     return {
       categories: statsCategories,
+      detailMap: statsDetailMap,
       activeKey: "policy",
       arcImg,
     };
   },
   computed: {
     activeDetail() {
-      return statsDetailMap[this.activeKey] || [];
+      return this.detailMap[this.activeKey] || [];
+    },
+  },
+  mounted() {
+    this.loadStats();
+  },
+  methods: {
+    /** 左侧政策统计走接口入口（失败时接口层回落 mock） */
+    async loadStats() {
+      const res = await fetchPolicyStats({});
+      if (!res) return;
+      if (Array.isArray(res.categories) && res.categories.length) {
+        this.categories = res.categories;
+      }
+      if (res.detailMap && typeof res.detailMap === "object") {
+        this.detailMap = res.detailMap;
+      }
     },
   },
 };

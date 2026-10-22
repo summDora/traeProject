@@ -33,12 +33,7 @@
             class="qzlt-feed__group"
           >
             <div class="qzlt-feed__group-head">
-              <svg class="qzlt-feed__group-icon" viewBox="0 0 12 12" aria-hidden="true">
-                <rect x="0.4" y="0.8" width="4.2" height="4.2" rx="0.7" />
-                <rect x="7.4" y="0.8" width="4.2" height="4.2" rx="0.7" opacity="0.75" />
-                <rect x="0.4" y="7.8" width="4.2" height="4.2" rx="0.7" opacity="0.75" />
-                <rect x="7.4" y="7.8" width="4.2" height="4.2" rx="0.7" />
-              </svg>
+              <img class="qzlt-feed__group-icon" src="./../../../../asset/images/qzlts/doc.png" alt="">
               <span class="qzlt-feed__group-title">{{ group.title }}</span>
             </div>
 
@@ -56,27 +51,11 @@
                 <p class="qzlt-feed-card__desc">{{ item.desc }}</p>
                 <div class="qzlt-feed-card__meta">
                   <span class="qzlt-feed-card__meta-item">
-                    <svg class="qzlt-feed-card__meta-icon" viewBox="0 0 16 16" aria-hidden="true">
-                      <circle cx="8" cy="8" r="6.3" fill="none" stroke="currentColor" stroke-width="1.3" />
-                      <path
-                        d="M8 4.5V8l2.4 1.7"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.3"
-                        stroke-linecap="round"
-                      />
-                    </svg>
+                    <img src="@/asset/images/qzlts/icon-time.png" class="qzlt-feed-card__meta-icon" alt="">
                     <span>{{ item.date }}</span>
                   </span>
                   <span class="qzlt-feed-card__meta-item">
-                    <svg class="qzlt-feed-card__meta-icon" viewBox="0 0 16 16" aria-hidden="true">
-                      <path
-                        d="M8 1.8 14.2 8 8 14.2 1.8 8z"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.3"
-                      />
-                    </svg>
+                    <img src="@/asset/images/qzlts/icon-local.png" class="qzlt-feed-card__meta-icon" alt="">
                     <span>{{ item.org }}</span>
                   </span>
                 </div>
@@ -91,6 +70,7 @@
 
 <script>
 import { externalTabs, externalFeedMap } from "./mockData";
+import { fetchExternalFeed } from "@/api/quanzhanlvetaishi";
 
 export default {
   name: "RightPanel",
@@ -101,6 +81,7 @@ export default {
     return {
       tabs: externalTabs,
       activeKey: externalTabs[0].key,
+      feedMap: externalFeedMap,
     };
   },
   computed: {
@@ -108,9 +89,22 @@ export default {
       return this.tabs.find((t) => t.key === this.activeKey) || this.tabs[0];
     },
     activeFeed() {
-      return (
-        externalFeedMap[this.activeKey] || { groups: [] }
-      );
+      return this.feedMap[this.activeKey] || { groups: [] };
+    },
+  },
+  watch: {
+    activeKey: "loadFeed",
+  },
+  mounted() {
+    this.loadFeed();
+  },
+  methods: {
+    /** 右侧外部动态走接口入口（失败时接口层回落 mock） */
+    async loadFeed() {
+      const res = await fetchExternalFeed({ type: this.activeKey });
+      if (res && typeof res === "object") {
+        this.feedMap = { ...this.feedMap, ...res };
+      }
     },
   },
 };

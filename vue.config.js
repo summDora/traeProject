@@ -18,6 +18,12 @@ module.exports = {
       ignored: /node_modules/,
     },
     proxy: {
+      /* 全战略态势大屏：图表数据接口（后端地址按实际部署调整） */
+      "/qzlt-api": {
+        target: "http://127.0.0.1:8010",
+        changeOrigin: true,
+        pathRewrite: { "^/qzlt-api": "" },
+      },
       "/pv-storage-api": {
         target: "http://127.0.0.1:8011",
         changeOrigin: true,
