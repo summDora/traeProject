@@ -10,7 +10,7 @@
     </div>
     <el-scrollbar class="bar">
       <el-tree v-bind="{ ...$attrs, ...$props }" v-on="$listeners" ref="tree" class="tree" icon-class="iconfont icon-tool_folder_open" :filter-node-method="filterNodeMethod" :draggable="draggable" @check-change="handleCheckChange" @node-drop="handleDrop">
-        <template #default="{ node, data }">
+        <template slot-scope="{ node, data }">
           <el-input v-if="data.INPUTING" v-model="data[props.label]" ref="input" class="inp" placeholder="按回车确认,按esc取消" @keyup.enter.native="handleConfirmAdd(data)" @keyup.esc.native="handleCancelAdd(data)" @blur="handleCancelAdd(data)"></el-input>
           <div v-else class="tree-item">
             <i v-show="singleIconShow(data)" class="iconfont icon-tool_node_diamond"></i>

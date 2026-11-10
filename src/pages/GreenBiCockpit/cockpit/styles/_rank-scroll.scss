@@ -1,0 +1,28 @@
+.rank-scroll-viewport {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+
+  &:hover .rank-scroll-track--scroll {
+    animation-play-state: paused;
+  }
+}
+
+.rank-scroll-track {
+  will-change: transform;
+
+  &--scroll {
+    animation: rank-scroll var(--rank-scroll-duration, 40s) linear infinite;
+  }
+}
+
+@keyframes rank-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(0, calc(-1 * var(--rank-scroll-distance, 0px)), 0);
+  }
+}

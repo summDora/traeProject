@@ -57,16 +57,27 @@
       <div class="left-main__rankings">
         <div class="inner-block rank-block rank-block--region">
           <CockpitSectionTitle sub title="全国绿色专利授权量区域排名" />
-          <ul class="rank-list rank-list--region">
-            <li v-for="item in regionRankingDisplay" :key="item.rank" class="rank-list__item">
-              <span
-                class="rank-list__badge"
-                :class="item.rank <= 3 ? 'rank-list__badge--' + item.rank : 'rank-list__badge--default'"
-              >{{ item.rank }}</span>
-              <span class="rank-list__name">{{ item.name }}</span>
-              <span class="rank-list__value">{{ formatNumber(item.value) }}</span>
-            </li>
-          </ul>
+          <div ref="regionRankViewport" class="rank-scroll-viewport">
+            <ul
+              class="rank-list rank-list--region rank-scroll-track"
+              :class="{ 'rank-scroll-track--scroll': regionCanScroll }"
+              :style="regionScrollStyle"
+            >
+              <li
+                v-for="(item, index) in regionRankTrack"
+                :key="'region-' + item.rank + '-' + index"
+                class="rank-list__item"
+                :style="regionItemStyle"
+              >
+                <span
+                  class="rank-list__badge"
+                  :class="item.rank <= 3 ? 'rank-list__badge--' + item.rank : 'rank-list__badge--default'"
+                >{{ item.rank }}</span>
+                <span class="rank-list__name">{{ item.name }}</span>
+                <span class="rank-list__value">{{ item.value }}<span class="rank-list__unit">件</span></span>
+              </li>
+            </ul>
+          </div>
         </div>
         <div class="inner-block rank-block rank-block--grantee">
           <CockpitSectionTitle sub title="绿色专利授权权人排名" />
@@ -79,16 +90,27 @@
               @click="granteeTab = tab.key"
             >{{ tab.label }}</span>
           </div>
-          <ul class="grantee-list">
-            <li v-for="item in currentGranteeList" :key="item.rank" class="grantee-list__item">
-              <span
-                class="grantee-list__badge"
-                :class="item.rank <= 3 ? 'grantee-list__badge--' + item.rank : 'grantee-list__badge--default'"
-              >{{ item.rank }}</span>
-              <span class="grantee-list__name">{{ item.name }}</span>
-              <span class="grantee-list__value">{{ item.value }}<span class="grantee-list__unit">件</span></span>
-            </li>
-          </ul>
+          <div ref="granteeRankViewport" class="rank-scroll-viewport">
+            <ul
+              class="grantee-list rank-scroll-track"
+              :class="{ 'rank-scroll-track--scroll': granteeCanScroll }"
+              :style="granteeScrollStyle"
+            >
+              <li
+                v-for="(item, index) in granteeRankTrack"
+                :key="'grantee-' + granteeTab + '-' + item.rank + '-' + index"
+                class="grantee-list__item"
+                :style="granteeItemStyle"
+              >
+                <span
+                  class="grantee-list__badge"
+                  :class="item.rank <= 3 ? 'grantee-list__badge--' + item.rank : 'grantee-list__badge--default'"
+                >{{ item.rank }}</span>
+                <span class="grantee-list__name">{{ item.name }}</span>
+                <span class="grantee-list__value">{{ item.value }}<span class="grantee-list__unit">件</span></span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <CockpitMapPlaceholder :data="mapProvinceData" />
@@ -105,20 +127,38 @@ import CockpitWorldRankHub from './CockpitWorldRankHub.vue'
 import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
 import CockpitMapPlaceholder from './CockpitMapPlaceholder.vue'
+import cockpitViewportMixin from './mixins/cockpitViewport'
+import cockpitRankScrollMixin from './mixins/cockpitRankScroll'
 import {
-  formatNumber,
-  FONT_DIN,
   getPieChartColor,
   getTrendLineColor,
   getApplyBarGradient,
   getApplyBarTopColor,
   normalizeSeriesValues,
+  FONT_DIN,
   AXIS_LABEL_COLOR,
-  AXIS_LABEL_FONT_SIZE,
   GRID_LINE_COLOR,
   POLAR_GRID_LINE_COLOR,
-  AXIS_LINE_COLOR
-} from '../utils/chartTheme'
+  AXIS_LINE_COLOR,
+  formatRadarAxisLabel,
+  computeNiceAxisScale
+} from './utils/chartTheme'
+
+const REGION_VISIBLE_COUNT = 5
+const GRANTEE_VISIBLE_COUNT = 10
+/** 区域排名单独滚动速度（pixel 模式 px/s，越大越快；默认全局 26） */
+const REGION_SCROLL_SPEED = 40
+/** 区域排名最小时长；全局 24s 会盖住更快的 speed，短列表必须单独降低 */
+const REGION_SCROLL_MIN_DURATION = 12
+
+/** 雷达图各维度数值标签位置（设计稿 px） */
+const RADAR_LABEL_LAYOUT = {
+  智能电网产业: { distance: 14, x: -4, y: 22 },
+  太阳能产业: { distance: 16, x: 20, y: 3 },
+  生物质能及其他新能源产业: { distance: 20, x: 12, y: 22 },
+  风能产业: { distance: 16, x: -12, y: 22 },
+  核电产业: { distance: 14, x: -20, y: 3 }
+}
 
 Highcharts3D(Highcharts)
 HighchartsMore(Highcharts)
@@ -126,6 +166,7 @@ HighchartsMore(Highcharts)
 export default {
   name: 'CockpitLeftMainPanel',
   components: { CockpitSectionTitle, CockpitHighchartsBase, CockpitMapPlaceholder, CockpitWorldRankHub },
+  mixins: [cockpitViewportMixin, cockpitRankScrollMixin],
   props: {
     data: {
       type: Object,
@@ -143,10 +184,17 @@ export default {
       applyTabs: [
         { key: 'countries', label: '申请人前5国' },
         { key: 'offices', label: '申请量前5专利局' }
-      ]
+      ],
+      regionItemHeight: 0,
+      regionScrollDistance: 0,
+      granteeItemHeight: 0,
+      granteeScrollDistance: 0
     }
   },
   computed: {
+    axisLabelFontSize() {
+      return this.ds(12)
+    },
     total() {
       const stock = this.data.globalPatentStock
       return (stock && stock.total) || 0
@@ -217,25 +265,58 @@ export default {
       return names.map(name => this.countryStats.find(item => item.name === name)).filter(Boolean)
     },
     currentGranteeList() {
-      const list = this.granteeTab === 'domestic' ? this.granteeDomestic : this.granteeGlobal
-      return list.slice(0, 10)
+      return this.granteeTab === 'domestic' ? this.granteeDomestic : this.granteeGlobal
     },
-    regionRankingDisplay() {
-      return this.regionRanking.slice(0, 5)
+    regionRankTrack() {
+      return this.buildRankScrollTrack(this.regionRanking, REGION_VISIBLE_COUNT)
+    },
+    granteeRankTrack() {
+      return this.buildRankScrollTrack(this.currentGranteeList, GRANTEE_VISIBLE_COUNT)
+    },
+    regionCanScroll() {
+      return this.canRankScroll(this.regionRanking, REGION_VISIBLE_COUNT) && this.regionScrollDistance > 0
+    },
+    granteeCanScroll() {
+      return this.canRankScroll(this.currentGranteeList, GRANTEE_VISIBLE_COUNT) && this.granteeScrollDistance > 0
+    },
+    regionScrollStyle() {
+      return this.createRankTrackStyle({
+        canScroll: this.regionCanScroll,
+        scrollDistance: this.regionScrollDistance,
+        itemHeight: this.regionItemHeight,
+        listLength: this.regionRanking.length,
+        speed: REGION_SCROLL_SPEED,
+        minDuration: REGION_SCROLL_MIN_DURATION
+      })
+    },
+    granteeScrollStyle() {
+      return this.createRankTrackStyle({
+        canScroll: this.granteeCanScroll,
+        scrollDistance: this.granteeScrollDistance,
+        itemHeight: this.granteeItemHeight,
+        listLength: this.currentGranteeList.length
+      })
+    },
+    regionItemStyle() {
+      return this.createRankItemStyle(this.regionItemHeight)
+    },
+    granteeItemStyle() {
+      return this.createRankItemStyle(this.granteeItemHeight)
     },
     currentApplyData() {
       return this.applyTab === 'countries' ? this.applyTrendCountries : this.applyTrendOffices
     },
     pieOptions() {
+      const ds = n => this.ds(n)
       return {
         chart: { type: 'pie', options3d: { enabled: true, alpha: 50, beta: 0 }, margin: [0, 0, 0, 0] },
         plotOptions: {
           pie: {
             innerSize: '55%', depth: 35, size: '92%', center: ['50%', '52%'],
             dataLabels: {
-              enabled: true, distance: 14, connectorColor: 'rgba(0,212,255,0.25)',
-              format: '<span style="color:#A8D4FF;font-size:10px;">{point.name}</span><br/>' +
-                `<span style="color:#00D4FF;font-size:11px;font-weight:600;font-family:${FONT_DIN}">{point.y}%</span>`,
+              enabled: true, distance: this.d(14), connectorColor: 'rgba(0,212,255,0.25)',
+              format: `<span style="color:#A8D4FF;font-size:${ds(10)};">{point.name}</span><br/>` +
+                `<span style="color:#00D4FF;font-size:${ds(11)};font-weight:600;font-family:${FONT_DIN}">{point.y}%</span>`,
               style: { textOutline: 'none', fontFamily: FONT_DIN }
             }
           }
@@ -253,8 +334,10 @@ export default {
       }
     },
     trendOptions() {
+      const allValues = this.trendSeries.flatMap(s => s.data || [])
+      const { max: yMax, tickInterval } = computeNiceAxisScale(allValues)
       return {
-        chart: { type: 'spline', marginTop: 8, marginBottom: 58 },
+        chart: { type: 'spline', marginTop: this.d(8), marginBottom: this.d(72) },
         xAxis: {
           categories: this.trendYears,
           tickmarkPlacement: 'between',
@@ -266,22 +349,22 @@ export default {
         },
         yAxis: {
           min: 0,
-          max: 40,
-          tickInterval: 10,
+          max: yMax,
+          tickInterval,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
-          labels: { format: '{value}万', style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN } }
+          labels: { format: '{value}万', style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN } }
         },
         legend: {
           align: 'center',
           verticalAlign: 'bottom',
-          margin: 18,
-          itemDistance: 8,
-          symbolWidth: 8,
-          symbolHeight: 8
+          margin: this.d(32),
+          itemDistance: this.d(8),
+          symbolWidth: this.d(8),
+          symbolHeight: this.d(8)
         },
-        plotOptions: { spline: { lineWidth: 2, marker: { enabled: false } } },
+        plotOptions: { spline: { lineWidth: this.d(2), marker: { enabled: false } } },
         series: this.trendSeries.map(s => {
           const color = getTrendLineColor(s.name)
           return {
@@ -290,10 +373,10 @@ export default {
             data: s.data,
             shadow: {
               color,
-              width: 4,
-              opacity: 0.18,
+              width: this.d(8),
+              opacity: 0.12,
               offsetX: 0,
-              offsetY: 0
+              offsetY: this.d(3)
             }
           }
         })
@@ -301,16 +384,20 @@ export default {
     },
     applyTrendOptions() {
       const data = this.currentApplyData
-      const maxY = 2000000
-      const items = data.data
+      const items = data.data || []
+      const { max: maxY, tickInterval } = computeNiceAxisScale(items, { tickCount: 2 })
+      const d = n => this.d(n)
+      const ds = n => this.ds(n)
+      const stripH = d(2)
+      const axisFontSize = this.axisLabelFontSize
 
       return {
         chart: {
           type: 'column',
-          marginTop: 24,
-          marginBottom: 36,
-          marginLeft: 44,
-          marginRight: 8,
+          marginTop: d(24),
+          marginBottom: d(36),
+          marginLeft: d(44),
+          marginRight: d(8),
           backgroundColor: 'transparent',
           events: {
             render() {
@@ -326,7 +413,7 @@ export default {
                 if (!point.shapeArgs || !point.y) return
                 const { x, y, width } = point.shapeArgs
                 const strip = chart.renderer
-                  .rect(x, y - 2, width, 2)
+                  .rect(x, y - stripH, width, stripH)
                   .attr({
                     fill: getApplyBarTopColor(index),
                     zIndex: 6
@@ -344,7 +431,7 @@ export default {
           tickLength: 0,
           gridLineWidth: 0,
           labels: {
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE },
+            style: { color: AXIS_LABEL_COLOR, fontSize: axisFontSize },
             rotation: 0,
             autoRotation: false,
             useHTML: true,
@@ -359,13 +446,13 @@ export default {
         yAxis: {
           min: 0,
           max: maxY,
-          tickInterval: 1000000,
+          tickInterval,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
           title: { text: null },
           labels: {
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN },
+            style: { color: AXIS_LABEL_COLOR, fontSize: axisFontSize, fontFamily: FONT_DIN },
             formatter() {
               return (this.value / 10000) + '万'
             }
@@ -387,9 +474,9 @@ export default {
               enabled: true,
               crop: false,
               overflow: 'none',
-              y: -4,
+              y: d(-4),
               format: '{y:,.0f}',
-              style: { color: '#FFFFFF', fontSize: '10px', textOutline: 'none', fontWeight: 'normal', fontFamily: FONT_DIN }
+              style: { color: '#FFFFFF', fontSize: ds(10), textOutline: 'none', fontWeight: 'normal', fontFamily: FONT_DIN }
             }
           },
           series: { states: { hover: { brightness: 0.08 } } }
@@ -399,7 +486,7 @@ export default {
             name: '背景',
             data: items.map(() => maxY),
             color: 'rgba(20, 60, 110, 0.45)',
-            pointWidth: 40,
+            pointWidth: d(40),
             enableMouseTracking: false,
             dataLabels: { enabled: false },
             zIndex: 0
@@ -410,7 +497,7 @@ export default {
               y,
               color: getApplyBarGradient(index, 0.68)
             })),
-            pointWidth: 22,
+            pointWidth: d(22),
             zIndex: 1
           }
         ]
@@ -428,16 +515,20 @@ export default {
         to: ringStep * (i + 1),
         color: i % 2 === 0 ? 'rgba(200, 215, 228, 0.1)' : 'transparent'
       }))
+      const d = n => this.d(n)
+      const ds = n => this.ds(n)
+      const axisFontSize = this.axisLabelFontSize
 
       return {
         chart: {
           polar: true,
           type: 'line',
-          margin: [4, 4, 4, 4],
-          backgroundColor: 'transparent'
+          margin: [d(10), d(16), d(10), d(16)],
+          backgroundColor: 'transparent',
+          spacing: [d(4), d(4), d(4), d(4)]
         },
         pane: {
-          size: '82%',
+          size: '80%',
           startAngle: 0,
           endAngle: 360,
           background: [{
@@ -454,9 +545,9 @@ export default {
           gridLineColor,
           labels: {
             useHTML: true,
-            distance: 18,
-            formatter() {
-              return `<span style="color:#ffffffcc;font-size:${AXIS_LABEL_FONT_SIZE};white-space:nowrap">${this.value}</span>`
+            distance: d(12),
+            formatter: function formatRadarLabel() {
+              return formatRadarAxisLabel(this.value, axisFontSize)
             }
           }
         },
@@ -478,13 +569,12 @@ export default {
             connectEnds: true
           },
           line: {
-            fillOpacity: 0.45,
-            lineWidth: 2,
-            lineColor: '#72A8DA',
+            lineWidth: d(2),
+            lineColor: '#537FF1',
             marker: {
               enabled: true,
-              radius: 3,
-              fillColor: '#72A8DA',
+              radius: d(3),
+              fillColor: '#537FF1',
               lineColor: '#fff',
               lineWidth: 1
             }
@@ -498,7 +588,7 @@ export default {
               overflow: 'none',
               formatter() {
                 const wan = (this.y / 10000).toFixed(2)
-                return `<span style="color:#ffffffcc;font-size:10px;font-family:${FONT_DIN};white-space:nowrap">${wan}万</span>`
+                return `<span style="color:#ffffffcc;font-size:${ds(10)};font-family:${FONT_DIN};white-space:nowrap">${wan}万</span>`
               }
             }
           }
@@ -506,27 +596,93 @@ export default {
         series: [{
           type: 'area',
           name: '授权量',
-          color: '#72A8DA',
+          color: '#537FF1',
+          lineColor: '#537FF1',
           connectEnds: true,
           pointPlacement: 'on',
-          data: values.map(y => ({
-            y,
-            dataLabels: {
-              distance: Math.max(12, (0.9 - y / maxVal) * 72)
+          data: this.radarCategories.map((category, index) => {
+            const y = values[index] || 0
+            const custom = RADAR_LABEL_LAYOUT[category] || {}
+            const defaultDistance = Math.max(d(12), (0.9 - y / maxVal) * d(72))
+
+            return {
+              y,
+              dataLabels: {
+                distance: custom.distance != null ? d(custom.distance) : defaultDistance,
+                x: custom.x != null ? d(custom.x) : 0,
+                y: custom.y != null ? d(custom.y) : 0
+              }
             }
-          })),
-          fillColor: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-            stops: [
-              [0, 'rgba(114, 168, 218, 0.55)'],
-              [1, 'rgba(19, 89, 153, 0.08)']
-            ]
-          }
+          }),
+          fillColor: 'rgba(83, 127, 241, 0.6)',
+          fillOpacity: 1
         }]
       }
     }
   },
-  methods: { formatNumber }
+  watch: {
+    regionRanking() {
+      this.resetRegionScroll()
+    },
+    currentGranteeList() {
+      this.resetGranteeScroll()
+    },
+    granteeTab() {
+      this.resetGranteeScroll()
+    },
+    viewportWidth() {
+      this.$nextTick(this.measureRankScrollLayouts)
+    }
+  },
+  mounted() {
+    this.$nextTick(this.measureRankScrollLayouts)
+    window.addEventListener('resize', this.measureRankScrollLayouts, { passive: true })
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.measureRankScrollLayouts)
+  },
+  methods: {
+    measureRankScrollLayouts() {
+      this.measureRegionScrollLayout()
+      this.measureGranteeScrollLayout()
+    },
+    measureRegionScrollLayout() {
+      this.measureRankScrollArea(
+        'regionRankViewport',
+        REGION_VISIBLE_COUNT,
+        this.regionRanking,
+        'regionItemHeight',
+        'regionScrollDistance'
+      )
+    },
+    measureGranteeScrollLayout() {
+      this.measureRankScrollArea(
+        'granteeRankViewport',
+        GRANTEE_VISIBLE_COUNT,
+        this.currentGranteeList,
+        'granteeItemHeight',
+        'granteeScrollDistance'
+      )
+    },
+    resetRegionScroll() {
+      this.resetRankScrollArea(
+        'regionRankViewport',
+        REGION_VISIBLE_COUNT,
+        this.regionRanking,
+        'regionItemHeight',
+        'regionScrollDistance'
+      )
+    },
+    resetGranteeScroll() {
+      this.resetRankScrollArea(
+        'granteeRankViewport',
+        GRANTEE_VISIBLE_COUNT,
+        this.currentGranteeList,
+        'granteeItemHeight',
+        'granteeScrollDistance'
+      )
+    }
+  }
 }
 </script>
 

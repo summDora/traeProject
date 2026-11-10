@@ -1,68 +1,82 @@
 <template>
   <header class="top-nav">
-    <div class="nav-brand">
-      <span class="brand-title">数据看板</span>
-    </div>
+    <router-link to="/" class="nav-brand">
+      <span class="brand-title">SUMMERDORA</span>
+    </router-link>
     <div class="nav-menu-wrap">
       <el-menu
         :default-active="activeMenu"
         mode="horizontal"
         router
-        background-color="#667eea"
-        text-color="#e8eaf6"
+        background-color="#0E7490"
+        text-color="#e6f4f6"
         active-text-color="#ffffff"
       >
-        <template v-for="item in menus">
-          <el-menu-item
-            v-if="!item.children"
-            :key="item.path"
-            :index="item.path"
-          >
-            {{ item.title }}
-          </el-menu-item>
-          <el-submenu
-            v-else
-            :key="'submenu-' + item.title"
-            :index="item.title"
-          >
-            <template slot="title">{{ item.title }}</template>
-            <el-menu-item
-              v-for="child in item.children"
-              :key="child.path"
-              :index="child.path"
-            >
-              {{ child.title }}
-            </el-menu-item>
-          </el-submenu>
-        </template>
+        <nav-menu-item
+          v-for="item in menus"
+          :key="item.path || item.title"
+          :item="item"
+        />
       </el-menu>
     </div>
   </header>
 </template>
 
 <script>
-import { navMenus } from '../router'
+import { navMenus } from "../router";
+
+// 递归渲染菜单项，支持任意层级（含三级菜单）
+const NavMenuItem = {
+  name: "NavMenuItem",
+  props: {
+    item: { type: Object, required: true },
+  },
+  render(h) {
+    const children = this.item.children || [];
+    if (!children.length) {
+      return h(
+        "el-menu-item",
+        { props: { index: this.item.path } },
+        this.item.title
+      );
+    }
+    return h(
+      "el-submenu",
+      { props: { index: this.item.title } },
+      [
+        h("span", { slot: "title" }, this.item.title),
+        ...children.map((child) =>
+          h(NavMenuItem, {
+            key: child.path || child.title,
+            props: { item: child },
+          })
+        ),
+      ]
+    );
+  },
+};
 
 export default {
-  name: 'TopNav',
+  name: "TopNav",
+  components: { NavMenuItem },
   data() {
     return {
-      menus: navMenus
-    }
+      menus: navMenus,
+    };
   },
   computed: {
     activeMenu() {
-      return this.$route.path
-    }
-  }
-}
+      return this.$route.path;
+    },
+  },
+};
 </script>
 
 <style scoped>
 .top-nav {
   display: flex;
   align-items: stretch;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0e7490 0%, #0c5c75 100%);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: sticky;
   top: 0;
@@ -75,6 +89,12 @@ export default {
   padding: 0 24px;
   flex-shrink: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.2);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.nav-brand:hover .brand-title {
+  opacity: 0.86;
 }
 
 .brand-title {

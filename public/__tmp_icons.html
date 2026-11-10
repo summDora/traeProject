@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>
+body{margin:0;background:#02101c;color:#cfe;font:12px sans-serif;display:flex;flex-wrap:wrap;gap:20px;padding:20px}
+figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+img{width:76px;height:76px;object-fit:contain;background:rgba(255,255,255,.05);border:1px solid #234}
+</style></head><body>
+<script>
+const names=['icon-lianghua','icon-lianghua-active','icon-heat','icon-fire','icon-fire-active','icon-zhengce','icon-zhengce-active'];
+names.forEach(n=>{
+  const f=document.createElement('figure');
+  const i=new Image(); i.src='/__tmp_icons/'+n+'.png';
+  const c=document.createElement('figcaption'); c.textContent=n;
+  f.appendChild(i); f.appendChild(c); document.body.appendChild(f);
+});
+</script>
+</body></html>

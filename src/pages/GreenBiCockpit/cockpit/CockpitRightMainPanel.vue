@@ -35,26 +35,48 @@
       <div class="inner-block right-main__section right-main__section--top50">
         <CockpitSectionTitle sub title="创新主体专利申请专利权人排名（TOP50）" />
         <div class="top50-cols">
-          <ul class="top50-col">
-            <li v-for="item in top50Odd" :key="item.rank" class="top50-col__item">
-              <span
-                class="top50-col__badge"
-                :class="item.rank <= 3 ? 'top50-col__badge--' + item.rank : 'top50-col__badge--default'"
-              >{{ item.rank }}</span>
-              <span class="top50-col__name">{{ item.name }}</span>
-              <span class="top50-col__value">{{ formatNumber(item.value) }}</span>
-            </li>
-          </ul>
-          <ul class="top50-col">
-            <li v-for="item in top50Even" :key="item.rank" class="top50-col__item">
-              <span
-                class="top50-col__badge"
-                :class="item.rank <= 3 ? 'top50-col__badge--' + item.rank : 'top50-col__badge--default'"
-              >{{ item.rank }}</span>
-              <span class="top50-col__name">{{ item.name }}</span>
-              <span class="top50-col__value">{{ formatNumber(item.value) }}</span>
-            </li>
-          </ul>
+          <div ref="top50OddViewport" class="rank-scroll-viewport">
+            <ul
+              class="top50-col rank-scroll-track"
+              :class="{ 'rank-scroll-track--scroll': top50CanScroll }"
+              :style="top50ScrollStyle"
+            >
+              <li
+                v-for="(item, index) in top50OddTrack"
+                :key="'odd-' + item.rank + '-' + index"
+                class="top50-col__item"
+                :style="top50ItemStyle"
+              >
+                <span
+                  class="top50-col__badge"
+                  :class="item.rank <= 3 ? 'top50-col__badge--' + item.rank : 'top50-col__badge--default'"
+                >{{ item.rank }}</span>
+                <span class="top50-col__name">{{ item.name }}</span>
+                <span class="top50-col__value">{{ item.value }}<span class="top50-col__unit">件</span></span>
+              </li>
+            </ul>
+          </div>
+          <div ref="top50EvenViewport" class="rank-scroll-viewport">
+            <ul
+              class="top50-col rank-scroll-track"
+              :class="{ 'rank-scroll-track--scroll': top50CanScroll }"
+              :style="top50ScrollStyle"
+            >
+              <li
+                v-for="(item, index) in top50EvenTrack"
+                :key="'even-' + item.rank + '-' + index"
+                class="top50-col__item"
+                :style="top50ItemStyle"
+              >
+                <span
+                  class="top50-col__badge"
+                  :class="item.rank <= 3 ? 'top50-col__badge--' + item.rank : 'top50-col__badge--default'"
+                >{{ item.rank }}</span>
+                <span class="top50-col__name">{{ item.name }}</span>
+                <span class="top50-col__value">{{ item.value }}<span class="top50-col__unit">件</span></span>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
       <!-- 245fr：技术领域分布 -->
@@ -71,18 +93,32 @@
 <script>
 import CockpitSectionTitle from './CockpitSectionTitle.vue'
 import CockpitHighchartsBase from './CockpitHighchartsBase.vue'
-import { formatNumber, FONT_DIN, AXIS_LABEL_COLOR, AXIS_LABEL_FONT_SIZE, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops } from '../utils/chartTheme'
+import cockpitViewportMixin from './mixins/cockpitViewport'
+import cockpitRankScrollMixin from './mixins/cockpitRankScroll'
+import { FONT_DIN, AXIS_LABEL_COLOR, GRID_LINE_COLOR, AXIS_LINE_COLOR, getChinaTrendSeriesColor, getChinaTrendAreaStops, computeNiceAxisScale } from './utils/chartTheme'
+
+const TOP50_VISIBLE_COUNT = 6
 
 export default {
   name: 'CockpitRightMainPanel',
   components: { CockpitSectionTitle, CockpitHighchartsBase },
+  mixins: [cockpitViewportMixin, cockpitRankScrollMixin],
   props: {
     data: {
       type: Object,
       default: () => ({})
     }
   },
+  data() {
+    return {
+      top50ItemHeight: 0,
+      top50ScrollDistance: 0
+    }
+  },
   computed: {
+    axisLabelFontSize() {
+      return this.ds(12)
+    },
     summary() {
       return this.data.chinaPatentSummary || {}
     },
@@ -110,54 +146,82 @@ export default {
         value: values[index] || 0
       }))
     },
-    top50Odd() {
-      return this.top50List.filter(item => item.rank % 2 === 1).slice(0, 6)
+    top50OddAll() {
+      return this.top50List.filter(item => item.rank % 2 === 1)
     },
-    top50Even() {
-      return this.top50List.filter(item => item.rank % 2 === 0).slice(0, 6)
+    top50EvenAll() {
+      return this.top50List.filter(item => item.rank % 2 === 0)
+    },
+    top50CanScroll() {
+      return this.canRankScroll(this.top50OddAll, TOP50_VISIBLE_COUNT) && this.top50ScrollDistance > 0
+    },
+    top50OddTrack() {
+      return this.buildRankScrollTrack(this.top50OddAll, TOP50_VISIBLE_COUNT)
+    },
+    top50EvenTrack() {
+      return this.buildRankScrollTrack(this.top50EvenAll, TOP50_VISIBLE_COUNT)
+    },
+    top50ScrollStyle() {
+      return this.createRankTrackStyle({
+        canScroll: this.top50CanScroll,
+        scrollDistance: this.top50ScrollDistance,
+        itemHeight: this.top50ItemHeight,
+        listLength: this.top50OddAll.length
+      })
+    },
+    top50ItemStyle() {
+      return this.createRankItemStyle(this.top50ItemHeight)
     },
     trendOptions() {
+      const d = n => this.d(n)
+      const allValues = this.trendSeries.flatMap(s => s.data || [])
+      const { max: yMax, tickInterval } = computeNiceAxisScale(allValues, { tickCount: 2 })
       return {
-        chart: { type: 'areaspline', marginTop: 22, marginBottom: 20 },
+        chart: { type: 'areaspline', marginTop: d(22), marginBottom: d(48) },
         xAxis: {
           categories: this.trendYears,
-          tickmarkPlacement: 'between',
-          startOnTick: false,
-          endOnTick: false,
-          gridLineWidth: 1,
-          gridLineDashStyle: 'Dash',
-          gridLineColor: GRID_LINE_COLOR
-        },
-        yAxis: {
-          min: 0,
-          max: 500000,
-          tickInterval: 250000,
+          tickmarkPlacement: 'on',
+          lineWidth: 1,
+          lineColor: AXIS_LINE_COLOR,
+          tickLength: 0,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
           gridLineColor: GRID_LINE_COLOR,
-          labels: { formatter() { return (this.value / 10000) + '万' }, style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN } }
+          labels: {
+            align: 'center',
+            style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize },
+            y: d(16)
+          }
+        },
+        yAxis: {
+          min: 0,
+          max: yMax,
+          tickInterval,
+          gridLineWidth: 1,
+          gridLineDashStyle: 'Dash',
+          gridLineColor: GRID_LINE_COLOR,
+          labels: { formatter() { return (this.value / 10000) + '万' }, style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN } }
         },
         legend: {
           align: 'center',
           verticalAlign: 'top',
-          y: -4,
-          itemDistance: 32,
-          symbolWidth: 18,
-          symbolHeight: 10,
-          itemStyle: { color: '#C8E6FF', fontSize: '11px', fontWeight: 'normal' },
+          y: d(-4),
+          itemDistance: d(32),
+          symbolWidth: d(18),
+          symbolHeight: d(10),
+          itemStyle: { color: '#C8E6FF', fontSize: this.ds(11), fontWeight: 'normal' },
           itemHoverStyle: { color: '#FFFFFF' }
         },
         plotOptions: {
           areaspline: {
             fillOpacity: 1,
-            lineWidth: 2,
-            legendSymbol: 'lineMarker',
+            lineWidth: d(2),
             marker: {
               enabled: true,
-              radius: 4,
+              radius: d(4),
               symbol: 'circle',
               fillColor: '#10224D',
-              lineWidth: 2,
+              lineWidth: d(2),
               lineColor: null
             }
           }
@@ -171,7 +235,7 @@ export default {
             marker: {
               fillColor: '#10224D',
               lineColor: color,
-              lineWidth: 2
+              lineWidth: d(2)
             },
             fillColor: {
               linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
@@ -186,24 +250,25 @@ export default {
       const values = this.techFieldData.map(d => d.value)
       const barColor = '#537FF1'
       const maxLabelLen = Math.max(...categories.map(name => name.length))
-      const axisMax = 400000
+      const { max: axisMax, tickInterval } = computeNiceAxisScale(values)
+      const d = n => this.d(n)
 
       return {
         chart: {
           type: 'bar',
-          marginLeft: Math.max(148, maxLabelLen * 11 + 16),
-          marginRight: 56,
-          marginTop: 22,
-          marginBottom: 8,
-          spacingTop: 4
+          marginLeft: Math.max(d(148), maxLabelLen * d(11) + d(16)),
+          marginRight: d(64),
+          marginTop: d(22),
+          marginBottom: d(8),
+          spacingTop: d(4)
         },
         xAxis: {
           categories,
           reversed: true,
           labels: {
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE },
+            style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize },
             align: 'right',
-            x: -6,
+            x: d(-4),
             reserveSpace: true
           },
           lineWidth: 0,
@@ -215,7 +280,7 @@ export default {
         yAxis: {
           min: 0,
           max: axisMax,
-          tickInterval: 100000,
+          tickInterval,
           opposite: true,
           gridLineWidth: 1,
           gridLineDashStyle: 'Dash',
@@ -224,8 +289,9 @@ export default {
             formatter() {
               return this.value === 0 ? '0' : (this.value / 10000) + '万'
             },
-            style: { color: AXIS_LABEL_COLOR, fontSize: AXIS_LABEL_FONT_SIZE, fontFamily: FONT_DIN },
-            y: 2
+            style: { color: AXIS_LABEL_COLOR, fontSize: this.axisLabelFontSize, fontFamily: FONT_DIN },
+            // 横向条形图的数值轴为 yAxis；x 只沿轴线左右移，改与轴线距离要用 y
+            y: d(-6)
           },
           lineColor: AXIS_LINE_COLOR,
           tickColor: AXIS_LINE_COLOR,
@@ -243,8 +309,8 @@ export default {
               enabled: true,
               align: 'right',
               format: '{y:.0f}',
-              style: { color: '#FFFFFF', fontSize: '10px', textOutline: 'none', fontFamily: FONT_DIN },
-              x: 6
+              style: { color: '#FFFFFF', fontSize: this.ds(10), textOutline: 'none', fontFamily: FONT_DIN },
+              x: d(6)
             }
           },
           series: { states: { hover: { brightness: 0.08 } } }
@@ -268,7 +334,41 @@ export default {
       }
     }
   },
-  methods: { formatNumber }
+  watch: {
+    top50List() {
+      this.resetTop50Scroll()
+    },
+    viewportWidth() {
+      this.$nextTick(this.measureTop50Scroll)
+    }
+  },
+  mounted() {
+    this.$nextTick(this.measureTop50Scroll)
+    window.addEventListener('resize', this.measureTop50Scroll, { passive: true })
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.measureTop50Scroll)
+  },
+  methods: {
+    measureTop50Scroll() {
+      this.measureRankScrollArea(
+        'top50OddViewport',
+        TOP50_VISIBLE_COUNT,
+        this.top50OddAll,
+        'top50ItemHeight',
+        'top50ScrollDistance'
+      )
+    },
+    resetTop50Scroll() {
+      this.resetRankScrollArea(
+        'top50OddViewport',
+        TOP50_VISIBLE_COUNT,
+        this.top50OddAll,
+        'top50ItemHeight',
+        'top50ScrollDistance'
+      )
+    }
+  }
 }
 </script>
 

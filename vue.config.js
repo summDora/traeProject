@@ -17,6 +17,24 @@ module.exports = {
       poll: 1000,
       ignored: /node_modules/,
     },
+    proxy: {
+      /* 全战略态势大屏：图表数据接口（后端地址按实际部署调整） */
+      "/qzlt-api": {
+        target: "http://127.0.0.1:8010",
+        changeOrigin: true,
+        pathRewrite: { "^/qzlt-api": "" },
+      },
+      "/pv-storage-api": {
+        target: "http://127.0.0.1:8011",
+        changeOrigin: true,
+        pathRewrite: { "^/pv-storage-api": "" },
+      },
+      "/green-power-api": {
+        target: "http://127.0.0.1:8003",
+        changeOrigin: true,
+        pathRewrite: { "^/green-power-api": "" },
+      },
+    },
   },
   chainWebpack: (config) => {
     config.resolve.alias

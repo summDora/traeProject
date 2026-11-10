@@ -3,7 +3,7 @@
     <el-table v-bind="{ ...$attrs, ...omit($props, 'headers') }" v-on="$listeners" ref="table" class="hyTableList" header-cell-class-name="header" @selection-change="handleSelectionChange">
       <el-table-column v-if="multiSelection" type="selection" width="55"> </el-table-column>
       <el-table-column v-for="item in headers" v-bind="omit(item, 'slot')" :key="item.id">
-        <template v-if="item.slot" #default="scope">
+        <template v-if="item.slot" slot-scope="scope">
           <slot :name="item.slot" v-bind="scope"></slot>
           <!--   -->
         </template>

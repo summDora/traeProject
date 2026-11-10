@@ -97,19 +97,11 @@
           :class="{ 'is-collapsed': !system.expanded }"
         >
           <div class="nest-header">
-            <span class="expand-trigger" @click="toggleExpand(system)">
-              <i
-                :class="
-                  system.expanded
-                    ? 'el-icon-caret-bottom'
-                    : 'el-icon-caret-right'
-                "
-              />
-            </span>
             <div class="nest-header-main">
               <span class="nest-label">系统名称</span>
               <el-select
                 v-model="system.systemId"
+                disabled
                 placeholder="请选择系统"
                 size="small"
                 style="width: 360px"
@@ -131,6 +123,15 @@
                 >删除系统</el-button
               >
             </div>
+            <span class="expand-trigger" @click="toggleExpand(system)">
+              <i
+                :class="
+                  system.expanded
+                    ? 'el-icon-caret-bottom'
+                    : 'el-icon-caret-right'
+                "
+              />
+            </span>
           </div>
 
           <div v-show="system.expanded" class="nest-body">
@@ -138,22 +139,18 @@
               v-for="subsystem in system.subsystems"
               :key="subsystem.id"
               class="nest-card subsystem-card"
-              :class="{ 'is-collapsed': !subsystem.expanded }"
+              :class="{
+                'is-collapsed': !subsystem.expanded,
+                'is-current': currentSubsystemId === subsystem.id,
+              }"
+              @click="setCurrentSubsystem(subsystem.id)"
             >
               <div class="nest-header">
-                <span class="expand-trigger" @click="toggleExpand(subsystem)">
-                  <i
-                    :class="
-                      subsystem.expanded
-                        ? 'el-icon-caret-bottom'
-                        : 'el-icon-caret-right'
-                    "
-                  />
-                </span>
                 <div class="nest-header-main">
                   <span class="nest-label">子系统/微应用</span>
                   <el-select
                     v-model="subsystem.subsystemId"
+                    disabled
                     placeholder="请选择子系统/微应用"
                     size="small"
                     style="width: 320px"
@@ -177,6 +174,15 @@
                     >删除微应用</el-button
                   >
                 </div>
+                <span class="expand-trigger" @click="toggleExpand(subsystem)">
+                  <i
+                    :class="
+                      subsystem.expanded
+                        ? 'el-icon-caret-bottom'
+                        : 'el-icon-caret-right'
+                    "
+                  />
+                </span>
               </div>
 
               <div v-show="subsystem.expanded" class="nest-body">
@@ -187,15 +193,6 @@
                   :class="{ 'is-collapsed': !level1.expanded }"
                 >
                   <div class="nest-header">
-                    <span class="expand-trigger" @click="toggleExpand(level1)">
-                      <i
-                        :class="
-                          level1.expanded
-                            ? 'el-icon-caret-bottom'
-                            : 'el-icon-caret-right'
-                        "
-                      />
-                    </span>
                     <div class="nest-header-main">
                       <span class="nest-label">一级功能名称</span>
                       <el-input
@@ -216,6 +213,15 @@
                         >删除一级功能</el-button
                       >
                     </div>
+                    <span class="expand-trigger" @click="toggleExpand(level1)">
+                      <i
+                        :class="
+                          level1.expanded
+                            ? 'el-icon-caret-bottom'
+                            : 'el-icon-caret-right'
+                        "
+                      />
+                    </span>
                   </div>
 
                   <div
@@ -337,6 +343,7 @@ export default {
       currentLevel1: null,
       currentLevel1PoolId: "",
       excludePoolIds: [],
+      currentSubsystemId: "",
     };
   },
 
@@ -357,6 +364,10 @@ export default {
       this.demandDetail = getDemandDetail(this.demandId);
       this.blueprintData = getBlueprintData(this.demandId);
       this.normalizeExpandState();
+      const firstSystem = this.blueprintData.systems[0];
+      const firstSubsystem =
+        firstSystem && firstSystem.subsystems[0];
+      this.currentSubsystemId = firstSubsystem ? firstSubsystem.id : "";
     },
 
     normalizeExpandState() {
@@ -379,6 +390,10 @@ export default {
 
     toggleExpand(node) {
       this.$set(node, "expanded", !node.expanded);
+    },
+
+    setCurrentSubsystem(id) {
+      this.currentSubsystemId = id;
     },
 
     expandAll() {
@@ -687,21 +702,38 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin-right: 8px;
+  width: 28px;
+  height: 28px;
+  margin-left: 8px;
   flex-shrink: 0;
   cursor: pointer;
   color: #13c2c2;
-  border-radius: 2px;
+  background: #fff;
+  border: 1px solid #cddede;
+  border-radius: 4px;
+  transition: all 0.2s;
 }
 
 .expand-trigger:hover {
   background: rgba(19, 194, 194, 0.12);
+  border-color: #13c2c2;
 }
 
 .expand-trigger i {
   font-size: 14px;
+}
+
+.subsystem-card .nest-header {
+  background: #fbfdfd;
+}
+
+.level1-card .nest-header {
+  background: #f7fbfb;
+}
+
+.subsystem-card.is-current {
+  border-color: #13c2c2;
+  box-shadow: 0 0 0 2px rgba(19, 194, 194, 0.25);
 }
 
 .nest-header-main {
