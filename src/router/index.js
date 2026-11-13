@@ -228,6 +228,13 @@ const router = new VueRouter({
       meta: { title: "全战略态势", fullscreen: true },
     },
     {
+      path: "/sys-jingyingxingyuce",
+      name: "SysJingyingxingyuce",
+      component: () =>
+        import("../pages/sys_page/sys_jingyingxingyuce/index.vue"),
+      meta: { title: "经营性预测指标", fullscreen: true },
+    },
+    {
       path: "*",
       redirect: "/",
     },
@@ -269,7 +276,10 @@ export const navMenus = [
       { path: "/green-bi-cockpit", title: "知识产权驾驶舱" },
       {
         title: "实验室",
-        children: [{ path: "/sys-quanzhanlvetaishi", title: "全战略态势" }],
+        children: [
+          { path: "/sys-quanzhanlvetaishi", title: "全战略态势" },
+          { path: "/sys-jingyingxingyuce", title: "经营性预测指标" },
+        ],
       },
     ],
   },
