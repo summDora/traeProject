@@ -220,6 +220,7 @@ export default {
         },
         yAxis: {
           type: "value",
+          name: "亿元",
           min: 0,
           max: 100,
           interval: 50,
@@ -242,6 +243,7 @@ export default {
                 { offset: 1, color: "#023BA5" },
               ]),
               borderRadius: [6, 6, 6, 6],
+              opacity: 0.8,
             },
             data: INVEST_PLAN,
           },
@@ -255,6 +257,7 @@ export default {
                 { offset: 1, color: "#006C6C" },
               ]),
               borderRadius: [6, 6, 6, 6],
+              opacity: 0.8,
             },
             data: INVEST_LIMIT,
           },
