@@ -95,7 +95,7 @@ export default {
     findCol(prop) {
       let found = null
       const walk = (cols) => {
-        ;(cols || []).forEach((c) => {
+        (cols || []).forEach((c) => {
           if (c.prop === prop) found = c
           if (c.children) walk(c.children)
         })

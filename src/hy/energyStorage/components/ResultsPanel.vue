@@ -234,7 +234,7 @@ export default {
       )
     },
     resizeAll() {
-      ;[this.peakChart, this.cdChart, this.socChart].forEach((c) => {
+      [this.peakChart, this.cdChart, this.socChart].forEach((c) => {
         if (c && c.resize) {
           try { c.resize() } catch (e) {}
         }

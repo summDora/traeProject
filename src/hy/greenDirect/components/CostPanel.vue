@@ -375,7 +375,7 @@ export default {
       this.resizeAll()
     },
     resizeAll() {
-      ;[this.monthlyChart, this.marketChart].concat(this.pieCharts).forEach((c) => {
+      [this.monthlyChart, this.marketChart].concat(this.pieCharts).forEach((c) => {
         if (c && c.resize) {
           try { c.resize() } catch (e) {}
         }
