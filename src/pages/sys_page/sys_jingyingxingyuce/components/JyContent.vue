@@ -35,7 +35,8 @@ import iconSave from "@/asset/images/jyzbyc/icon-file.png";
 import iconCalc from "@/asset/images/jyzbyc/icon-calculator.png";
 
 const DESIGN_W = 1920;
-const MIN_SCALE = 0.72;
+const DESIGN_H = 1080;
+const MIN_SCALE = 0.6;
 const MAX_SCALE = 2.2;
 
 export default {
@@ -70,7 +71,14 @@ export default {
       const el = this.$refs.root;
       if (!el) return;
       const w = el.clientWidth || window.innerWidth;
-      const s = Math.min(MAX_SCALE, Math.max(MIN_SCALE, w / DESIGN_W));
+      const h = window.innerHeight || document.documentElement.clientHeight;
+      /* 宽、高同时等比缩放：浏览器地址栏存在时 innerHeight 变小，
+         按高度比例缩小，避免左/右面板固定高度内容溢出出现滚动条；
+         减去少量安全余量，防止边框/亚像素舍入造成 1~2px 溢出 */
+      const s = Math.min(
+        MAX_SCALE,
+        Math.max(MIN_SCALE, Math.min(w / DESIGN_W, (h - 8) / DESIGN_H))
+      );
       if (Math.abs(s - this.scale) < 0.0005) return;
       this.scale = s;
       el.style.setProperty("--jy-s", s);
