@@ -235,6 +235,12 @@ const router = new VueRouter({
       meta: { title: "经营性预测指标", fullscreen: true },
     },
     {
+      path: "/sys-root-home",
+      name: "SysRootHome",
+      component: () => import("../pages/sys_page/sys_rootHome/index.vue"),
+      meta: { title: "新型电力系统经济实验室", fullscreen: true, scrollX: true },
+    },
+    {
       path: "*",
       redirect: "/",
     },
@@ -279,6 +285,7 @@ export const navMenus = [
         children: [
           { path: "/sys-quanzhanlvetaishi", title: "全战略态势" },
           { path: "/sys-jingyingxingyuce", title: "经营性预测指标" },
+          { path: "/sys-root-home", title: "新型电力系统经济实验室" },
         ],
       },
     ],

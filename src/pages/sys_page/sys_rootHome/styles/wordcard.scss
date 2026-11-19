@@ -1,0 +1,146 @@
+// 词条卡片：公共视觉 + 入场动画
+// 宿主组件负责
+//   1) 定义 --wordcard-* 变量
+//   2) 给 .wordcard 补定位（left/top/transform）
+//   3) <transition name="wordcard"> 包裹，方向用 .wordcard--from-right 切换
+.wordcard {
+  position: absolute;
+  z-index: 60;
+  width: calc(var(--wordcard-w, 520) * var(--home-s) * 1px);
+  pointer-events: none;
+}
+
+.wordcard__panel {
+  position: relative;
+  padding: calc(var(--wordcard-pad, 18) * var(--home-s) * 1px);
+  border: calc(1 * var(--home-s) * 1px) solid rgba(102, 214, 242, 0.42);
+  background: linear-gradient(
+    180deg,
+    rgba(9, 44, 66, 0.94) 0%,
+    rgba(5, 24, 38, 0.96) 100%
+  );
+  box-shadow: 0 calc(8 * var(--home-s) * 1px) calc(28 * var(--home-s) * 1px)
+      rgba(0, 0, 0, 0.45),
+    0 0 calc(18 * var(--home-s) * 1px) rgba(71, 189, 232, 0.22),
+    inset 0 0 calc(26 * var(--home-s) * 1px) rgba(41, 137, 178, 0.16);
+}
+
+// 左上 / 右下 角标
+.wordcard__panel::before,
+.wordcard__panel::after {
+  content: "";
+  position: absolute;
+  width: calc(16 * var(--home-s) * 1px);
+  height: calc(16 * var(--home-s) * 1px);
+  border: 0 solid #66d6f2;
+  filter: drop-shadow(
+    0 0 calc(4 * var(--home-s) * 1px) rgba(90, 205, 245, 0.85)
+  );
+}
+
+.wordcard__panel::before {
+  top: calc(-1 * var(--home-s) * 1px);
+  left: calc(-1 * var(--home-s) * 1px);
+  border-top-width: calc(2 * var(--home-s) * 1px);
+  border-left-width: calc(2 * var(--home-s) * 1px);
+}
+
+.wordcard__panel::after {
+  right: calc(-1 * var(--home-s) * 1px);
+  bottom: calc(-1 * var(--home-s) * 1px);
+  border-right-width: calc(2 * var(--home-s) * 1px);
+  border-bottom-width: calc(2 * var(--home-s) * 1px);
+}
+
+.wordcard__head {
+  display: flex;
+  align-items: baseline;
+  gap: calc(10 * var(--home-s) * 1px);
+  padding-bottom: calc(10 * var(--home-s) * 1px);
+  border-bottom: calc(1 * var(--home-s) * 1px) solid rgba(102, 214, 242, 0.2);
+}
+
+.wordcard__title {
+  color: #eafeff;
+  font-size: calc(var(--wordcard-title-font, 20) * 1px);
+  font-weight: 600;
+  letter-spacing: calc(1 * var(--home-s) * 1px);
+  line-height: 1.2;
+  text-shadow: calc(2 * var(--home-s) * 1px) calc(2 * var(--home-s) * 1px)
+    calc(8 * var(--home-s) * 1px) rgba(93, 158, 195, 0.75);
+  white-space: nowrap;
+}
+
+.wordcard__en {
+  overflow: hidden;
+  color: rgba(138, 214, 240, 0.55);
+  font-size: calc(var(--wordcard-en-font, 12) * 1px);
+  letter-spacing: calc(0.6 * var(--home-s) * 1px);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.wordcard__body {
+  margin: calc(10 * var(--home-s) * 1px) 0 0;
+  color: rgba(214, 240, 250, 0.84);
+  font-size: calc(var(--wordcard-body-font, 14) * 1px);
+  letter-spacing: calc(0.4 * var(--home-s) * 1px);
+  line-height: 1.9;
+  text-align: justify;
+}
+
+// ---- 入场 / 出场：默认从下向上 ----
+// 过渡类直接作用在 .wordcard__panel 上（v-if 在面板上，离场动画才不会被掐断）
+// 方向由 .wordcard--from-{top|left|right} 切换，位移量 入场 30 / 出场 20（横向 36 / 24）
+.wordcard-enter-active {
+  transition: opacity 0.26s ease,
+    transform 0.44s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.wordcard-enter,
+.wordcard-leave-to {
+  opacity: 0;
+}
+
+.wordcard-leave-active {
+  transition: opacity 0.24s ease,
+    transform 0.24s cubic-bezier(0.4, 0, 1, 1);
+}
+
+// 从下向上（默认）
+.wordcard-enter {
+  transform: translateY(calc(30 * var(--home-s) * 1px));
+}
+
+.wordcard-leave-to {
+  transform: translateY(calc(20 * var(--home-s) * 1px));
+}
+
+// 从上向下
+.wordcard--from-top .wordcard-enter {
+  transform: translateY(calc(-30 * var(--home-s) * 1px));
+}
+
+.wordcard--from-top .wordcard-leave-to {
+  transform: translateY(calc(-20 * var(--home-s) * 1px));
+}
+
+// 从左向右
+.wordcard--from-left .wordcard-enter {
+  transform: translateX(calc(-36 * var(--home-s) * 1px));
+}
+
+.wordcard--from-left .wordcard-leave-to {
+  transform: translateX(calc(-24 * var(--home-s) * 1px));
+}
+
+// 从右向左
+.wordcard--from-right .wordcard-enter {
+  transform: translateX(calc(36 * var(--home-s) * 1px));
+}
+
+.wordcard--from-right .wordcard-leave-to {
+  transform: translateX(calc(24 * var(--home-s) * 1px));
+}

@@ -1,0 +1,297 @@
+.root-home {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  // 大屏项目：窄屏锁定最小宽度，多余部分由横向滚动承接
+  // 实际值由 index.vue 写入：只窄十几像素时吸收掉，避免为 15px 出滚动条
+  --home-min-w: 1920px;
+  min-width: var(--home-min-w);
+  // 最小高度：默认按 900 视口撑开，低于 900 时由外层出纵向滚动条。
+  // index.vue 会实测三栏内容后把这个值写准确。
+  min-height: 900px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #031521;
+  color: #e8fbff;
+  font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+
+  // 2880 设计稿 → 实际容器宽的受控比例（只用于间距/字号 token，不做 transform 缩放）
+  --home-s: 1;
+  --home-pad-x: 140px;
+  --home-left-card-w: 488px;
+
+  &.root-home > .lab-header {
+    position: relative;
+    z-index: 2;
+    flex: 0 0 auto;
+  }
+
+  &__backdrop,
+  &__ambient {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__backdrop {
+    z-index: -3;
+    background-color: #031521;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  &--standard &__backdrop {
+    background-image: url("~@/asset/images/jyzbyc/bg-mask.png"),
+      url("~@/asset/images/home/background-1920.png");
+  }
+
+  &--wide &__backdrop {
+    background-image: url("~@/asset/images/home/background-2880.png");
+  }
+
+  &__ambient {
+    z-index: -2;
+    pointer-events: none;
+    background: radial-gradient(
+        ellipse at 50% 72%,
+        rgba(0, 173, 255, 0.16) 0%,
+        rgba(0, 87, 153, 0.07) 26%,
+        transparent 58%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(0, 14, 30, 0.12) 0%,
+        rgba(0, 23, 43, 0.08) 52%,
+        rgba(0, 6, 18, 0.34) 100%
+      );
+    mix-blend-mode: screen;
+  }
+
+  &__stage {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  // 不再对内容做整体 transform 缩放：world 与舞台同尺寸，内部元素按真实像素渲染
+  &__world {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__content,
+  &__tips {
+    position: absolute;
+    inset: 0;
+  }
+
+  &__content {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    // 垂直不留 padding，保证中间底座能占满内容区高度；水平 padding 由 token 控制
+    padding: 0 var(--home-pad-x);
+    box-sizing: border-box;
+  }
+
+  &__search {
+    flex: 0 0 auto;
+  }
+
+  // 三栏按 1980/2880 设计稿宽度插值（--home-* 由 index.vue 写入），左右叠在中间背景上方
+  &__layout {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  &__region {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  // 中间：平台底座背景图（1920 用 platform-base，2880 用 platform-wide）
+  &__region--center {
+    left: var(--home-center-x);
+    z-index: 1;
+    width: var(--home-center-w);
+  }
+
+  // 中间图形（五全五库）由组件自带底色与宽高比，这里只控制与内容区的偏移
+  &__center {
+    width: 100%;
+  }
+
+  &--standard &__center {
+    margin-top: 20px;
+  }
+
+  /* ===== 新需求：战略联合推演中枢 start ===== */
+  // 进入问答页时，中间底座（含场景与主力方向）、研究方向、右栏场景、
+  // 宽屏括号装饰一并隐藏，只保留左栏检索与团队结构
+  &--deduction {
+    .root-home__center,
+    .root-home__directions,
+    .root-home__region--right,
+    .root-home__wide-decorations {
+      display: none;
+    }
+  }
+
+  // 问答面板：左边界对齐左栏卡片右缘（不含已隐藏的「研究方向」宽度），避免整体过于靠右
+  // 选择器必须是三级（.root-home .root-home__layout > …），否则压不过组件内 scoped 的
+  // .home-deduction[data-v-xxx]（0,2,0）——那条规则带 position: relative + width: 100%，
+  // 会让 left 变成相对偏移、宽度保持整块宽度，结果整块右移并溢出右侧
+  .root-home__layout > &__deduction {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: calc(var(--home-left-card-w) + var(--home-left-gap));
+    width: auto;
+    z-index: 6;
+  }
+  /* ===== 新需求：战略联合推演中枢 end ===== */
+
+  // 左栏：检索 + 团队结构（左栈）与主要研究方向，横向流式排布
+  &__region--left {
+    left: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    // 由 JS 按页宽写入：1920 → 32px，2880 → 60px（两端等比外推）
+    gap: var(--home-left-gap, calc(60px * var(--home-s)));
+    padding: calc(18px * var(--home-s)) 0 calc(20px * var(--home-s));
+    box-sizing: border-box;
+  }
+
+  &__left-stack {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    gap: calc(16px * var(--home-s));
+    min-width: 0;
+  }
+
+  &__left-body {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  // 主要研究方向：左栈右侧的流式子项，纵向对齐到设计稿位置
+  &__directions {
+    flex: 0 0 auto;
+    margin-top: calc(50px * var(--home-s));
+  }
+
+  // 紧凑模式下「主要研究方向」整体上移，与右侧大箭头保持水平
+  &--compact .root-home__directions {
+    margin-top: calc(16px * var(--home-s));
+  }
+
+  // 紧凑模式下左右两栏底部收紧，给内容留一点余量
+  &--compact .root-home__region--left,
+  &--compact .root-home__region--right {
+    padding-bottom: calc(6px * var(--home-s));
+  }
+
+  // 右栏：卡片贴右边缘，起始位置与「主要研究方向」一致
+  &__region--right {
+    right: 0;
+    z-index: 3;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    width: var(--home-right-w);
+    padding: calc(98px * var(--home-s)) 0 calc(20px * var(--home-s));
+    box-sizing: border-box;
+    // 右栏内的大箭头要伸到栏外，不能再裁切
+    overflow: visible;
+  }
+
+  &__wide-decorations {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  // 宽屏下左右括号固定在屏幕左右，距边框 24px，高度按设计稿比例
+  &__parenthesis {
+    position: absolute;
+    top: 17.4%;
+    width: auto;
+    height: 73.4%;
+    object-fit: contain;
+  }
+
+  &__parenthesis--left {
+    left: 24px;
+  }
+
+  &__parenthesis--right {
+    right: 24px;
+  }
+
+  &__tips {
+    z-index: 20;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  &__tips > * {
+    pointer-events: auto;
+  }
+}
+
+/* ---------- 面板标题：左栏「团队结构」卡片 / 右栏「场景驱动」共用 ----------
+ * 字体、颜色、光晕统一在这里；各面板只保留布局（对齐、间距）
+ * 需要局部微调时覆盖 --home-panel-title-font / --home-panel-subtitle-font
+ */
+.root-home-panel-title {
+  margin: 0;
+  color: #f2feff;
+  font-size: calc(var(--home-panel-title-font, 18) * 1px);
+  font-weight: 600;
+  letter-spacing: calc(1 * var(--home-s) * 1px);
+  line-height: 1.25;
+  white-space: nowrap;
+  text-shadow: calc(7 * var(--home-s) * 1px) calc(7 * var(--home-s) * 1px)
+      calc(32 * var(--home-s) * 1px) #5fa2c98a,
+    calc(2 * var(--home-s) * 1px) calc(2 * var(--home-s) * 1px)
+      calc(10 * var(--home-s) * 1px) #5d9ec3,
+    calc(15 * var(--home-s) * 1px) calc(15 * var(--home-s) * 1px)
+      calc(9 * var(--home-s) * 1px) #02040899;
+}
+
+.root-home-panel-subtitle {
+  margin: calc(-4 * var(--home-s) * 1px) 0 0;
+  overflow: hidden;
+  color: #ffffff66;
+  font-size: calc(var(--home-panel-subtitle-font, 10) * 1px);
+  letter-spacing: calc(0.5 * var(--home-s) * 1px);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: calc(7 * var(--home-s) * 1px) calc(7 * var(--home-s) * 1px)
+      calc(32 * var(--home-s) * 1px) #5fa2c957,
+    calc(2 * var(--home-s) * 1px) calc(2 * var(--home-s) * 1px)
+      calc(10 * var(--home-s) * 1px) #5d9ec366;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root-home * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
