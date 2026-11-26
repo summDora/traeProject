@@ -17,6 +17,10 @@ import { getTheme, buildTooltip } from "./theme";
 export default {
   name: "RankBarChart",
   mixins: [chartMixin],
+  props: {
+    /** 数值轴上限（如打分 0-100）；不传则由数据自适应 */
+    max: { type: Number, default: null },
+  },
   computed: {
     palette() {
       return getTheme(this.theme);
@@ -61,6 +65,7 @@ export default {
         xAxis: {
           type: "value",
           position: "top",
+          max: this.max || undefined,
           splitLine: { show: true, lineStyle: { color: p.splitLine } },
           axisLabel: { color: p.textDim, fontSize: 11 },
           axisLine: { show: false },

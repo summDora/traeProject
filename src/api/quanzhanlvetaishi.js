@@ -21,6 +21,11 @@ import {
   statsDetailMap,
   externalFeedMap,
 } from "@/pages/sys_page/sys_quanzhanlvetaishi/components/mockData";
+import {
+  goalTableRows,
+  provinceScores,
+  buildDomainRadar,
+} from "@/pages/sys_page/sys_quanzhanlvetaishi/components/centerV2/mockData";
 
 const BASE = process.env.VUE_APP_QZLT_API || "/qzlt-api";
 
@@ -137,6 +142,21 @@ export const fetchPolicyStats = (params) =>
 export const fetchExternalFeed = (params) =>
   withMock("/policy/feed", { params }, () => externalFeedMap);
 
+/* ---------------- 中心卡片 V2（centerV2） ---------------- */
+/** 量化目标明细表：方向 / 硬度 / 地区 */
+export const fetchGoalTable = (params) =>
+  withMock("/v2/goal/table", { params }, () => goalTableRows);
+
+/** 省域政策对比：省级打分（0-100） */
+export const fetchProvinceCompare = (params) =>
+  withMock("/v2/score/province", { params }, () => provinceScores);
+
+/** 政策领域对比：指定省份的雷达维度得分 */
+export const fetchDomainCompare = (params) =>
+  withMock("/v2/score/domain", { params }, () =>
+    buildDomainRadar(params && params.province)
+  );
+
 export default {
   fetchBubbleChart,
   fetchBubbleCards,
@@ -147,4 +167,7 @@ export default {
   fetchTertiaryOptions,
   fetchPolicyStats,
   fetchExternalFeed,
+  fetchGoalTable,
+  fetchProvinceCompare,
+  fetchDomainCompare,
 };

@@ -16,7 +16,8 @@
 
 <script>
 import LeftPanel from "./LeftPanel.vue";
-import CenterPanel from "./CenterPanel.vue";
+// 中栏走新版卡片；回退老版本只需把这两处换回 ./CenterPanel.vue
+import CenterPanel from "./centerV2/CenterPanelV2.vue";
 import RightPanel from "./RightPanel.vue";
 
 const DESIGN_W = 2880;

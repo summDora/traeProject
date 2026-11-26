@@ -17,6 +17,14 @@ import { getTheme, buildTooltip } from "./theme";
 export default {
   name: "RadarChart",
   mixins: [chartMixin],
+  props: {
+    /** 是否显示底部图例（单序列场景一般关掉） */
+    showLegend: { type: Boolean, default: true },
+    /** 雷达半径（维度多时可缩小，给外侧文字留空间） */
+    radius: { type: String, default: "62%" },
+    /** 维度文字字号 */
+    indicatorFontSize: { type: Number, default: 13 },
+  },
   computed: {
     palette() {
       return getTheme(this.theme);
@@ -46,6 +54,7 @@ export default {
         color: p.series,
         tooltip: { ...buildTooltip(p), trigger: "item" },
         legend: {
+          show: this.showLegend,
           bottom: 6,
           icon: "circle",
           itemWidth: 9,
@@ -54,11 +63,11 @@ export default {
         },
         radar: {
           center: ["50%", "48%"],
-          radius: "62%",
+          radius: this.radius,
           indicator: indicators,
           /* 4.x 用 name.textStyle 控制维度文字样式 */
           name: {
-            textStyle: { color: p.text, fontSize: 13 },
+            textStyle: { color: p.text, fontSize: this.indicatorFontSize },
           },
           splitLine: { lineStyle: { color: p.splitLine } },
           splitArea: {

@@ -1,0 +1,30 @@
+/* 中心卡片 V2 · 详情页通用筛选行（各视图 scoped 内 @import 复用） */
+.qcv2-filters {
+  flex: none;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: calc(26px * var(--qzlt-s, 1));
+  padding: calc(6px * var(--qzlt-s, 1)) calc(6px * var(--qzlt-s, 1))
+    calc(14px * var(--qzlt-s, 1));
+}
+
+.qcv2-filter {
+  display: flex;
+  align-items: center;
+  gap: calc(12px * var(--qzlt-s, 1));
+
+  &__label {
+    font-size: clamp(12px, calc(20px * var(--qzlt-s, 1)), 22px);
+    color: #cfe9ff;
+    white-space: nowrap;
+  }
+
+  &__select {
+    width: calc(170px * var(--qzlt-s, 1));
+
+    &--wide {
+      width: calc(190px * var(--qzlt-s, 1));
+    }
+  }
+}
