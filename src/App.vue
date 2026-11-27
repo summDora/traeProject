@@ -7,6 +7,7 @@
         'main-content--fullscreen': isFullscreen,
         'main-content--home': isHome,
         'main-content--scroll-x': isScrollX,
+        'main-content--scroll-y': isScrollY,
       }"
     >
       <router-view />
@@ -32,6 +33,10 @@ export default {
     // 大屏页面设了 min-width，需要让全屏容器允许横向滚动，否则超出部分会被裁掉
     isScrollX() {
       return !!(this.$route.meta && this.$route.meta.scrollX)
+    },
+    // 大屏页面高度按内容撑开时设了 scrollY，由全屏容器承接纵向滚动
+    isScrollY() {
+      return !!(this.$route.meta && this.$route.meta.scrollY)
     }
   }
 }
@@ -87,5 +92,13 @@ body {
   .main-content--scroll-x {
     overflow-y: auto;
   }
+}
+
+/* 高度可滚动的大屏：不做一屏铺满，纵向（含横向）滚动都交给这一层 */
+.main-content--scroll-y {
+  height: 100vh;
+  overflow-x: auto;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
 }
 </style>

@@ -241,6 +241,14 @@ const router = new VueRouter({
       meta: { title: "新型电力系统经济实验室", fullscreen: true, scrollX: true },
     },
     {
+      path: "/sys-quanyingyongchangjing",
+      name: "SysQuanyingyongchangjing",
+      component: () =>
+        import("../pages/sys_page/sys_quanyingyongchangjing/index.vue"),
+      // 设计基准宽度 1980，高度按内容撑开：不做一屏铺满，纵向滚动
+      meta: { title: "全应用场景", fullscreen: true, scrollY: true },
+    },
+    {
       path: "*",
       redirect: "/",
     },
@@ -286,6 +294,7 @@ export const navMenus = [
           { path: "/sys-quanzhanlvetaishi", title: "全战略态势" },
           { path: "/sys-jingyingxingyuce", title: "经营性预测指标" },
           { path: "/sys-root-home", title: "新型电力系统经济实验室" },
+          { path: "/sys-quanyingyongchangjing", title: "全应用场景" },
         ],
       },
     ],
