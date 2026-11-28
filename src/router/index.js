@@ -6,7 +6,8 @@ Vue.use(VueRouter)
 const xcyPages = [
   { path: '/xcy/page6', name: 'Page6', component: () => import('../hy/page6.vue'), meta: { title: '页面 6' } },
   { path: '/xcy/page10', name: 'Page10', component: () => import('../hy/page10.vue'), meta: { title: '页面 10' } },
-  { path: '/xcy/page12', name: 'Page12', component: () => import('../hy/page12.vue'), meta: { title: '页面 12' } }
+  { path: '/xcy/page12', name: 'Page12', component: () => import('../hy/page12.vue'), meta: { title: '页面 12' } },
+  { path: '/xcy/pageExcel', name: 'PageExcel', component: () => import('../hy/pageExcel.vue'), meta: { title: '浙江省能源供应' } }
 ]
 
 const router = new VueRouter({
@@ -282,6 +283,7 @@ export const navMenus = [
     children: [
       { path: "/energy-storage", title: "储能优化调度" },
       { path: "/green-direct", title: "绿电直连评估" },
+      { path: "/xcy/pageExcel", title: "浙江省能源供应" },
     ],
   },
   {
